@@ -114,11 +114,7 @@ int Station::findLeavingTrackIndexToStation(int targetStationID)
     foreach(int i, leavingTrackVector)
     {
         tempStationID=(thisStationList->at(thisTrackList->at(i)->getEndStation())->getID());
-        if((thisTrackList->at(i)->getEndStation()) == targetStationID){
-            return i;
-        }else{}
-//      "Fortsätt här!";
-        //if (thisTrackList.at(thisTrackID)->getEndStation()==endStationID);
+        if((thisTrackList->at(i)->getEndStation()) == targetStationID){ return i; }
     }
     return -1;
 }
