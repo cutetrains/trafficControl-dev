@@ -52,7 +52,7 @@ using namespace std;
 		case TRACK: nbrOfColumns=4; break;//Name, length, start, end, 
         case TRAIN: nbrOfColumns=5; break;//Name, Track, Position, Speed, State
 		case STATION: nbrOfColumns=2; break;//Name, NbrOfPassengers
-	}
+    }
  }
 
 /*!
@@ -84,6 +84,7 @@ using namespace std;
  *
  * @param row The row that will be modified.
  * @param var The incoming data.
+ * @TODO adjust the table width automatically
  */
 void TrafficDataModel::onDataChanged(int row, const QVariant &var){ 	 
 	QModelIndex index = this->index(row, 0, QModelIndex());
@@ -179,7 +180,7 @@ Qt::ItemFlags TrafficDataModel::flags(const QModelIndex &index) const
 	 	            case 1:
 	 	                return QString("Location");
 	 	            case 2:
-	 	                return QString("Position");
+                        return QString("Pos:");
 	 	            case 3:
 	 	                return QString("Speed");
                     case 4:

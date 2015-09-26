@@ -176,4 +176,9 @@ void TrafficControl::importPredefinedNetwork()
         if (!approvedCommand){qDebug()<<"TC:IPN Command not recognised: "<<line;}
     }
     file.close();
+
+    //This method will be called with care, in order to reduce the cost for updating the tables
+    ui->trainListTableView->resizeColumnsToContents();
+    ui->trackListTableView->resizeColumnsToContents();
+    ui->stationListTableView->resizeColumnsToContents();
 }

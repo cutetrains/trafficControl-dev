@@ -239,6 +239,9 @@ void TrafficControl::stepTimeForNetwork()
     foreach(Train* thisTrain, trainList){
         ddd=thisTrain->move(n);
     }
+    ui->stationListTableView->resizeColumnsToContents();
+    ui->trackListTableView->resizeColumnsToContents();
+    ui->trainListTableView->resizeColumnsToContents();
 }
 
 void TrafficControl::onRunThreadCheckBoxChanged(int newState)

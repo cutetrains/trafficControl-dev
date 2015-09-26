@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>751</width>
-    <height>613</height>
+    <width>1200</width>
+    <height>690</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>trafficControl</string>
@@ -17,10 +23,10 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>10</y>
-      <width>741</width>
-      <height>491</height>
+      <x>10</x>
+      <y>0</y>
+      <width>1181</width>
+      <height>661</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -42,10 +48,10 @@
      <widget class="QTableView" name="trainListTableView">
       <property name="geometry">
        <rect>
-        <x>180</x>
-        <y>10</y>
-        <width>551</width>
-        <height>131</height>
+        <x>10</x>
+        <y>120</y>
+        <width>331</width>
+        <height>151</height>
        </rect>
       </property>
       <property name="font">
@@ -57,8 +63,8 @@
      <widget class="QPushButton" name="listTrainButton">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>110</y>
+        <x>10</x>
+        <y>80</y>
         <width>94</width>
         <height>33</height>
        </rect>
@@ -66,96 +72,6 @@
       <property name="text">
        <string>List Trains</string>
       </property>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>457</x>
-        <y>160</y>
-        <width>271</width>
-        <height>281</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QPushButton" name="listStationButton">
-           <property name="text">
-            <string>List Stations</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QTableView" name="stationListTableView">
-         <property name="font">
-          <font>
-           <pointsize>8</pointsize>
-          </font>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="layoutWidget1">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>160</y>
-        <width>421</width>
-        <height>281</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QPushButton" name="listTrackButton">
-           <property name="text">
-            <string>ListTracks</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QTableView" name="trackListTableView">
-         <property name="font">
-          <font>
-           <pointsize>8</pointsize>
-          </font>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </widget>
      <widget class="QSpinBox" name="tickIntervalSpinBox">
       <property name="geometry">
@@ -203,6 +119,123 @@
       </property>
       <property name="text">
        <string>Interval</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="stepTimeBox">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>420</y>
+        <width>49</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <property name="suffix">
+       <string> s</string>
+      </property>
+      <property name="maximum">
+       <number>3600</number>
+      </property>
+      <property name="value">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="timeTickButton">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>420</y>
+        <width>101</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Step time</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="importNetworkButton">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>470</y>
+        <width>171</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Import Network</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="generateNetworkButton">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>510</y>
+        <width>201</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Not used</string>
+      </property>
+     </widget>
+     <widget class="QTableView" name="stationListTableView">
+      <property name="geometry">
+       <rect>
+        <x>870</x>
+        <y>40</y>
+        <width>300</width>
+        <height>581</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="listStationButton">
+      <property name="geometry">
+       <rect>
+        <x>870</x>
+        <y>10</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>List Stations</string>
+      </property>
+     </widget>
+     <widget class="QTableView" name="trackListTableView">
+      <property name="geometry">
+       <rect>
+        <x>360</x>
+        <y>40</y>
+        <width>500</width>
+        <height>581</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="listTrackButton">
+      <property name="geometry">
+       <rect>
+        <x>360</x>
+        <y>10</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>ListTracks</string>
       </property>
      </widget>
     </widget>
@@ -441,71 +474,13 @@
      </attribute>
     </widget>
    </widget>
-   <widget class="QSpinBox" name="stepTimeBox">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>510</y>
-      <width>49</width>
-      <height>33</height>
-     </rect>
-    </property>
-    <property name="suffix">
-     <string> s</string>
-    </property>
-    <property name="maximum">
-     <number>3600</number>
-    </property>
-    <property name="value">
-     <number>1</number>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="timeTickButton">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>510</y>
-      <width>101</width>
-      <height>33</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Step time</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="generateNetworkButton">
-    <property name="geometry">
-     <rect>
-      <x>390</x>
-      <y>510</y>
-      <width>201</width>
-      <height>33</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Generate simple network</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="importNetworkButton">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>510</y>
-      <width>171</width>
-      <height>33</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Import Lund_suburbs</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>751</width>
+     <width>1200</width>
      <height>21</height>
     </rect>
    </property>
@@ -516,15 +491,6 @@
    </widget>
    <addaction name="menuTrafficControl"/>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

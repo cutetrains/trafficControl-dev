@@ -61,7 +61,6 @@ void TrafficClock::threadTick()
         {
             emit stepTimeSignal();
         }
-
         QThread::msleep(std::max(tWait, tInterval/2));
     }
 }
