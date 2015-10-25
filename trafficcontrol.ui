@@ -39,7 +39,7 @@
      <cursorShape>ArrowCursor</cursorShape>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -472,6 +472,34 @@
      <attribute name="title">
       <string>Tracks</string>
      </attribute>
+    </widget>
+    <widget class="QWidget" name="tab_map">
+     <attribute name="title">
+      <string>Map</string>
+     </attribute>
+     <widget class="QGraphicsView" name="mapGraphicsView">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>1161</width>
+        <height>601</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="graphicsInitButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Init Scene</string>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>

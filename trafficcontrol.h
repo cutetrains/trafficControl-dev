@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QThread>
 #include <QMutexLocker>
+#include <QGraphicsScene>
 #include <iostream>//Port to QDebug
 #include <sstream>//Port to QDebug
 #include "tctrain.h"
@@ -30,7 +31,7 @@
 #include "tcstation.h"
 #include "trafficdatamodel.h"
 #include "trafficclock.h"
-
+#include "trafficmap.h"
 
 namespace Ui {
     class TrafficControl;
@@ -76,7 +77,9 @@ private:
     TrafficDataModel *trackListModel;
     TrafficDataModel *trainListModel;
     TrafficDataModel *stationListModel;
+    TrafficMap *trafficMap;
     QMutex mutex;
+    QGraphicsScene *mapScene;
 
 };
 

@@ -18,13 +18,15 @@ SOURCES += main.cpp\
     tctrack.cpp \
     tcstation.cpp \
     trafficcontrol_importNW.cpp \
-    trafficclock.cpp
+    trafficclock.cpp \
+    trafficmap.cpp
 
 HEADERS  += trafficcontrol.h \
     trafficdatamodel.h \
     tctrain.h \
     tctrack.h \
     tcstation.h \
-    trafficclock.h
+    trafficclock.h \
+    trafficmap.h
 
 FORMS    += trafficcontrol.ui

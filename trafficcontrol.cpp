@@ -53,7 +53,7 @@ TrafficControl::TrafficControl(QWidget *parent) :
     connect( ui->tickIntervalSpinBox, SIGNAL( valueChanged(int) ), this, SLOT(onTickIntervalChanged(int)) );
     //THE CONNECT SIGNAL/SLOT is not valid
 
-
+    trafficMap = new TrafficMap();
     trackListModel=new TrafficDataModel(TRACK, 0);//QGUSBRA: This instead of 0
     trainListModel=new TrafficDataModel(TRAIN, 0);//QGUSBRA: This instead of 0
     stationListModel=new TrafficDataModel(STATION, 0);//QGUSBRA: This instead of 0
@@ -63,6 +63,9 @@ TrafficControl::TrafficControl(QWidget *parent) :
     ui->trainListTableView->show();
     ui->stationListTableView->setModel( stationListModel );
     ui->stationListTableView->show();
+
+    mapScene = new QGraphicsScene(this);
+    ui->mapGraphicsView->setScene(mapScene);
 }
 
 
@@ -234,7 +237,8 @@ void TrafficControl::listStationsInNetwork()
 void TrafficControl::stepTimeForNetwork()
 {
     QMutexLocker locker(&mutex);
-    int ddd;
+    int ddd=0;
+
     int n=ui->stepTimeBox->value();
     foreach(Train* thisTrain, trainList){
         ddd=thisTrain->move(n);
@@ -263,11 +267,14 @@ void TrafficControl::onTickIntervalChanged(int newInterval)
 
 /*!
  * The destructor method
- * @todo Investigate what objects ad data structures shall be removed at termination of the program at termination.
+ * @TODO Investigate what objects ad data structures shall be removed at termination of
+ * the program at termination.
+ *
+ * @TODO Investigate dependencies when removing objects
  */
 TrafficControl::~TrafficControl()
 {
-
+    delete trafficMap;
     trafficClock.disconnectThread();
     clockThread.terminate();
     while(!clockThread.isFinished()){}
