@@ -6,6 +6,7 @@
 class TrafficMap : public QObject
 {
     Q_OBJECT
+
 public:
     explicit TrafficMap(QObject *parent = 0);
     ~TrafficMap();

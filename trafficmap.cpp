@@ -22,7 +22,6 @@ TrafficMap::TrafficMap(QObject *parent) :
     QObject(parent)
 {
     qDebug()<<"Created TrafficMap object!";
-
 }
 
 TrafficMap::~TrafficMap()
