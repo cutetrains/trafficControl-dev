@@ -2,6 +2,8 @@
 #define TRAFFICMAP_H
 
 #include <QObject>
+#include <QMutexLocker>
+#include <QGraphicsScene>
 
 class TrafficMap : public QObject
 {
@@ -9,10 +11,18 @@ class TrafficMap : public QObject
 
 public:
     explicit TrafficMap(QObject *parent = 0);
+    void setGraphicsScene(QGraphicsScene &mapScene);
     ~TrafficMap();
+
 signals:
 
 public slots:
+
+private:
+    //QGraphicsScene *scene;
+    QGraphicsEllipseItem *ellipse;
+    QGraphicsRectItem *rectangle;
+    QGraphicsTextItem *text;
 
 };
 

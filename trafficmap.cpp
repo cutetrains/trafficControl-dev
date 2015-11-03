@@ -22,7 +22,25 @@ TrafficMap::TrafficMap(QObject *parent) :
     QObject(parent)
 {
     qDebug()<<"Created TrafficMap object!";
+
 }
+
+//Should this be in constructor instead?
+void TrafficMap::setGraphicsScene(QGraphicsScene &mapScene)
+{
+    qDebug()<<"Set Graphics Scene";
+    QBrush greenBrush(Qt::green);
+    QBrush blueBrush(Qt::blue);
+    QPen outlinePen(Qt::black);
+    outlinePen.setWidth(2);
+    rectangle = mapScene.addRect(100, 0, 80, 100, outlinePen, blueBrush);
+
+    // addEllipse(x,y,w,h,pen,brush)
+    ellipse = mapScene.addEllipse(0, -100, 300, 60, outlinePen, greenBrush);
+
+    text = mapScene.addText("bogotobogo.com", QFont("Arial", 20) );
+}
+
 
 TrafficMap::~TrafficMap()
 {
