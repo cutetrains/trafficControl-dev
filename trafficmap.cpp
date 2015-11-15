@@ -29,18 +29,52 @@ TrafficMap::TrafficMap(QObject *parent) :
 void TrafficMap::setGraphicsScene(QGraphicsScene &mapScene)
 {
     qDebug()<<"Set Graphics Scene";
-    QBrush greenBrush(Qt::green);
+    QBrush greenBrush(QColor(0,153,0));
     QBrush blueBrush(Qt::blue);
+    QBrush redBrush(Qt::red);
+    QBrush blackBrush(Qt::black);
+    QBrush yellowBrush(Qt::yellow);
+
     QPen outlinePen(Qt::black);
     outlinePen.setWidth(2);
-    rectangle = mapScene.addRect(100, 0, 80, 100, outlinePen, blueBrush);
 
+    QPen thinPen(QColor(64,64,64));
+    thinPen.setWidth(1);
+
+    QPen stationPen(Qt::blue);
+    stationPen.setWidth(2);
+
+
+    QGraphicsEllipseItem *stationLundC = mapScene.addEllipse(200-20/2,100-20/2,20,20, stationPen);
+    QGraphicsEllipseItem *stationStangby = mapScene.addEllipse(500-20/2,-200-20/2,20,20, stationPen);
+    QGraphicsEllipseItem *stationGunnesbo = mapScene.addEllipse(100-20/2,-100-20/2,20,20, stationPen);
+    QGraphicsEllipseItem *stationHjarup = mapScene.addEllipse(100-20/2,200-20/2,20,20, stationPen);
+    outlinePen.setBrush(redBrush);
+    QGraphicsLineItem *trackLunStaN = mapScene.addLine(200,100,500,-200, thinPen);
+    QGraphicsLineItem *trackLunGunN = mapScene.addLine(200,100,100,-100, outlinePen);
+    thinPen.setBrush(greenBrush);
+    QGraphicsLineItem *trackHjaLunNN = mapScene.addLine(200,100,100,200, thinPen);
     // addEllipse(x,y,w,h,pen,brush)
-    ellipse = mapScene.addEllipse(0, -100, 300, 60, outlinePen, greenBrush);
+    outlinePen.setBrush(blackBrush);
+    thinPen.setBrush(blackBrush);
+    QGraphicsEllipseItem *trainHedyLamarr = mapScene.addEllipse(200-10/2,100-10/2,10,10,thinPen,yellowBrush);
 
-    text = mapScene.addText("bogotobogo.com", QFont("Arial", 20) );
+    trainHedyLamarr->moveBy(-50,-100);
+
+
+    //ellipse = mapScene.addEllipse(0, -100, 300, 60, outlinePen, greenBrush);
+
+    //rectangle = mapScene.addRect(100, 0, 80, 100, outlinePen, blueBrush);
+    //text = mapScene.addText("bogotobogo.com", QFont("Arial", 20) );
+    //rotateEllipse(-45);
+
+
 }
 
+void TrafficMap::moveTraindXdY(int dx, int dy)
+{
+
+}
 
 TrafficMap::~TrafficMap()
 {

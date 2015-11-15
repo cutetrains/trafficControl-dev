@@ -67,23 +67,8 @@ TrafficControl::TrafficControl(QWidget *parent) :
 
     ui->mapGraphicsView->setScene(mapScene);
 
-    trafficMap = new TrafficMap();//
+    trafficMap = new TrafficMap();
     trafficMap->setGraphicsScene(*mapScene);
-    //REMOVE FROM HERE
-    /*QBrush greenBrush(Qt::green);
-    QBrush blueBrush(Qt::blue);
-    QPen outlinePen(Qt::black);
-    outlinePen.setWidth(2);
-
-    rectangle = mapScene->addRect(100, 0, 80, 100, outlinePen, blueBrush);
-
-    // addEllipse(x,y,w,h,pen,brush)
-    ellipse = mapScene->addEllipse(0, -100, 300, 60, outlinePen, greenBrush);
-
-    text = mapScene->addText("bogotobogo.com", QFont("Arial", 20) );//*/
-    // movable text
-    //text->setFlag(QGraphicsItem::ItemIsMovable);
-    //REMOVE UNTIL HERE
 }
 
 
