@@ -74,14 +74,14 @@ with open(inputfile, "r", encoding='utf8') as ins:
       trackListItem=[placeMarkName, numLines, coordinateList[0].split(",")[:-1], "", coordinateList[-1].split(",")[:-1], "", summa]
       trackList.append(trackListItem)
       
-      print("ADD TRACK "+ placeMarkName + " " + str(int(summa*1000) ) +  " COORDINATES " +thisTrackCoordinates )
+      print("ADD TRACK "+ placeMarkName + " " + str(int(summa*1000) ) +  " COORDINATES" +thisTrackCoordinates )
       if(placeMarkName[0]=="d"):#dLunGunN shall have a friend dLunGunS (same name, but in opposite direction)
         tempPlaceMarkName=""
         if (placeMarkName[-1]=='N'): tempPlaceMarkName='S'
         if (placeMarkName[-1]=='S'): tempPlaceMarkName='N'
         if (placeMarkName[-1]=='E'): tempPlaceMarkName='W'
         if (placeMarkName[-1]=='W'): tempPlaceMarkName='E'
-        print("ADD TRACK " + str(placeMarkName[:-1])+tempPlaceMarkName + " " + str(int(summa*1000))  +  " COORDINATES " +reversedTrackCoordinates)
+        print("ADD TRACK " + str(placeMarkName[:-1])+tempPlaceMarkName + " " + str(int(summa*1000))  +  " COORDINATES" +reversedTrackCoordinates)
         trackListItem=[str(placeMarkName[:-1])+tempPlaceMarkName, numLines, coordinateList[0].split(",")[:-1], "", coordinateList[-1].split(",")[:-1], "", summa]
         trackList.append(trackListItem)
 
