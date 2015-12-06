@@ -480,10 +480,10 @@
      <widget class="QGraphicsView" name="mapGraphicsView">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>1161</width>
-        <height>601</height>
+        <x>650</x>
+        <y>-10</y>
+        <width>16</width>
+        <height>51</height>
        </rect>
       </property>
      </widget>
@@ -498,6 +498,19 @@
       </property>
       <property name="text">
        <string>Init Scene</string>
+      </property>
+     </widget>
+     <widget class="QQuickWidget" name="mapQuickWidget">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>39</y>
+        <width>1171</width>
+        <height>601</height>
+       </rect>
+      </property>
+      <property name="resizeMode">
+       <enum>QQuickWidget::SizeRootObjectToView</enum>
       </property>
      </widget>
     </widget>
@@ -521,6 +534,13 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QQuickWidget</class>
+   <extends>QWidget</extends>
+   <header>QtQuickWidgets/QQuickWidget</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QMutexLocker>
 #include <QGraphicsScene>
-#include <QGraphicsEllipseItem>
+#include <QQuickView>
 
 class TrafficMap : public QObject
 {
@@ -14,7 +14,6 @@ public:
     explicit TrafficMap(QObject *parent = 0);
     void setGraphicsScene(QGraphicsScene &mapScene);
     ~TrafficMap();
-    void moveTraindXdY(int dx, int dy);
 
 signals:
 

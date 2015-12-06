@@ -4,7 +4,12 @@
 #
 #-------------------------------------------------
 
+QT       += quick
 QT       += core gui
+
+QT       += quickwidgets
+QT       += positioning
+QT       += location
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -30,3 +35,11 @@ HEADERS  += trafficcontrol.h \
     trafficmap.h
 
 FORMS    += trafficcontrol.ui
+
+OTHER_FILES  =
+
+DISTFILES += \
+    map.qml
+
+RESOURCES += \
+    resources.qrc

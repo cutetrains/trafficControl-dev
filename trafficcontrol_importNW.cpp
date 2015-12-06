@@ -30,9 +30,8 @@ using namespace std;
 
 /*!
  * This method imports a network from a file to the program.
- * @TODO: If this part becomes too extensive, place this code in a separate source file.
- * @TODO: Remove old create clauses, not containing coordinates
- * @TODO: Introduce consistensy checks for files.
+ * @todo: If this part becomes too extensive, place this code in a separate source file.
+ * @todo: Introduce consistensy checks for files.
  */
 void TrafficControl::importPredefinedNetwork()
 {
@@ -61,8 +60,6 @@ void TrafficControl::importPredefinedNetwork()
             qDebug()<<"FATAL ERROR: Train definition file modifies train before creating it!";
             exit(1);
         }
-
-        /* ADD TRACK <track name> <length> */
         if ( ( argumentList.indexOf("ADD") ==0 ) && ( argumentList.indexOf("TRACK") ==1 ) ) {
             if(argumentList.count()==4){
                 bool ok=false;
@@ -72,19 +69,13 @@ void TrafficControl::importPredefinedNetwork()
                     approvedCommand=true;
                     currentTrack=trackList.length()-1;
         } } }
-        /* ADD TRACK <track name> <length> COORDINATES <lat1> <lon1> <lat2> <lon2> ... <latN> <lonN> */
-        /* ADD TRACK <track name> <length> COORDINATES <lat1> <lon1> <lat2> <lon2> ... <latN> <lonN> DEFAULT*/
-
-        /* TRACK SELECT <track name> */
         if ( ( argumentList.indexOf("TRACK") ==0 ) && ( argumentList.indexOf("SELECT") ==1 ) ){
             if (argumentList.count()==3){
                 foreach(Track* t, trackList){
                     if(t->getName()==argumentList.at(2)){
                         currentTrack=t->getID();
                         approvedCommand=TRUE;
-        } } } }
-
-        /* TRACK SET MAX_SPEED <speed> */
+        }   }   }   }
         if ( ( argumentList.indexOf("TRACK") ==0 ) && ( argumentList.indexOf("SET") ==1 ) && ( argumentList.indexOf("MAX_SPEED") ==2 )){
             if(argumentList.count()==4) {
                 bool ok=false;
@@ -93,19 +84,11 @@ void TrafficControl::importPredefinedNetwork()
                     trackList.at(currentTrack)->setMaxAllowedSpeed(iSpeed);
                     approvedCommand=true;
         } } }
-
-        /* ADD STATION <name> */
         if ( ( argumentList.indexOf("ADD") ==0 ) && ( argumentList.indexOf("STATION") ==1 ) ){
             if(argumentList.count()==3) {//Verify that the name is not a number.
                 addStationToNetwork(argumentList.at(2));
                 approvedCommand=true;
         } }
-
-        /* ADD STATION <name> COORDINATES <lat1> <lon1> <lat2> <lon2> ... <latN> <lonN> */
-        /* ADD STATION <name> AS JUNCTION*/
-        /* ADD STATION <name> AS JUNCTION COORDINATES <lat1> <lon1> <lat2> <lon2> ... <latN> <lonN> */
-
-        /* CONNECT TRACK <name> FROM <start station> TO <end station> */
         if ( ( argumentList.indexOf("CONNECT") ==0 ) && ( argumentList.indexOf("TRACK") ==1 )&& ( argumentList.indexOf("FROM") ==3 )&& ( argumentList.indexOf("TO") ==5 )  && (argumentList.count()==7)){
             //Check that the second argument reflects an existing track, and that the stations exist.
             int foundTrack=-1;
@@ -123,6 +106,7 @@ void TrafficControl::importPredefinedNetwork()
                 approvedCommand=true;
             }
         }
+
 
         //Code for analysing train commands
         if ( ( argumentList.indexOf("TRAIN")==0 ) && ( currentTrain == -1 ) ){

@@ -63,12 +63,31 @@ TrafficControl::TrafficControl(QWidget *parent) :
     ui->stationListTableView->setModel( stationListModel );
     ui->stationListTableView->show();
 
-    mapScene = new QGraphicsScene(this);
+    QUrl source("qrc:Traffic/qml/map.qml");
+//    QUrl source("map.qml");
+//    QUrl source("qrc:quickwidget/rotatingsquare.qml");
 
-    ui->mapGraphicsView->setScene(mapScene);
+//    ui->mapQuickWidget->setSource(QUrl::fromLocalFile("map.qml"));
+    ui->mapQuickWidget->setSource(source);
+    //    ui->mapGraphicsView->setScene(mapContainer);
 
-    trafficMap = new TrafficMap();
-    trafficMap->setGraphicsScene(*mapScene);
+//    trafficMap = new TrafficMap();//
+//    trafficMap->setGraphicsScene(*mapScene);
+    //REMOVE FROM HERE
+    /*QBrush greenBrush(Qt::green);
+    QBrush blueBrush(Qt::blue);
+    QPen outlinePen(Qt::black);
+    outlinePen.setWidth(2);
+
+    rectangle = mapScene->addRect(100, 0, 80, 100, outlinePen, blueBrush);
+
+    // addEllipse(x,y,w,h,pen,brush)
+    ellipse = mapScene->addEllipse(0, -100, 300, 60, outlinePen, greenBrush);
+
+    text = mapScene->addText("bogotobogo.com", QFont("Arial", 20) );//*/
+    // movable text
+    //text->setFlag(QGraphicsItem::ItemIsMovable);
+    //REMOVE UNTIL HERE
 }
 
 

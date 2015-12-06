@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/Traffic/qml">
+        <file>map.qml</file>
+    </qresource>
+</RCC>
