@@ -19,6 +19,11 @@
 #include <QFile>
 #include <QTextStream>
 #include <QFileDialog>
+#include <QQuickView> //New
+#include <QQuickItem> //New
+#include <QQmlComponent> //New
+#include <QQmlEngine> //New
+
 #include "TrafficControl.h"
 #include "ui_TrafficControl.h"
 #define TRACK 1
@@ -27,7 +32,6 @@
 #define TRUE 1
 #define FALSE 0
 using namespace std;
-
 
 TrafficControl::TrafficControl(QWidget *parent) :
     QMainWindow(parent),
@@ -51,7 +55,6 @@ TrafficControl::TrafficControl(QWidget *parent) :
 
     connect( ui->runThreadCheckBox, SIGNAL( stateChanged(int) ), this, SLOT(onRunThreadCheckBoxChanged(int)) );
     connect( ui->tickIntervalSpinBox, SIGNAL( valueChanged(int) ), this, SLOT(onTickIntervalChanged(int)) );
-    //THE CONNECT SIGNAL/SLOT is not valid
 
     trackListModel=new TrafficDataModel(TRACK, 0);//QGUSBRA: This instead of 0
     trainListModel=new TrafficDataModel(TRAIN, 0);//QGUSBRA: This instead of 0
@@ -64,30 +67,35 @@ TrafficControl::TrafficControl(QWidget *parent) :
     ui->stationListTableView->show();
 
     QUrl source("qrc:Traffic/qml/map.qml");
-//    QUrl source("map.qml");
-//    QUrl source("qrc:quickwidget/rotatingsquare.qml");
 
-//    ui->mapQuickWidget->setSource(QUrl::fromLocalFile("map.qml"));
     ui->mapQuickWidget->setSource(source);
-    //    ui->mapGraphicsView->setScene(mapContainer);
+    QObject *object=ui->mapQuickWidget->rootObject();//Use this to get the different objects
+    if(object){
+        qDebug()<<"rootObject found!";
+    }
+    //object->dumpObjectInfo();
+    //object->dumpObjectTree();
 
-//    trafficMap = new TrafficMap();//
-//    trafficMap->setGraphicsScene(*mapScene);
-    //REMOVE FROM HERE
-    /*QBrush greenBrush(Qt::green);
-    QBrush blueBrush(Qt::blue);
-    QPen outlinePen(Qt::black);
-    outlinePen.setWidth(2);
 
-    rectangle = mapScene->addRect(100, 0, 80, 100, outlinePen, blueBrush);
+    QObject *myStation1 = object->findChild<QObject *>(QString("nameMainMap"));
+    if(myStation1==NULL){
+        qDebug()<<"No nameMainMap found";
+        }
+        else{
+        qDebug()<<"nameMainMap found";
+        }
+    QObject *myStation2 = object->findChild<QObject *>(QString("nameMainMapCircle1"));
+    if(myStation2 == NULL)
+        {
+            qDebug()<<"No nameMainMapCircle1 found";
+        }
+        else
+        {
+            qDebug()<<"Found nameMainMapCircle1, changing color to green";
+            myStation2->setProperty("color","green");
+        }
+    qDebug()<<ui->mapQuickWidget->height();
 
-    // addEllipse(x,y,w,h,pen,brush)
-    ellipse = mapScene->addEllipse(0, -100, 300, 60, outlinePen, greenBrush);
-
-    text = mapScene->addText("bogotobogo.com", QFont("Arial", 20) );//*/
-    // movable text
-    //text->setFlag(QGraphicsItem::ItemIsMovable);
-    //REMOVE UNTIL HERE
 }
 
 
@@ -190,7 +198,7 @@ int TrafficControl::connectTrackToStations(QString trackName, QString startStati
         }
         if( (foundStartStationID!=-1) && ( foundEndStationID!=-1) && (foundTrackID!=-1))
         {
-            if ( ( trackList[foundTrackID]->getStartStation() != -1 ) && ( trackList[foundTrackID]->getEndStation() !=-1 ) ) {cout<<"TC:CTTS, overwriting old start or end stations.\n";}
+            if ( ( trackList[foundTrackID]->getStartStation() != -1 ) && ( trackList[foundTrackID]->getEndStation() !=-1 ) ) {qDebug()<<"TC:CTTS, overwriting old start or end stations.\n";}
             trackList.at(foundTrackID)->setStartStation(foundStartStationID);
             trackList.at(foundTrackID)->setEndStation(foundEndStationID);
             stationList.at(foundStartStationID)->addTrack(foundTrackID);
@@ -296,7 +304,7 @@ void TrafficControl::onTickIntervalChanged(int newInterval)
  */
 TrafficControl::~TrafficControl()
 {
-    delete trafficMap;
+    // delete trafficMap;
     trafficClock.disconnectThread();
     clockThread.terminate();
     while(!clockThread.isFinished()){}

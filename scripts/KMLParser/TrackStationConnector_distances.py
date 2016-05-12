@@ -48,8 +48,8 @@ with open(inputfile, "r", encoding='utf8') as ins:
       stationListItem=[placeMarkName, numLines, line[18:-17].split(","), ("Junction" in placeMarkType) and "(S)" or "(J)"]
       #print(stationListItem[2][1])
       stationList.append(stationListItem)
-      print("ADD STATION " + placeMarkName + str(" AS JUNCTION" if ("Junction" in placeMarkType) else "") + " COORDINATES " + stationListItem[2][1] +" " +
-            stationListItem[2][0] )
+      print("ADD STATION " + placeMarkName + " COORDINATES " + stationListItem[2][1] +" " +
+            stationListItem[2][0] + str(" AS JUNCTION" if ("Junction" in placeMarkType) else "") )
 
     if(isNextLineCoordinateList==True):#This happens directly after coordinates are found below
       summa=0.0
@@ -66,12 +66,12 @@ with open(inputfile, "r", encoding='utf8') as ins:
         tempDist=haversine(float(orgLon),float(orgLat),float(desLon),float(desLat))
         summa=summa+tempDist
         if(placeMarkName[0]=="d"):
-          reversedTrackCoordinates=orgLat + " " + orgLon + " " + str(summa) + " " + reversedTrackCoordinates 
-        thisTrackCoordinates=thisTrackCoordinates+" " + orgLat + " " + orgLon + " " +  str(summa)
+          reversedTrackCoordinates=orgLat + " " + orgLon + " " + reversedTrackCoordinates
+        thisTrackCoordinates=thisTrackCoordinates+" " + orgLat + " " + orgLon
       if(placeMarkName[0]=="d"):
-        reversedTrackCoordinates=  desLat + " " + desLon + " " + str(summa) + " " + reversedTrackCoordinates 
+        reversedTrackCoordinates=  desLat + " " + desLon + " " + reversedTrackCoordinates 
       #Modify here to add temp distances
-      thisTrackCoordinates=thisTrackCoordinates+" " + desLat + " " + desLon + " " + str(summa)
+      thisTrackCoordinates=thisTrackCoordinates+" " + desLat + " " + desLon
       #print(thisTrackCoordinates)
       isNextLineCoordinateList=False
       trackListItem=[placeMarkName, numLines, coordinateList[0].split(",")[:-1], "", coordinateList[-1].split(",")[:-1], "", summa]
@@ -84,7 +84,7 @@ with open(inputfile, "r", encoding='utf8') as ins:
         if (placeMarkName[-1]=='S'): tempPlaceMarkName='N'
         if (placeMarkName[-1]=='E'): tempPlaceMarkName='W'
         if (placeMarkName[-1]=='W'): tempPlaceMarkName='E'
-        print("ADD TRACK e" + str(placeMarkName[1:-1])+tempPlaceMarkName + " " + str(int(summa*1000))  +  " COORDINATES " +reversedTrackCoordinates)
+        print("ADD TRACK " + str(placeMarkName[:-1])+tempPlaceMarkName + " " + str(int(summa*1000))  +  " COORDINATES" +reversedTrackCoordinates)
         trackListItem=[str(placeMarkName[:-1])+tempPlaceMarkName, numLines, coordinateList[0].split(",")[:-1], "", coordinateList[-1].split(",")[:-1], "", summa]
         trackList.append(trackListItem)
 

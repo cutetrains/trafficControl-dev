@@ -60,6 +60,8 @@ void TrafficControl::importPredefinedNetwork()
             qDebug()<<"FATAL ERROR: Train definition file modifies train before creating it!";
             exit(1);
         }
+
+        /* ADD TRACK <track name> <length> */
         if ( ( argumentList.indexOf("ADD") ==0 ) && ( argumentList.indexOf("TRACK") ==1 ) ) {
             if(argumentList.count()==4){
                 bool ok=false;
@@ -69,6 +71,12 @@ void TrafficControl::importPredefinedNetwork()
                     approvedCommand=true;
                     currentTrack=trackList.length()-1;
         } } }
+
+        /* ADD TRACK <track name> <length> COORDINATES <lat1> <lon1> <accumulated distance1>
+         *  <latN> <lonN> <accumulated distanceN>
+         * Note that dXXX-YYYN will have a twin eYYY-XXXS, with falling accumulated distance.*/
+
+        /* TRACK SELECT <track name> */
         if ( ( argumentList.indexOf("TRACK") ==0 ) && ( argumentList.indexOf("SELECT") ==1 ) ){
             if (argumentList.count()==3){
                 foreach(Track* t, trackList){
@@ -76,6 +84,8 @@ void TrafficControl::importPredefinedNetwork()
                         currentTrack=t->getID();
                         approvedCommand=TRUE;
         }   }   }   }
+
+        /* TRACK SET MAX_SPEED <speed> */
         if ( ( argumentList.indexOf("TRACK") ==0 ) && ( argumentList.indexOf("SET") ==1 ) && ( argumentList.indexOf("MAX_SPEED") ==2 )){
             if(argumentList.count()==4) {
                 bool ok=false;
@@ -84,11 +94,20 @@ void TrafficControl::importPredefinedNetwork()
                     trackList.at(currentTrack)->setMaxAllowedSpeed(iSpeed);
                     approvedCommand=true;
         } } }
-        if ( ( argumentList.indexOf("ADD") ==0 ) && ( argumentList.indexOf("STATION") ==1 ) ){
+
+        /* ADD STATION <station name> */
+        if ( ( argumentList.indexOf("ADD") ==0 ) && ( argumentList.indexOf("STATION") == 1 ) ){
             if(argumentList.count()==3) {//Verify that the name is not a number.
                 addStationToNetwork(argumentList.at(2));
                 approvedCommand=true;
         } }
+
+        /* ADD STATION <station name> COORDINATES <lat> <lon> */
+        if ( ( argumentList.indexOf("ADD") == 0 ) && (argumentList.indexOf("STATION") == 1) && argumentList.indexOf("COORDINATES") ){
+            //Either as station or as junction
+        }
+
+        /* CONNECT TRACK <track name> FROM <station> TO <station> */
         if ( ( argumentList.indexOf("CONNECT") ==0 ) && ( argumentList.indexOf("TRACK") ==1 )&& ( argumentList.indexOf("FROM") ==3 )&& ( argumentList.indexOf("TO") ==5 )  && (argumentList.count()==7)){
             //Check that the second argument reflects an existing track, and that the stations exist.
             int foundTrack=-1;
@@ -114,12 +133,15 @@ void TrafficControl::importPredefinedNetwork()
             exit(1);
         }
 
+        /* ADD TRAIN <train name> */
         if ( ( argumentList.indexOf("ADD") ==0 ) && ( argumentList.indexOf("TRAIN") ==1 ) && ( argumentList.indexOf("NAME") == 2 ) && (argumentList.count() == 4) ){
             qDebug()<<"ADD TRAIN recognised";
             addTrainToNetwork( QString( argumentList.at(3) ) );
             currentTrain=trainList.length()-1;
             approvedCommand=true;
         }
+
+        /* TRAIN SET <track name> <length> */
         if ( ( argumentList.indexOf("TRAIN") ==0 ) && ( argumentList.indexOf("SET") ==1 )&& ( argumentList.indexOf("NAME") ==2 ) ){
             if (argumentList.count()==4){
                 bool foundTrain=FALSE;
@@ -131,6 +153,8 @@ void TrafficControl::importPredefinedNetwork()
                     trainList[currentTrain]->setName(argumentList.at(3));
                     approvedCommand=true;
         }   }   }
+
+        /* TRAIN SET STATION <station name> */
         if ( ( argumentList.indexOf("TRAIN") ==0 ) && ( argumentList.indexOf("SET") ==1 ) && ( argumentList.indexOf("CURRENT") ==2 )  && ( argumentList.indexOf("STATION") == 3 ) ){
             if (argumentList.count()==5){
                 qDebug()<<"TRAIN SET STATION recognised with Station="<<argumentList.at(4)<<". Check that the station exists.";
@@ -138,11 +162,15 @@ void TrafficControl::importPredefinedNetwork()
                     //QString tempstr2=argumentList.at(4)
                     if ( ( s->getName() ) == ( argumentList.at( 4 ) ) ) { trainList[currentTrain]->setCurrentStation(s->getID()); approvedCommand=true; }
         }   }   }
+
+        /* TRAIN SET MODEL <model type> */
         if ( ( argumentList.indexOf("TRAIN") ==0 ) && ( argumentList.indexOf("SET") ==1 )&& ( argumentList.indexOf("MODEL") ==2 ) ){
             if (argumentList.count()==4){
                 qDebug()<<"TRAIN SET MODEL recognised with Model="<<argumentList.at(3)<<". To be implemented!";
                 approvedCommand=true;
         }   }
+
+        /* TRAIN SET DESIRED_SPEED <desired speed> */
         if ( ( argumentList.indexOf("TRAIN") ==0 ) && ( argumentList.indexOf("SET") ==1 ) && ( argumentList.indexOf("DESIRED_SPEED") ==2 ) ){
             if (argumentList.count()==4){
                 qDebug()<<"TRAIN SET DESIRED_SPEED recognised with DesiredSpeed="<<argumentList.at(3);
@@ -152,6 +180,8 @@ void TrafficControl::importPredefinedNetwork()
                     trainList.at(currentTrain)->setDesiredSpeed(iSpeed);
                     approvedCommand=true;
         }   }   }
+
+        /* ADD TRACK <track name> <length> */
         if ( ( argumentList.indexOf("TRAIN") ==0 ) && ( argumentList.indexOf("TRAVELPLAN") ==1 ) && ( argumentList.indexOf("ADD") ==2 )  && ( argumentList.indexOf("STATION") == 3 ) ){
             if (argumentList.count()==5){
                 qDebug()<<"TRAIN TRAVELPLAN ADD STATION recognised with Station="<<argumentList.at(4)<<". Check that the station exists.";
@@ -161,9 +191,9 @@ void TrafficControl::importPredefinedNetwork()
                         //stationFound=TRUE;
                         trainList.at(currentTrain)->addStationToTrainRoute(s->getID());
                         approvedCommand=true;
-                    }
-                }
-        }   }
+        }    }   }   }
+
+        /* TRAIN SELECT <train name name> */
         if ( ( argumentList.indexOf("TRAIN") ==0 ) && ( argumentList.indexOf("SELECT") ==1 ) ){
             if (argumentList.count()==3){
                 foreach(Train* t, trainList){

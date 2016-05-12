@@ -23,7 +23,7 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>5</x>
       <y>0</y>
       <width>1181</width>
       <height>661</height>
@@ -477,16 +477,6 @@
      <attribute name="title">
       <string>Map</string>
      </attribute>
-     <widget class="QGraphicsView" name="mapGraphicsView">
-      <property name="geometry">
-       <rect>
-        <x>650</x>
-        <y>-10</y>
-        <width>16</width>
-        <height>51</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QPushButton" name="graphicsInitButton">
       <property name="geometry">
        <rect>
@@ -505,12 +495,27 @@
        <rect>
         <x>0</x>
         <y>39</y>
-        <width>1171</width>
+        <width>1161</width>
         <height>601</height>
        </rect>
       </property>
       <property name="resizeMode">
        <enum>QQuickWidget::SizeRootObjectToView</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_4">
+     <attribute name="title">
+      <string>Text Log</string>
+     </attribute>
+     <widget class="QPlainTextEdit" name="plainTextEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>1161</width>
+        <height>621</height>
+       </rect>
       </property>
      </widget>
     </widget>

@@ -26,14 +26,14 @@
 #include <QUrl>
 #include <QQuickView>
 #include <QGeoCoordinate>
-#include <iostream>//Port to QDebug
-#include <sstream>//Port to QDebug
+#include <QtQml>
+//#include <iostream>//Port to QDebug
+//#include <sstream>//Port to QDebug
 #include "tctrain.h"
 #include "tctrack.h"
 #include "tcstation.h"
 #include "trafficdatamodel.h"
 #include "trafficclock.h"
-#include "trafficmap.h"
 
 namespace Ui {
     class TrafficControl;
@@ -51,9 +51,6 @@ public:
     QList<Station*> stationList;
     QThread clockThread;
     TrafficClock trafficClock;
-    TrafficMap *trafficMap;
-//    QGraphicsScene *mapScene;
-    QQuickView *mapView;
     QWidget *mapContainer;
 
 public slots:
@@ -71,6 +68,7 @@ public slots:
     void onTickIntervalChanged(int newInterval);
 
     void stepTimeForNetwork();
+
     int connectTrackToStations(QString trackName, QString startStationName, QString endStationName);
     int connectTrackToStations(int trackID, int startStationID, int endStationID);
     
@@ -84,8 +82,6 @@ private:
     TrafficDataModel *trainListModel;
     TrafficDataModel *stationListModel;
     QMutex mutex;
-
-
 };
 
 #endif // TRAFFICCONTROL_H

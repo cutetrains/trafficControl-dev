@@ -1,8 +1,10 @@
-import QtQuick 2.0
+import QtQuick 2.4
 import QtPositioning 5.2
-import QtLocation 5.2
+import QtLocation 5.5
 
 Item {
+  id: mainItemGustaf
+  objectName: "nameMainItem"
   PositionSource {
       active: true
       onPositionChanged: {
@@ -11,13 +13,41 @@ Item {
   }
 
   Map {
-     id: map
+     id: mainMap
+     objectName: "nameMainMap"
      anchors.fill: parent
      plugin: Plugin { name: "osm" }
      center: QtPositioning.coordinate(55.6,13)
      zoomLevel: 15
 
+    MapCircle {
+        id: mainMapCircle1
+        objectName: "nameMainMapCircle1"
+        center {
+            latitude: 55.60985893200806
+            longitude: 13.00118644566413
+        }
+        radius: 50.0
+        color: 'red'
+        border.width: 3
+        opacity: 0.3
+    }
+    MapCircle {
+        id: mainMapCircle2
+        objectName: "nameMainMapCircle2"
+        center {
+            latitude: 55.6
+            longitude: 13
+        }
+        radius: 100.0
+        color: 'blue'
+        border.width: 3
+        opacity: 0.3
+    }
+
      MapPolyline {
+        id: mainMapPoly
+        objectName:"nameMainMapPoly"
         line.width: 3
         line.color: 'green'
         path: [

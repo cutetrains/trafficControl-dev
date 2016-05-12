@@ -6,7 +6,7 @@
 
 QT       += quick
 QT       += core gui
-
+QT       += qml
 QT       += quickwidgets
 QT       += positioning
 QT       += location
@@ -23,16 +23,14 @@ SOURCES += main.cpp\
     tctrack.cpp \
     tcstation.cpp \
     trafficcontrol_importNW.cpp \
-    trafficclock.cpp \
-    trafficmap.cpp
+    trafficclock.cpp
 
 HEADERS  += trafficcontrol.h \
     trafficdatamodel.h \
     tctrain.h \
     tctrack.h \
     tcstation.h \
-    trafficclock.h \
-    trafficmap.h
+    trafficclock.h
 
 FORMS    += trafficcontrol.ui
 
