@@ -52,39 +52,40 @@ with open(inputfile, "r", encoding='utf8') as ins:
             stationListItem[2][0] )
 
     if(isNextLineCoordinateList==True):#This happens directly after coordinates are found below
-      summa=0.0
-      tempDist=0.0
+      summa=0
+      tempDist=0
       coordinateList=str(line[6:-2]).split(" ")
       #print(coordinateList)
       thisTrackCoordinates=""
-      reversedTrackCoordinates=""
-      for iii in range(1, len(coordinateList)):
-        orgLon=coordinateList[iii-1].split(",")[0]
-        orgLat=coordinateList[iii-1].split(",")[1]
-        desLon=coordinateList[iii].split(",")[0]
-        desLat=coordinateList[iii].split(",")[1]
-        tempDist=haversine(float(orgLon),float(orgLat),float(desLon),float(desLat))
+      reversedTrackCoordinates="" #remove comment
+      for iii in range(0, len(coordinateList)-1):
+        orgLon=coordinateList[iii].split(",")[0]
+        orgLat=coordinateList[iii].split(",")[1]
+        desLon=coordinateList[iii+1].split(",")[0]
+        desLat=coordinateList[iii+1].split(",")[1]
+        tempDist=int(haversine(float(orgLon),float(orgLat),float(desLon),float(desLat))*1000)
         summa=summa+tempDist
+        #print(" + " + str(tempDist) + " = " +str( summa ) )
         if(placeMarkName[0]=="d"):
-          reversedTrackCoordinates=orgLat + " " + orgLon + " " + str(summa) + " " + reversedTrackCoordinates 
-        thisTrackCoordinates=thisTrackCoordinates+" " + orgLat + " " + orgLon + " " +  str(summa)
+          reversedTrackCoordinates= str(tempDist) + " " +  orgLat + " " + orgLon + " " + reversedTrackCoordinates 
+        thisTrackCoordinates=thisTrackCoordinates+" " + orgLat + " " + orgLon + " " +  str(tempDist)
       if(placeMarkName[0]=="d"):
-        reversedTrackCoordinates=  desLat + " " + desLon + " " + str(summa) + " " + reversedTrackCoordinates 
+        reversedTrackCoordinates= desLat + " " + desLon + " " + reversedTrackCoordinates  + " 0"
       #Modify here to add temp distances
-      thisTrackCoordinates=thisTrackCoordinates+" " + desLat + " " + desLon + " " + str(summa)
+      thisTrackCoordinates=thisTrackCoordinates+" " + desLat + " " + desLon + " 0"
       #print(thisTrackCoordinates)
       isNextLineCoordinateList=False
       trackListItem=[placeMarkName, numLines, coordinateList[0].split(",")[:-1], "", coordinateList[-1].split(",")[:-1], "", summa]
       trackList.append(trackListItem)
       
-      print("ADD TRACK "+ placeMarkName + " " + str(int(summa*1000) ) +  " COORDINATES" +thisTrackCoordinates )
+      print("ADD TRACK "+ placeMarkName + " " + str(summa ) +  " COORDINATES" +thisTrackCoordinates )
       if(placeMarkName[0]=="d"):#dLunGunN shall have a friend dLunGunS (same name, but in opposite direction)
         tempPlaceMarkName=""
         if (placeMarkName[-1]=='N'): tempPlaceMarkName='S'
         if (placeMarkName[-1]=='S'): tempPlaceMarkName='N'
         if (placeMarkName[-1]=='E'): tempPlaceMarkName='W'
         if (placeMarkName[-1]=='W'): tempPlaceMarkName='E'
-        print("ADD TRACK e" + str(placeMarkName[1:-1])+tempPlaceMarkName + " " + str(int(summa*1000))  +  " COORDINATES " +reversedTrackCoordinates)
+        print("ADD TRACK e" + str(placeMarkName[1:-1])+tempPlaceMarkName + " " + str(summa)  +  " COORDINATES " +reversedTrackCoordinates)
         trackListItem=[str(placeMarkName[:-1])+tempPlaceMarkName, numLines, coordinateList[0].split(",")[:-1], "", coordinateList[-1].split(",")[:-1], "", summa]
         trackList.append(trackListItem)
 

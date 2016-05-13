@@ -38,10 +38,12 @@ private:
     QList<Track*> *thisTrackList;//inserted, REMOVE?
     QList<Train*> *thisTrainList;//inserted
     QList<Station*> *thisStationList;//inserted
+
 public:// to do later: Add vector with pointers to the trains on each station.
   	/*! The constructor for a Station object.*/
-  	Station(QString cn,QList<Track*>& trackList, QList<Train*>& trainList, QList<Station*>& stationList);
+    Station(QString cn, bool isJunction, QList<Track*>& trackList, QList<Train*>& trainList, QList<Station*>& stationList);
     ~Station();
+
 	bool checkIfTrackLeavesStation(int trackID);
     int findLeavingTrackIndexToStation(int targetStationID);
 	void addTrack(int trackID); //To be handled in trafficcontrol
@@ -51,6 +53,7 @@ public:// to do later: Add vector with pointers to the trains on each station.
   	int getNbrOfWaitingPassengers();
 	void sendDataChangedSignal(int stationID);
   	void showInfo();
+    bool isJunction;
 };
 
 #endif

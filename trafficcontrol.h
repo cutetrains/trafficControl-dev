@@ -57,7 +57,7 @@ public slots:
     void addTrainToNetworkUI();
     void addTrackToNetwork(QString trackName, int trackLength);
     void addTrainToNetwork(QString trainName);
-    void addStationToNetwork(QString stationName);
+    void addStationToNetwork(QString stationName, bool isJunction);
     void listTracksInNetwork();
     void listTrainsInNetwork();
     void listStationsInNetwork();

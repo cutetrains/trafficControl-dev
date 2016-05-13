@@ -70,32 +70,25 @@ TrafficControl::TrafficControl(QWidget *parent) :
 
     ui->mapQuickWidget->setSource(source);
     QObject *object=ui->mapQuickWidget->rootObject();//Use this to get the different objects
-    if(object){
-        qDebug()<<"rootObject found!";
-    }
+    /*if(object){
+        qDebug()<<"INFO   : rootObject found!";
+    }*/
     //object->dumpObjectInfo();
     //object->dumpObjectTree();
 
 
     QObject *myStation1 = object->findChild<QObject *>(QString("nameMainMap"));
     if(myStation1==NULL){
-        qDebug()<<"No nameMainMap found";
+            qDebug()<<"ERROR  : No nameMainMap found";
         }
         else{
-        qDebug()<<"nameMainMap found";
+            qDebug()<<"INFO   : nameMainMap found";
         }
     QObject *myStation2 = object->findChild<QObject *>(QString("nameMainMapCircle1"));
-    if(myStation2 == NULL)
-        {
-            qDebug()<<"No nameMainMapCircle1 found";
-        }
-        else
-        {
-            qDebug()<<"Found nameMainMapCircle1, changing color to green";
-            myStation2->setProperty("color","green");
-        }
-    qDebug()<<ui->mapQuickWidget->height();
-
+    if(myStation2 != NULL)
+    {
+        myStation2->setProperty("color","green");
+    }
 }
 
 
@@ -119,7 +112,7 @@ void TrafficControl::addTrackToNetwork(QString trackName, int trackLength)
  */
 void TrafficControl::addTrainToNetworkUI()
 {
-    qDebug()<<"This function has intentionally been removed";
+    qDebug()<<"WARNING: This function has intentionally been removed";
 }
 
 /*!
@@ -144,15 +137,17 @@ void TrafficControl::addTrainToNetwork(QString trainName)// Ambigous variable na
  *
  * @param stationName Name of the station
  */
-void TrafficControl::addStationToNetwork(QString stationName)
+void TrafficControl::addStationToNetwork(QString stationName, bool isJunction)
 {
-    Station* station1 = new Station(stationName, trackList, trainList, stationList);
+    Station* station1 = new Station(stationName, isJunction, trackList, trainList, stationList);
     connect( station1, SIGNAL( dataChangedSignal(int, const QVariant & ) ), stationListModel, SLOT(onDataChanged(int , const QVariant & ) ) );
     stationList.append(station1);
     stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
     stationList[stationList.size()-1]->changeNbrOfPassengers(0);
     station1 = NULL;
 }
+
+
 
 /*!
  * The method connects at Track object to a Start Station and an End Station.
@@ -198,12 +193,12 @@ int TrafficControl::connectTrackToStations(QString trackName, QString startStati
         }
         if( (foundStartStationID!=-1) && ( foundEndStationID!=-1) && (foundTrackID!=-1))
         {
-            if ( ( trackList[foundTrackID]->getStartStation() != -1 ) && ( trackList[foundTrackID]->getEndStation() !=-1 ) ) {qDebug()<<"TC:CTTS, overwriting old start or end stations.\n";}
+            //if ( ( trackList[foundTrackID]->getStartStation() != -1 ) && ( trackList[foundTrackID]->getEndStation() !=-1 ) ) {qDebug()<<"TC:CTTS, overwriting old start or end stations.\n";}
             trackList.at(foundTrackID)->setStartStation(foundStartStationID);
             trackList.at(foundTrackID)->setEndStation(foundEndStationID);
             stationList.at(foundStartStationID)->addTrack(foundTrackID);
         } else {
-            qDebug()<<"TC:cTTS: Either track or station name is not found.";
+            qDebug()<<"ERROR  : TC:cTTS: Either track or station name is not found.";
             return 0;
         }
     }
@@ -228,9 +223,9 @@ void TrafficControl::createPredefinedNetworkUI()/*Clarify the relationship betwe
  */
 void TrafficControl::listTracksInNetwork()
 {
-    qDebug()<<"Contents of trackList:";
+    qDebug()<<"INFO   : Contents of trackList:";
     foreach(Track* thisTrack, trackList){ thisTrack->showInfo(); }
-    qDebug()<<"----End of trackList---";
+    qDebug()<<"INFO   : ----End of trackList---";
 }
 
 /*!
@@ -242,9 +237,9 @@ void TrafficControl::listTracksInNetwork()
  */
 void TrafficControl::listTrainsInNetwork()
 {
-    qDebug()<<"Contents of trainList:";
+    qDebug()<<"INFO   : Contents of trainList:";
     foreach(Train* thisTrain, trainList){ thisTrain->showInfo(); }
-    qDebug()<<"----End of trainList----";
+    qDebug()<<"INFO   : ----End of trainList----";
 }
 
 /*!
@@ -255,9 +250,9 @@ void TrafficControl::listTrainsInNetwork()
  */
 void TrafficControl::listStationsInNetwork()
 {
-    qDebug()<<"Contents of stationList:";
+    qDebug()<<"INFO   : Contents of stationList:";
     foreach(Station* thisStation, stationList){ thisStation->showInfo(); }
-    qDebug()<<"----End of stationList----";
+    qDebug()<<"INFO   : ----End of stationList----";
 }
 
 /*!
@@ -308,7 +303,7 @@ TrafficControl::~TrafficControl()
     trafficClock.disconnectThread();
     clockThread.terminate();
     while(!clockThread.isFinished()){}
-    qDebug()<<"The thread is terminated. Deleting pointers.";
+    qDebug()<<"INFO   : The thread is terminated. Deleting pointers.";
     foreach(Station* thisStation, stationList){ delete thisStation; thisStation=NULL;}
     foreach(Track* thisTrack, trackList){ delete thisTrack; thisTrack=NULL;}
     foreach(Train* thisTrain, trainList){ delete thisTrain; thisTrain=NULL;}

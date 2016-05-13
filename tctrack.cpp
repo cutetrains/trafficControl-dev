@@ -63,7 +63,7 @@ Track::Track( const Track& sTrack)
 	maxAllowedSpeed=sTrack.maxAllowedSpeed;
 	trackID=sTrack.trackID;
     thisTrackList=sTrack.thisTrackList;
-    qDebug()<<"WARNING: copy constructor assigns by value!";
+    //qDebug()<<"WARNING: copy constructor assigns by value!";
     thisTrainList=sTrack.thisTrainList;
     thisStationList=(sTrack.thisStationList);
 }
@@ -183,18 +183,18 @@ void Track::setMaxAllowedSpeed(int n) { maxAllowedSpeed = n; }
  */
 void Track::showInfo()
 {
-    qDebug()<<"TrackID: "<<name<<", Length:  "<<length<<", Max Speed: "<<maxAllowedSpeed<<".";
+    qDebug()<<"INFO   : TrackID: "<<name<<", Length:  "<<length<<", Max Speed: "<<maxAllowedSpeed<<".";
 	if (startStation!=-1)
 	{
-        qDebug()<<"StartStation ["<<startStation<<"] ";
+        qDebug()<<"INFO   : StartStation ["<<startStation<<"] ";
 	} else {	
-        qDebug()<<"No start station is defined. ";
+        qDebug()<<"ERROR  : No start station is defined. ";
 	}
 	if (endStation!=-1)
 	{
-		qDebug()<<"EndStation ["<<endStation<<"] ";
+        qDebug()<<"INFO   : EndStation ["<<endStation<<"] ";
 	} else {	
-		qDebug()<<"No end station is defined. ";
+        qDebug()<<"WARNING: No end station is defined. ";
 	}
     qDebug()<<"thisTrackList: Size is "<<thisTrackList->size()<<"thisStationList: Size is "<<thisStationList->size()<<" thisTrainList: Size is "<<thisTrainList->size();
 }

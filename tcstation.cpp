@@ -47,7 +47,7 @@ int Station::totalNbrOfStations =0;
  * @param trainList is a pointer to the trackList
  * @param stationList is a pointer to the stationList
  */
-Station::Station(QString cn, QList<Track*>& trackList, QList<Train*>& trainList, QList<Station*>& stationList) 
+Station::Station(QString cn, bool isJunction, QList<Track*>& trackList, QList<Train*>& trainList, QList<Station*>& stationList)
 { 	
 	name=QString::fromUtf16(cn.utf16());
 
@@ -91,7 +91,7 @@ QString Station::getName() { return name; }
  */
 void Station::addTrack(int trackID) { 
     if (trackID<=-1){
-        qDebug()<<"Station::addTrack" <<name<<" Error: negative number specified: "<<trackID;
+        qDebug()<<"ERROR  : Station::addTrack" <<name<<" Error: negative number specified: "<<trackID;
 	} else {
 		leavingTrackVector.push_back(trackID);
 	}
@@ -157,11 +157,11 @@ void Station::sendDataChangedSignal(int stationID){//Name, Track/Station , Posit
 void Station::showInfo() { 
     qDebug() << name <<" ("<<stationID<<") has "<<waitingPassengers<<" waiting passengers. ";
  	vector<int>::iterator it;
-	cout<<"Leaving tracks: ";
+    cout<<"INFO   : Leaving tracks: ";
 	for ( it = leavingTrackVector.begin(); it != leavingTrackVector.end(); ++it ) {
 		cout <<", "<<*it; 
 	}
-    qDebug()<<"thisTrackList: Size is "<<thisTrackList->size()<<"thisStationList: Size is "<<thisStationList->size()<<" thisTrainList: Size is "<<thisTrainList->size();
+    qDebug()<<"INFO : thisTrackList: Size is "<<thisTrackList->size()<<"thisStationList: Size is "<<thisStationList->size()<<" thisTrainList: Size is "<<thisTrainList->size();
 	cout <<"\n";
 }
 

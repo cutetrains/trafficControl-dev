@@ -81,9 +81,9 @@ void Train::addStationToTrainRoute(int trackID)
 {
 //	For trafficcontrol:Check if track exists and can be reached from the prior track.
     if (trackID<=0){
-        qDebug()<<"Train::addTrackToTrainRoute Error: negative number specified.\n";
+        qDebug()<<"ERROR  : Train::addTrackToTrainRoute Error: negative number specified.\n";
     } else {
-        qDebug()<<"Adding track to trainroute";
+        qDebug()<<"INFO   : Adding track to trainroute";
         travelPlanByStationID.push_back(trackID);
 	}
 	sendDataChangedSignal(trainID);
@@ -99,7 +99,7 @@ void Train::addStationToTrainRoute(int trackID)
  */
 int addStationToTrainRoute(QString stationName, bool stopAtStation)
 {
-    qDebug()<<"Add station"<< stationName<< " to train route. Stop="<<stopAtStation ;
+    qDebug()<<"INFO   : Add station"<< stationName<< " to train route. Stop="<<stopAtStation ;
     return 1;
 }
 
@@ -181,7 +181,7 @@ int Train::move(int n)
                             state=stateTable.value("STOPPED");
                             return 0;
                         } else {
-                            qDebug()<<"Tr:M:ERROR! No track from "<<thisStationList->at(currentStation)->getName()
+                            qDebug()<<"ERROR  : Train:Move No track from "<<thisStationList->at(currentStation)->getName()
                                <<" to "<<thisStationList->at(travelPlanByStationID
                                                             .at(nextIndexTravelPlanByStationID))
                                                             ->getName();
@@ -202,7 +202,7 @@ int Train::move(int n)
                     nextTrack=thisStationList->at(currentStation)
                             ->findLeavingTrackIndexToStation(travelPlanByStationID.at(nextIndexTravelPlanByStationID));
                     if(nextTrack==-1){
-                        qDebug()<<"TR:M(172): ERROR! No track from "<<thisStationList->at(currentStation)->getName()
+                        qDebug()<<"ERROR  : Train:Move! No track from "<<thisStationList->at(currentStation)->getName()
                                <<" to "<<thisStationList->at(travelPlanByStationID
                                                             .at(nextIndexTravelPlanByStationID))
                                                             ->getName();
@@ -370,16 +370,16 @@ void Train::showInfo()
 {
 	int iii=0;
  	vector<int>::iterator it;
-    qDebug()<<"Car has "<<nbrOfSeats<<" seats.  " << nbrOfPassengers <<" are taken. ";
+    qDebug()<<"INFO  : Car has "<<nbrOfSeats<<" seats.  " << nbrOfPassengers <<" are taken. ";
 	if(currentTrack!=-1)	{	
-        qDebug()<<"CurrentTrack is not null";
-        qDebug()<<"Speed: "<<currentSpeed<<" m/s, track:"<<thisTrackList->at(currentTrack)->getName()<< " at position "<<positionOnTrack<<". ";
+        qDebug()<<"INFO   : CurrentTrack is not null";
+        qDebug()<<"INFO   : Speed: "<<currentSpeed<<" m/s, track:"<<thisTrackList->at(currentTrack)->getName()<< " at position "<<positionOnTrack<<". ";
 	}
     if(currentStation!=-1)
     {
-        qDebug()<<"Train is at station "<<thisStationList->at(currentStation)->getName();
+        qDebug()<<"INFO   : Train is at station "<<thisStationList->at(currentStation)->getName();
     }
-    qDebug()<<"TrainRoute, index: "<<nextIndexTravelPlanByStationID<<" : ";
+    qDebug()<<"INFO   : TrainRoute, index: "<<nextIndexTravelPlanByStationID<<" : ";
     for ( it = travelPlanByStationID.begin(); it != travelPlanByStationID.end(); ++it ) {
 		qDebug()<<" "<<*it;
         if(nextIndexTravelPlanByStationID==iii){cout<<"*";}
