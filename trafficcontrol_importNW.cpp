@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
+#include <iostream>
 
 #include <QDebug>
 #include <QFile>
@@ -100,17 +101,31 @@ void TrafficControl::importPredefinedNetwork()
                     approvedCommand=true;
         } } }
 
-        /* ADD STATION <station name> [AS JUNCTION] <station name> */
+        /* ADD STATION <station name> [AS JUNCTION] [COORDINATES lat long] */
         if ( ( argumentList.indexOf("ADD") == 0 ) && ( argumentList.indexOf("STATION") == 1 ) ){
-            if(argumentList.count()==3) {//Verify that the name is not a number.
-                addStationToNetwork(argumentList.at(2), false);
-                approvedCommand=true;
-            } else {
-                if ( (argumentList.indexOf("AS") == 3) && ( argumentList.indexOf("JUNCTION") == 4 ) ) {
-                    qDebug()<< "INFO   : " << argumentList.at(2) <<" is a junction!";
-                    addStationToNetwork(argumentList.at(2), true);
-                    approvedCommand = true;
-        } } }
+            bool isJunction = ( (argumentList.indexOf("AS") == 3) && ( argumentList.indexOf("JUNCTION") == 4 ) );
+            bool hasCoordinates=(argumentList.indexOf("COORDINATES")!=-1); // Now, don't include coordinates to
+            addStationToNetwork(argumentList.at(2),isJunction);
+            qDebug() <<argumentList.at(2)<< " isJunction ? "<< isJunction << "  "<<(isJunction == true ? 5 : 3);
+            if( ( argumentList.indexOf("COORDINATES") == (isJunction==true ? 5:3) ) ) {
+                qDebug()<<"INFO   : Coordinates found for station "<< argumentList.at(2);
+
+                /* LATER: Parse the latlong to the tcStation object, if necessary */
+                /* Create a QML argument string */
+                // 'import QtQuick 2.3; MapCircle { id: 'St\u00C3\u00A5ngby\"St\u00C3\u00A5ngby\" center { latitude:
+                // 'import QtQuick 2.3;Rectangle{id:nameSample1;objectName:"nameSample1";width:40;height:40;color:"blue";x:300;y:300;}'
+                //QString tmpQMLDynamicCommand = "import QtQuick 2.3; MapCircle { id: " + argumentList.at(2) +
+                    ";objectName: \"" + argumentList.at(2) +
+                    "Name\"; center { latitude:" + argumentList.at(isJunction == true ? 6:4) +
+                    "; longitude:" + argumentList.at(isJunction == true ? 7:5 ) +
+                    "}; radius:50.0; color: 'red'; opacity=0.3 ;border.width: 3}";
+                //qDebug()<<tmpQMLDynamicCommand;
+
+                createQMLStation(argumentList.at(2), isJunction, argumentList.at(isJunction ==true ? 6:4), argumentList.at(isJunction == true ? 7:5));
+
+            }
+            approvedCommand = true;
+        }
 
         //Check if the command includes coordinates
 
@@ -178,7 +193,8 @@ void TrafficControl::importPredefinedNetwork()
         }   }
 
         /* TRAIN SET DESIRED_SPEED <desired speed> */
-        if ( ( argumentList.indexOf("TRAIN") ==0 ) && ( argumentList.indexOf("SET") ==1 ) && ( argumentList.indexOf("DESIRED_SPEED") ==2 ) ){
+        if ( ( argumentList.indexOf("TRAIN") ==0 ) && ( argumentList.indexOf("SET") ==1 )
+                && ( argumentList.indexOf("DESIRED_SPEED") ==2 ) ){
             if (argumentList.count()==4){
                 qDebug()<<"INFO   : TRAIN SET DESIRED_SPEED recognised with DesiredSpeed="<<argumentList.at(3);
                 bool ok=false;
@@ -189,9 +205,10 @@ void TrafficControl::importPredefinedNetwork()
         }   }   }
 
         /* ADD TRACK <track name> <length> */
-        if ( ( argumentList.indexOf("TRAIN") ==0 ) && ( argumentList.indexOf("TRAVELPLAN") ==1 ) && ( argumentList.indexOf("ADD") ==2 )  && ( argumentList.indexOf("STATION") == 3 ) ){
+        if ( ( argumentList.indexOf("TRAIN") == 0 ) && ( argumentList.indexOf("TRAVELPLAN") ==1 )
+                && ( argumentList.indexOf("ADD") == 2 ) && ( argumentList.indexOf("STATION") == 3 ) ){
             if (argumentList.count()==5){
-                qDebug()<<"INFO   : TRAIN TRAVELPLAN ADD STATION recognised with Station="<<argumentList.at(4)<<". Check that the station exists.";
+                qDebug()<<"INFO   : TRAIN TRAVELPLAN ADD STATION recognised with Station="<<argumentList.at(4)<<". TODO: Check that the station exists.";
                 //bool stationFound=FALSE;
                 foreach (Station* s, stationList) {
                     if( s->getName()==argumentList.at(4)){

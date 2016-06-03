@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/Traffic/qml">
         <file>map.qml</file>
+        <file>resources/QmlLogic.js</file>
     </qresource>
 </RCC>

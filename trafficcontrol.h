@@ -58,6 +58,7 @@ public slots:
     void addTrackToNetwork(QString trackName, int trackLength);
     void addTrainToNetwork(QString trainName);
     void addStationToNetwork(QString stationName, bool isJunction);
+    int createQMLStation(QString objectName, bool isJunction, QString stationLat, QString stationLong); //Add QList <QVariant >  later;
     void listTracksInNetwork();
     void listTrainsInNetwork();
     void listStationsInNetwork();
@@ -78,6 +79,8 @@ private:
     Track *track1;
     Train *train1;
     Station *station1;
+    QObject* handleQMLObject;
+
     TrafficDataModel *trackListModel;
     TrafficDataModel *trainListModel;
     TrafficDataModel *stationListModel;

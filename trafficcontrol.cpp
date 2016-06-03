@@ -69,24 +69,27 @@ TrafficControl::TrafficControl(QWidget *parent) :
     QUrl source("qrc:Traffic/qml/map.qml");
 
     ui->mapQuickWidget->setSource(source);
-    QObject *object=ui->mapQuickWidget->rootObject();//Use this to get the different objects
+    //QObject* handleQMLObject; // Move to h file
+    handleQMLObject = ui->mapQuickWidget->rootObject();//Use this to get the different objects
+    //QObject *object=ui->mapQuickWidget->rootObject();//Use this to get the different objects
     /*if(object){
         qDebug()<<"INFO   : rootObject found!";
     }*/
-    //object->dumpObjectInfo();
-    //object->dumpObjectTree();
+    //handleQMLOject->dumpObjectInfo();
+    handleQMLObject->dumpObjectTree();
 
 
-    QObject *myStation1 = object->findChild<QObject *>(QString("nameMainMap"));
+    QObject *myStation1 = handleQMLObject->findChild<QObject *>(QString("nameMainMap"));
     if(myStation1==NULL){
             qDebug()<<"ERROR  : No nameMainMap found";
         }
         else{
             qDebug()<<"INFO   : nameMainMap found";
         }
-    QObject *myStation2 = object->findChild<QObject *>(QString("nameMainMapCircle1"));
+    QObject *myStation2 = handleQMLObject->findChild<QObject *>(QString("nameMainMapCircle1"));
     if(myStation2 != NULL)
     {
+        qDebug()<<"INFO   : nameMainMapCircle1 found";
         myStation2->setProperty("color","green");
     }
 }
@@ -147,7 +150,19 @@ void TrafficControl::addStationToNetwork(QString stationName, bool isJunction)
     station1 = NULL;
 }
 
+int TrafficControl::createQMLStation(QString objectName, bool isJunction, QString stationLat, QString stationLong)
+{
+    qDebug()<<"In TC::callQMLMap "<<objectName <<" "<<isJunction<<" "<<stationLat<<" "<<stationLong;
 
+    QVariant returnedValue;
+    QMetaObject::invokeMethod(handleQMLObject, "createQMLStation",
+        Q_RETURN_ARG(QVariant, returnedValue),
+        Q_ARG(QVariant, objectName),
+        Q_ARG(QVariant, stationLat),
+        Q_ARG(QVariant, stationLong));
+
+    return 0;
+}
 
 /*!
  * The method connects at Track object to a Start Station and an End Station.

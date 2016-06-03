@@ -40,7 +40,7 @@ Track::Track(QString cn, int nn,QList<Track*>& trackList, QList<Train*>& trainLi
 	name=QString::fromUtf16(cn.utf16());
   	startStation=-1;
 	endStation=-1;
-	maxAllowedSpeed=180;
+    maxAllowedSpeed=60;
 	trackID=totalNbrOfTracks;/*!<The trackID will correspond to the order of created Track objects. */
     totalNbrOfTracks++;
     thisTrackList=&trackList;
