@@ -155,9 +155,10 @@ int TrafficControl::createQMLStation(QString objectName, bool isJunction, QStrin
     qDebug()<<"In TC::callQMLMap "<<objectName <<" "<<isJunction<<" "<<stationLat<<" "<<stationLong;
 
     QVariant returnedValue;
-    QMetaObject::invokeMethod(handleQMLObject, "createQMLStation",
+    QMetaObject::invokeMethod(handleQMLObject, "createQMLStationFromSprite",
         Q_RETURN_ARG(QVariant, returnedValue),
         Q_ARG(QVariant, objectName),
+        Q_ARG(QVariant, isJunction),
         Q_ARG(QVariant, stationLat),
         Q_ARG(QVariant, stationLong));
 

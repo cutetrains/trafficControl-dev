@@ -4,6 +4,7 @@
 #
 #-------------------------------------------------
 
+#QT += qml network quick positioning location core gui quickwidgets
 QT       += quick
 QT       += core gui
 QT       += qml
@@ -22,8 +23,8 @@ SOURCES += main.cpp\
     tctrain.cpp \
     tctrack.cpp \
     tcstation.cpp \
-    trafficcontrol_importNW.cpp \
-    trafficclock.cpp
+    trafficclock.cpp \
+    trafficcontrolImportNW.cpp
 
 HEADERS  += trafficcontrol.h \
     trafficdatamodel.h \
@@ -37,7 +38,8 @@ FORMS    += trafficcontrol.ui
 OTHER_FILES  =
 
 DISTFILES += \
-    map.qml
+    map.qml \
+    stationSprite.qml
 
 RESOURCES += \
     resources.qrc

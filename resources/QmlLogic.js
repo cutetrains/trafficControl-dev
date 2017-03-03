@@ -1,36 +1,35 @@
 .pragma library // Shared game state
-.import QtQuick 2.0 as QQ
+.import QtQuick 2.5 as QQ
+//.import "map.qml"// FIND GOOD URI
+var component; //Story_2_2
+var sprite;
 
-var testVariable=0;
+//var testVariable=123;
 //public class QmlLogic.js {
 
 //}
 
 function jsCreateQMLStation(stationName, stationLat, stationLong) {
     console.log("jsCreateQMLStation called with arguments: ", stationName, stationLat, stationLong);
-    var str="";
-    str='import QtQuick 2.4 \n  import QtPositioning 5.2 \n import QtLocation 5.5\n MapCircle { \n id: s' + stationName +'\n objectName: "' + stationName+'Name"\n center { latitude: ' + stationLat +'\n longitude: ' + stationLong + '} \n radius:50.0\n color: "red"\n opacity:0.3 \n border.width: 3}'
-    //str='MapCircle { ; id: s' + stationName +'; objectName: "' + stationName+'Name"; center { latitude: ' + stationLat +'; longitude: ' + stationLong + '} radius:50.0; color: "red"; opacity:0.3 ;border.width: 3}'
-    //console.log('MapCircle { id: s' + stationName +'; objectName: "' + stationName+'Name"; center { latitude: ' + stationLat +'; longitude: ' + stationLong + '} radius:50.0; color: "red"; opacity:0.3 ;border.width: 3}')
-    console.log(str)
-    //eval(str)
-    //eval('import QtQuick 2.3; MapCircle { id: s' + stationName +'; objectName: \"' + stationName+'Name\"; center { latitude: ' + stationLat +'; longitude: ' + stationLong + '} radius:50.0; color: \'red\'; opacity=0.3 ;border.width: 3}')
+    //QQmlEngine engine;//TEST BY EGUSBRA
+    component = Qt.createComponent("qrc:Traffic/qml/stationSprite.qml");
+    if (component.status == Component.Ready)
+        finishCreation();
+    else
+        component.statusChanged.connect(finishCreation);
+    return(stationName);
+}
 
-    //eval('MapCircle {\n id: s' + stationName +'\n objectName: \"' + stationName+'Name\"\n center { \n latitude: ' + stationLat +'\n longitude: ' + stationLong + '\n} \n radius:500.0\n color: \'red\'\n opacity=0.3 \nborder.width: 3 \n }')
-
-    //eval('MapCircle { id: sGunnesbo; objectName: "GunnesboName"; center { latitude: 55.71606862405453; longitude: 13.18645933296118} radius:50.0; color: "red"; opacity:0.3 ;border.width: 3}')
-
-    //var newObject = Qt.createQmlObject('MapCircle { objectName: \"' + stationName+'Name\" center { \n latitude: ' + stationLat +' longitude: ' + stationLong + '}  radius:500.0 color: \'red\' opacity:0.3 border.width: 3  }', mainMap,'firstmap')
-
-    //console.log(myNum)
-    var newObject = Qt.createQmlObject(str, mainMap, 'firstmap')
-        if (newObject === null)
-        {
-            console.log("Object doesn't exist!!!")
+function finishCreation() {
+    if (component.status == Component.Ready) {
+        //sprite = component.createObject(appWindow, {"x": 100, "y": 100});
+        sprite = component.createObject(nameMainItem, {"center.latitude": stationLat, "center.longitude": stationLong});
+        if (sprite == null) {
+            // Error Handling
+            console.log("Error creating object");
         }
-        else
-        {
-            console.log("Object exists!!!")
-        }
-        return(stationName)
+    } else if (component.status == Component.Error) {
+        // Error Handling
+        console.log("Error loading component:", component.errorString());
     }
+}
