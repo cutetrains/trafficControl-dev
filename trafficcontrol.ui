@@ -39,7 +39,7 @@
      <cursorShape>ArrowCursor</cursorShape>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -49,28 +49,15 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>120</y>
+        <y>100</y>
         <width>331</width>
-        <height>151</height>
+        <height>171</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <pointsize>8</pointsize>
        </font>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="listTrainButton">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>80</y>
-        <width>94</width>
-        <height>33</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>List Trains</string>
       </property>
      </widget>
      <widget class="QSpinBox" name="tickIntervalSpinBox">
@@ -166,22 +153,6 @@
        <string>Import Network</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="generateNetworkButton">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>510</y>
-        <width>201</width>
-        <height>33</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Not used</string>
-      </property>
-     </widget>
      <widget class="QTableView" name="stationListTableView">
       <property name="geometry">
        <rect>
@@ -197,19 +168,6 @@
        </font>
       </property>
      </widget>
-     <widget class="QPushButton" name="listStationButton">
-      <property name="geometry">
-       <rect>
-        <x>870</x>
-        <y>10</y>
-        <width>75</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>List Stations</string>
-      </property>
-     </widget>
      <widget class="QTableView" name="trackListTableView">
       <property name="geometry">
        <rect>
@@ -223,19 +181,6 @@
        <font>
         <pointsize>8</pointsize>
        </font>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="listTrackButton">
-      <property name="geometry">
-       <rect>
-        <x>360</x>
-        <y>10</y>
-        <width>75</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>ListTracks</string>
       </property>
      </widget>
     </widget>

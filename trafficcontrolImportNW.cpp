@@ -25,8 +25,6 @@
 #define TRACK 1//Replace with constants that are global!
 #define TRAIN 2
 #define STATION 3
-#define TRUE 1//Replace with constants that are global!
-#define FALSE 0
 #define UNDEFINED -1
 using namespace std;
 
@@ -37,10 +35,10 @@ using namespace std;
  */
 void TrafficControl::importPredefinedNetwork()
 {
-
-  QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
-                                                    "C://temp//train//",
-                                                    tr("Files (*.*)"));
+  QString fileName = QFileDialog::getOpenFileName(this,
+                                                  tr("Open File"),
+                                                  "C://temp//train//",
+                                                  tr("Files (*.*)"));
   QFile file(fileName);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
   {
@@ -188,14 +186,14 @@ void TrafficControl::importPredefinedNetwork()
         (1 == argumentList.indexOf("SET")) &&
         (2 == argumentList.indexOf("NAME")) &&
         (4 == argumentList.count())){
-      bool foundTrain=FALSE;
+      bool foundTrain = false;
       foreach (Train* t, trainList){
         if (t->getName() == argumentList.at(3)) {
-          foundTrain = TRUE;
+          foundTrain = true;
           qDebug()<<"FATAL ERROR: Name is taken.";
         }
       }
-      if (FALSE == foundTrain){
+      if (false == foundTrain){
         //qDebug()<<"INFO   : TRAIN SET NAME recognised with Name="<<argumentList.at(3);
         trainList[currentTrain]->setName(argumentList.at(3));
         approvedCommand=true;
@@ -249,10 +247,8 @@ void TrafficControl::importPredefinedNetwork()
         (5 == argumentList.count())){
       //qDebug()<<"INFO   : TRAIN TRAVELPLAN ADD TRACK recognised with Track="
       //        <<argumentList.at(4)<<". TODO: Check that the station exists.";
-      //bool stationFound=FALSE;
       foreach (Station* s, stationList) {
         if( s->getName()==argumentList.at(4)){
-          //stationFound=TRUE;
           trainList.at(currentTrain)->addStationToTrainRoute(s->getID());
           approvedCommand=true;
         }

@@ -22,10 +22,10 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    TrafficControl w;
+  QApplication a(argc, argv);
+  TrafficControl w;
 
-    w.show();
+  w.show();
 
-    return a.exec();
+  return a.exec();
 }

@@ -17,26 +17,26 @@
 
 #include "trafficclock.h"
 #include <QDebug>
-
+using namespace std;
 
 TrafficClock::TrafficClock(QObject *parent) :
     QObject(parent)
 {
-    continueTick=false;//hardcoded, let the trafficControl emit a signal that updates this parameter later
-    isAlive=true;
-    systemTime=QTime::currentTime();//may be deleted
-    timer.start();
-    tInterval=500;
+  continueTick = false;//hardcoded, let the trafficControl emit a signal that updates this parameter later
+  isAlive = true;
+  systemTime = QTime::currentTime();//may be deleted
+  timer.start();
+  tInterval = 500; //No magic numbers
 }
 
 void TrafficClock::setTickInterval(int n)
 {
-    tInterval=n;
+  tInterval = n;
 }
 
 void TrafficClock::disconnectThread()
 {
-    isAlive=false;
+  isAlive = false;
 }
 
 /*void TrafficClock::releaseMutex()
@@ -51,34 +51,36 @@ void TrafficClock::disconnectThread()
 */
 void TrafficClock::threadTick()
 {
-    targetTime=QTime::currentTime();
-    while(isAlive)
+  targetTime = QTime::currentTime();
+  while(isAlive)
+  {
+    targetTime = targetTime.addMSecs(tInterval);
+    tWait = max(QTime::currentTime().msecsTo(targetTime) , tInterval/2);
+    if (tWait < 0)
     {
-        targetTime=targetTime.addMSecs(tInterval);
-        tWait=std::max(QTime::currentTime().msecsTo(targetTime),tInterval/2);
-        if(tWait<0){qDebug()<<"***ERROR*** Target time missed!";}
-        if(continueTick==true)
-        {
-            emit stepTimeSignal();
-        }
-        QThread::msleep(std::max(tWait, tInterval/2));
+      qDebug()<<"***ERROR*** Target time missed!";
     }
+    if (true == continueTick)
+    {
+      emit stepTimeSignal();
+    }
+    QThread::msleep(max(tWait, tInterval/2));
+  }
 }
-
 
 void TrafficClock::pauseThread()
 {
-    continueTick=false;
+  continueTick = false;
 }
 
 void TrafficClock::resumeThread()
 {
-    continueTick=true;
+  continueTick = true;
 }
 
 void TrafficClock::threadSetup(QThread &clockThread)
 {
-    connect(&clockThread, SIGNAL(started()), this, SLOT(threadTick()) );
+  connect(&clockThread, SIGNAL(started()), this, SLOT(threadTick()) );
 }
 
 TrafficClock::~TrafficClock()

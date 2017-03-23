@@ -27,8 +27,6 @@
 #include <QQuickView>
 #include <QGeoCoordinate>
 #include <QtQml>
-//#include <iostream>//Port to QDebug
-//#include <sstream>//Port to QDebug
 #include "tctrain.h"
 #include "tctrack.h"
 #include "tcstation.h"
@@ -36,55 +34,57 @@
 #include "trafficclock.h"
 
 namespace Ui {
-    class TrafficControl;
+  class TrafficControl;
 }
 
 class TrafficControl : public QMainWindow
 {
-    Q_OBJECT
+  Q_OBJECT
     
 public:
-    explicit TrafficControl(QWidget *parent = 0);
-    ~TrafficControl();
-    QList<Train*> trainList;
-    QList<Track*> trackList;
-    QList<Station*> stationList;
-    QThread clockThread;
-    TrafficClock trafficClock;
-    QWidget *mapContainer;
+  explicit TrafficControl(QWidget *parent = 0);
+  ~TrafficControl();
+  QList<Train*> trainList;
+  QList<Track*> trackList;
+  QList<Station*> stationList;
+  QThread clockThread;
+  TrafficClock trafficClock;
+  QWidget *mapContainer;
 
 public slots:
-    void addTrainToNetworkUI();
-    void addTrackToNetwork(QString trackName, int trackLength);
-    void addTrainToNetwork(QString trainName);
-    void addStationToNetwork(QString stationName, bool isJunction);
-    int createQMLStation(QString objectName, bool isJunction, QString stationLat, QString stationLong); //Add QList <QVariant >  later;
-    void listTracksInNetwork();
-    void listTrainsInNetwork();
-    void listStationsInNetwork();
-    void createPredefinedNetworkUI();
-    void importPredefinedNetwork();
-
-    void onRunThreadCheckBoxChanged(int newState);
-    void onTickIntervalChanged(int newInterval);
-
-    void stepTimeForNetwork();
-
-    int connectTrackToStations(QString trackName, QString startStationName, QString endStationName);
-    int connectTrackToStations(int trackID, int startStationID, int endStationID);
+  void addTrainToNetworkUI();
+  void addTrackToNetwork(QString trackName,
+                         int trackLength);
+  void addTrainToNetwork(QString trainName);
+  void addStationToNetwork(QString stationName,
+                           bool isJunction);
+  int createQMLStation(QString objectName,
+                       bool isJunction,
+                       QString stationLat,
+                       QString stationLong); //Add QList <QVariant>  later;
+  void importPredefinedNetwork();
+  void onRunThreadCheckBoxChanged(int newState);
+  void onTickIntervalChanged(int newInterval);
+  void stepTimeForNetwork();
+  int connectTrackToStations(QString trackName,
+                             QString startStationName,
+                             QString endStationName);
+  int connectTrackToStations(int trackID,
+                             int startStationID,
+                             int endStationID);
     
 private:
-    Ui::TrafficControl *ui;
-    QStringList list;
-    Track *track1;
-    Train *train1;
-    Station *station1;
-    QObject* handleQMLObject;
+  Ui::TrafficControl *ui;
+  QStringList list;
+  Track *track1;
+  Train *train1;
+  Station *station1;
+  QObject* handleQMLObject;
 
-    TrafficDataModel *trackListModel;
-    TrafficDataModel *trainListModel;
-    TrafficDataModel *stationListModel;
-    QMutex mutex;
+  TrafficDataModel *trackListModel;
+  TrafficDataModel *trainListModel;
+  TrafficDataModel *stationListModel;
+  QMutex mutex;
 };
 
 #endif // TRAFFICCONTROL_H

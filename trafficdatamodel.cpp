@@ -42,18 +42,18 @@ using namespace std;
 /*!
  * The constructor for TrafficDataModel defines dataModel objects according to the type of data they will handle.
  */
- TrafficDataModel::TrafficDataModel(int type, QObject *parent)
+TrafficDataModel::TrafficDataModel(int type, QObject *parent)
      :QAbstractTableModel(parent)
- {
-	modelType=type;	  
-	nbrOfRows=0;
-	switch (type)
-	{
-		case TRACK: nbrOfColumns=4; break;//Name, length, start, end, 
-        case TRAIN: nbrOfColumns=5; break;//Name, Track, Position, Speed, State
-		case STATION: nbrOfColumns=2; break;//Name, NbrOfPassengers
-    }
- }
+{
+  modelType=type;
+  nbrOfRows=0;
+  switch (type)
+  {
+    case TRACK: nbrOfColumns=4; break;//Name, length, start, end,
+    case TRAIN: nbrOfColumns=5; break;//Name, Track, Position, Speed, State
+    case STATION: nbrOfColumns=2; break;//Name, NbrOfPassengers
+  }
+}
 
 /*!
  * The method returns the number of rows for the data model. 
@@ -62,10 +62,10 @@ using namespace std;
  *
  * @return trafficDataMatrix.size The number of rows for the datamodel.
  */
- int TrafficDataModel::rowCount(const QModelIndex & /*parent*/) const
- {
-	return trafficDataMatrix.size();
- }
+int TrafficDataModel::rowCount(const QModelIndex & /*parent*/) const
+{
+  return trafficDataMatrix.size();
+}
 
 /*!
  * The method returns the number of columns for the data model. 
@@ -86,7 +86,8 @@ using namespace std;
  * @param var The incoming data.
  * @TODO adjust the table width automatically
  */
-void TrafficDataModel::onDataChanged(int row, const QVariant &var){ 	 
+void TrafficDataModel::onDataChanged(int row, const QVariant &var)
+{
 	QModelIndex index = this->index(row, 0, QModelIndex());
     this->setData(index, var.toStringList());
 }
@@ -99,24 +100,20 @@ void TrafficDataModel::onDataChanged(int row, const QVariant &var){
  *
  * @return QVariant The data in the model index.
  */
- QVariant TrafficDataModel::data(const QModelIndex &index, int role) const
- {
-    int row = index.row();
-     int col = index.column();
-	if (!index.isValid())
-		return QVariant();
-	if(row>=trafficDataMatrix.size())
-		return QVariant();
-	if(col>=nbrOfColumns)
-		return QVariant();
-	
-     switch(role){
-     	case Qt::DisplayRole:
-		return trafficDataMatrix[row][col];
-         	break;
-     	}
-     	return QVariant();
- }
+QVariant TrafficDataModel::data(const QModelIndex &index, int role) const
+{
+  int row = index.row();
+  int col = index.column();
+  if (!index.isValid()) return QVariant();
+  if(row>=trafficDataMatrix.size()) return QVariant();
+  if(col>=nbrOfColumns) return QVariant();
+  switch(role){
+    case Qt::DisplayRole:
+    return trafficDataMatrix[row][col];
+    break;
+  }
+  return QVariant();
+}
 
 /*!
  * The method returns the flags for the dataModel. It specifies that the models are enabled.
@@ -127,10 +124,9 @@ void TrafficDataModel::onDataChanged(int row, const QVariant &var){
  */
 Qt::ItemFlags TrafficDataModel::flags(const QModelIndex &index) const
 {
-    if (!index.isValid())
-    	return Qt::ItemIsEnabled;
+  if (!index.isValid()) return Qt::ItemIsEnabled;
 
-   	return QAbstractTableModel::flags(index) ;
+  return QAbstractTableModel::flags(index) ;
 }
 
 /*!
@@ -142,58 +138,66 @@ Qt::ItemFlags TrafficDataModel::flags(const QModelIndex &index) const
  *
  * @return QVariant The headers for the model.
  */
- QVariant TrafficDataModel::headerData(int section, Qt::Orientation orientation, int role) const
- {
-    if (role == Qt::DisplayRole){
-		if (modelType==TRACK){
-	     	if (orientation == Qt::Horizontal) {
-	 	       	switch (section)
-	 	        {
-	 	            case 0:
-	 	                return QString("Name");
-	 	            case 1:
-	 	                return QString("Length");
-	 	            case 2:
-	 	                return QString("Start");
-	 	            case 3:
-	 	                return QString("End");
-	 	        }
-	 	    }
-		}
-		if (modelType==STATION){
-	     	if (orientation == Qt::Horizontal) {
-	 	        switch (section)
-	 	        {
-	 	            case 0:
-	 	                return QString("Name");
-	 	            case 1:
-	 	                return QString("Waiting");
-	 	        }
-	 	    }
-		}
-		if (modelType==TRAIN){
-	     	if (orientation == Qt::Horizontal) {
-	 	        switch (section)
-	 	        {
-	 	            case 0:
-	 	                return QString("Name");
-	 	            case 1:
-	 	                return QString("Location");
-	 	            case 2:
-                        return QString("Pos:");
-	 	            case 3:
-	 	                return QString("Speed");
-                    case 4:
-                        return QString("Status");
-	 	        }
-	 	    }
-		}
- 	}
-    return QVariant();
- }
+QVariant TrafficDataModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+  if (role == Qt::DisplayRole)
+    {
+    if (TRACK == modelType)
+    {
+      if (Qt::Horizontal == orientation)
+      {
+        switch (section)
+        {
+          case 0:
+            return QString("Name");
+          case 1:
+            return QString("Length");
+          case 2:
+            return QString("Start");
+          case 3:
+            return QString("End");
+        }
+      }
+    }
+    if (STATION == modelType)
+    {
+      if (Qt::Horizontal == orientation)
+      {
+        switch (section)
+        {
+          case 0:
+            return QString("Name");
+          case 1:
+            return QString("Waiting");
+        }
+      }
+    }
+    if (TRAIN == modelType)
+    {
+      if (Qt::Horizontal == orientation)
+      {
+        switch (section)
+        {
+          case 0:
+            return QString("Name");
+          case 1:
+            return QString("Location");
+          case 2:
+            return QString("Pos:");
+          case 3:
+            return QString("Speed");
+          case 4:
+            return QString("Status");
+        }
+      }
+    }
+  }
+  return QVariant();
+}
 
 /*!
- * The method inserts new entries into the data model at a specific position position. It populates the data model with dots, ".".
+ * The method inserts new entries into the data model at a specific position.
+ * It populates the data model with dots, ".".
  *
  * @param position The position where the rows shall be added.
  * @param rows The number of rows that shall be added.
@@ -203,22 +207,28 @@ Qt::ItemFlags TrafficDataModel::flags(const QModelIndex &index) const
  * @return result TRUE indicates success, FALSE indicates failure. 
  * @todo Change the boolean variable to int so that more error codes can be returned.
  */
-bool TrafficDataModel::insertRows(int position, int rows, const QModelIndex &/*index=QModelIndex()*/) 
+bool TrafficDataModel::insertRows(int position,
+                                  int rows,
+                                  const QModelIndex &/*index=QModelIndex()*/)
 {
-	beginInsertRows(QModelIndex(), position, position+rows-1);//CHECK IF ROWS ARE VALID
-	QStringList list; //Here, insert cols depending on number of cols
-	for(int iii=0;iii<nbrOfColumns; iii++) {
-	  	list << "."; 
-	}
-	for (int row = 0; row < rows; ++row) {
-        trafficDataMatrix.insert(position, list); 
-    }
-	endInsertRows();
-	return true; 
+  beginInsertRows(QModelIndex(),
+                  position,
+                  position+rows-1);//CHECK IF ROWS ARE VALID
+  QStringList list; //Here, insert cols depending on number of cols
+  for(int iii=0;iii<nbrOfColumns; iii++) {
+    list << ".";
+  }
+  for (int row = 0; row < rows; ++row)
+  {
+    trafficDataMatrix.insert(position, list);
+  }
+  endInsertRows();
+  return true;
 } 
 
 /*!
- * The method sets data in the corresponding data matrix and emits a signal when that is done so that the views are updated.
+ * The method sets data in the corresponding data matrix and emits a signal
+ * when that is done so that the views are updated.
  *
  * @param index Index to dataModel entry that shall be updated
  * @param value The value that shall be updated
@@ -226,18 +236,22 @@ bool TrafficDataModel::insertRows(int position, int rows, const QModelIndex &/*i
  *
  * @return result TRUE indicates success, FALSE indicates failure. 
  * @todo Change the boolean variable to int so that more error codes can be returned.
- * @todo The data inserted is a stringlist (value) for the entire row. Check if this will create problems in future. In that case,  replace with the index (row, column).
+ * @todo The data inserted is a stringlist (value) for the entire row. Check if
+ *       this will create problems in future. In that case,  replace with the
+ *       index (row, column).
  */
 bool TrafficDataModel::setData(const QModelIndex &index,
-                              const QVariant &value, int role)
+                               const QVariant &value,
+                               int role)
 {
-    if (index.isValid() && role == Qt::EditRole) {
-	trafficDataMatrix.replace(index.row(), value.toStringList());
-        emit dataChanged(index, index);
-		emit layoutChanged();
-        return true;
-    }
-    return false;
+  if (index.isValid() && role == Qt::EditRole)
+  {
+    trafficDataMatrix.replace(index.row(), value.toStringList());
+    emit dataChanged(index, index);
+    emit layoutChanged();
+    return true;
+  }
+  return false;
 }
 
 TrafficDataModel::~TrafficDataModel()

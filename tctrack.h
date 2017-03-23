@@ -15,8 +15,8 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
-#include<vector>
-#include<QObject>
+#include <vector>
+#include <QObject>
 #ifndef _TCTRACK_H_
 #define _TCTRACK_H_
 using namespace std;
@@ -24,24 +24,30 @@ class Train;
 class Station;
 class Track: public QObject// to do later: Add vector with indices to the trains on each track.
 {
-	Q_OBJECT
+  Q_OBJECT
 
 signals:
-	void dataChangedSignal(int , const QVariant & ); 
+  void dataChangedSignal(int , const QVariant & );
 
 private:
-	static int totalNbrOfTracks;
-  	int length;
-  	int trainsOnTrack;
-  	QString name;
-  	int startStation;
-  	int endStation;
-	int maxAllowedSpeed;
-	int trackID;
+  static int totalNbrOfTracks;
+  int length;
+  int trainsOnTrack;
+  QString name;
+  int startStation;
+  int endStation;
+  int maxAllowedSpeed;
+  int trackID;
+
 public:
-  	Track(QString cn, int nn,QList<Track*>& trackList, QList<Train*>& trainList, QList<Station*>& stationList);//ID and length
-	Track(const Track& sTrack  );
-	Track& operator=( const Track& sTrack );
+  //TODO: Rename parameters to be more intuitive
+  Track(QString cn,
+        int nn,
+        QList<Track*>& trackList,
+        QList<Train*>& trainList,
+        QList<Station*>& stationList);//ID and length
+    Track(const Track& sTrack);
+    Track& operator=(const Track& sTrack);
     ~Track();
   	int getID();
 	int getLength();

@@ -29,140 +29,155 @@
 #define TRACK 1
 #define TRAIN 2
 #define STATION 3
-#define TRUE 1
-#define FALSE 0
+#define UNDEFINED -1
+
 using namespace std;
 
 TrafficControl::TrafficControl(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::TrafficControl)
+  QMainWindow(parent),
+  ui(new Ui::TrafficControl)
 {
-    ui->setupUi(this);
+  ui->setupUi(this);
 
-    trafficClock.threadSetup(clockThread);// Use the old implementation of clockThread (see Traffic - R1C012_Independent_Thread)
-    trafficClock.moveToThread(&clockThread);
-    clockThread.start();
+  trafficClock.threadSetup(clockThread);// Use the old implementation of clockThread (see Traffic - R1C012_Independent_Thread)
+  trafficClock.moveToThread(&clockThread);
+  clockThread.start();
 
-    connect( ui->createTrainButton, SIGNAL( clicked() ), this, SLOT(addTrainToNetworkUI() ) );
-    connect( ui->generateNetworkButton, SIGNAL( clicked() ), this, SLOT(createPredefinedNetworkUI() ) );
-    connect( ui->importNetworkButton, SIGNAL( clicked() ), this, SLOT(importPredefinedNetwork() ) );
-    connect( ui->listTrackButton, SIGNAL( clicked() ), this, SLOT(listTracksInNetwork() ) );
-    connect( ui->listTrainButton, SIGNAL( clicked() ), this, SLOT(listTrainsInNetwork() ) );
-    connect( ui->listStationButton, SIGNAL( clicked() ), this, SLOT(listStationsInNetwork() ) );
+  connect(ui->createTrainButton, SIGNAL(clicked()), this, SLOT(addTrainToNetworkUI()));
+  connect(ui->importNetworkButton, SIGNAL(clicked()), this, SLOT(importPredefinedNetwork()));
+  connect(ui->timeTickButton, SIGNAL(clicked()), this, SLOT(stepTimeForNetwork()));
+  connect(ui->runThreadCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onRunThreadCheckBoxChanged(int)));
+  connect(ui->tickIntervalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onTickIntervalChanged(int)));
+  connect(&trafficClock, SIGNAL(stepTimeSignal()), this, SLOT(stepTimeForNetwork()));
 
-    connect( ui->timeTickButton, SIGNAL( clicked() ), this, SLOT(stepTimeForNetwork() ) );
-    connect(&trafficClock, SIGNAL( stepTimeSignal() ), this, SLOT(stepTimeForNetwork() ) );
+  trackListModel=new TrafficDataModel(TRACK, 0);
+  trainListModel=new TrafficDataModel(TRAIN, 0);
+  stationListModel=new TrafficDataModel(STATION, 0);
+  ui->trackListTableView->setModel(trackListModel);
+  ui->trackListTableView->show();
+  ui->trainListTableView->setModel(trainListModel);
+  ui->trainListTableView->show();
+  ui->stationListTableView->setModel(stationListModel);
+  ui->stationListTableView->show();
+  QUrl source("qrc:Traffic/qml/map.qml");
 
-    connect( ui->runThreadCheckBox, SIGNAL( stateChanged(int) ), this, SLOT(onRunThreadCheckBoxChanged(int)) );
-    connect( ui->tickIntervalSpinBox, SIGNAL( valueChanged(int) ), this, SLOT(onTickIntervalChanged(int)) );
+  ui->mapQuickWidget->setSource(source);
+  handleQMLObject = ui->mapQuickWidget->rootObject();
+  //  handleQMLObject->dumpObjectTree();
 
-    trackListModel=new TrafficDataModel(TRACK, 0);//QGUSBRA: This instead of 0
-    trainListModel=new TrafficDataModel(TRAIN, 0);//QGUSBRA: This instead of 0
-    stationListModel=new TrafficDataModel(STATION, 0);//QGUSBRA: This instead of 0
-    ui->trackListTableView->setModel( trackListModel);
-    ui->trackListTableView->show();
-    ui->trainListTableView->setModel( trainListModel );
-    ui->trainListTableView->show();
-    ui->stationListTableView->setModel( stationListModel );
-    ui->stationListTableView->show();
+  /* TODO: Rename nameMainMap */
+  QObject *myStation1 = handleQMLObject->findChild<QObject *>(QString("nameMainMap"));
+  if (NULL == myStation1)
+  {
+    qDebug()<<"ERROR  : No nameMainMap found";
+  }
 
-    QUrl source("qrc:Traffic/qml/map.qml");
-
-    ui->mapQuickWidget->setSource(source);
-    //QObject* handleQMLObject; // Move to h file
-    handleQMLObject = ui->mapQuickWidget->rootObject();//Use this to get the different objects
-    //QObject *object=ui->mapQuickWidget->rootObject();//Use this to get the different objects
-    /*if(object){
-        qDebug()<<"INFO   : rootObject found!";
-    }*/
-    //handleQMLOject->dumpObjectInfo();
-    handleQMLObject->dumpObjectTree();
-
-
-    QObject *myStation1 = handleQMLObject->findChild<QObject *>(QString("nameMainMap"));
-    if(myStation1==NULL){
-            qDebug()<<"ERROR  : No nameMainMap found";
-        }
-        else{
-            qDebug()<<"INFO   : nameMainMap found";
-        }
-    QObject *myStation2 = handleQMLObject->findChild<QObject *>(QString("nameMainMapCircle1"));
+  /*  QObject *myStation2 = handleQMLObject->findChild<QObject *>(QString("nameMainMapCircle1"));
     if(myStation2 != NULL)
     {
         qDebug()<<"INFO   : nameMainMapCircle1 found";
-        myStation2->setProperty("color","green");
+        myStation2->setProperty("color","yellow");
     }
+  */
 }
 
-
 /*!
- * The method creates a Track Object, connects it to the onDataChanged slot and appends it to the trackList and the trackListModel.
+ * The method creates a Track Object, connects it to the onDataChanged slot and
+ * appends it to the trackList and the trackListModel.
  *
  * @param trackName Name of the track
  * @param trackLength Length of the track [Unit: m]
  */
 void TrafficControl::addTrackToNetwork(QString trackName, int trackLength)
 {
-    Track* track1 = new Track(trackName, trackLength, trackList, trainList, stationList);
-    connect( track1, SIGNAL( dataChangedSignal(int, const QVariant & ) ), trackListModel, SLOT(onDataChanged(int , const QVariant & ) ) );
-    trackList.append(track1);
-    trackListModel->insertRows(trackList.size(), 1 , QModelIndex());
-    track1=NULL;
+  Track* track1 = new Track(trackName,
+                            trackLength,
+                            trackList,
+                            trainList,
+                            stationList);
+
+  connect(track1,
+          SIGNAL(dataChangedSignal(int, const QVariant &)),
+          trackListModel,
+          SLOT(onDataChanged(int, const QVariant &)));
+  trackList.append(track1);
+  trackListModel->insertRows(trackList.size(), 1 , QModelIndex());
+  track1=NULL;
 }
 
 /*!
- * The method addTrackToNetwork creates a Train object with parameters from the User Interface. It connects the train object to the onDataChanged slot and appends it to the trainList and the trainListModel.
+ * The method addTrackToNetwork creates a Train object with parameters from
+ * the User Interface. It connects the train object to the onDataChanged slot
+ * and appends it to the trainList and the trainListModel.
  */
 void TrafficControl::addTrainToNetworkUI()
 {
-    qDebug()<<"WARNING: This function has intentionally been removed";
+  qDebug()<<"WARNING: This function has intentionally been removed";
 }
 
 /*!
- * The method addTrainToNetwork creates a Train object, connects it to the onDataChanged slot and appends it to the trainList and the trainListModel.
+ * The method addTrainToNetwork creates a Train object, connects it to the
+ * onDataChanged slot and appends it to the trainList and the trainListModel.
  *
- * @param nbrOfPassengers Maximum allowed number of passengers. COMMENT: This naming is confusing and should be maxNbrOfPassengers.
+ * @param nbrOfPassengers Maximum allowed number of passengers. COMMENT: This
+ *        naming is confusing and should be maxNbrOfPassengers.
  */
-void TrafficControl::addTrainToNetwork(QString trainName)// Ambigous variable name. Should be maxNbrOfPassengers.
+void TrafficControl::addTrainToNetwork(QString trainName)
 {
-    Train* train1 =new Train(trainName, trackList, trainList, stationList);
-    connect( train1, SIGNAL( dataChangedSignal(int, const QVariant & ) ), trainListModel, SLOT(onDataChanged(int , const QVariant & ) ) );
-    trainList.append(train1);
+  Train* newTrain =new Train(trainName, trackList, trainList, stationList);
+  connect(newTrain,
+          SIGNAL(dataChangedSignal(int, const QVariant &)),
+          trainListModel,
+          SLOT(onDataChanged(int , const QVariant &)));
+  trainList.append(newTrain);
 
-    trainListModel->insertRows(trainList.size(), 1 , QModelIndex());
-    trainList[trainList.size()-1]->load(2);/*Maybe send datachanged? 2 refers to number
-        of passengers and is hardcoded. Change this later*/
-    train1 = NULL;
+  trainListModel->insertRows(trainList.size(), 1 , QModelIndex());
+  trainList[trainList.size()-1]->load(2);/*Maybe send datachanged? 2 refers to number
+                                          of passengers and is hardcoded. Change this later*/
+  newTrain = NULL;
 }
 
 /*!
- * The method addStationToNetwork creates a Train object, connects it to the onDataChanged slot and appends it to the trainList and the trainListModel.
+ * The method addStationToNetwork creates a Train object, connects it to the
+ * onDataChanged slot and appends it to the trainList and the trainListModel.
  *
  * @param stationName Name of the station
  */
 void TrafficControl::addStationToNetwork(QString stationName, bool isJunction)
 {
-    Station* station1 = new Station(stationName, isJunction, trackList, trainList, stationList);
-    connect( station1, SIGNAL( dataChangedSignal(int, const QVariant & ) ), stationListModel, SLOT(onDataChanged(int , const QVariant & ) ) );
-    stationList.append(station1);
-    stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
-    stationList[stationList.size()-1]->changeNbrOfPassengers(0);
-    station1 = NULL;
+  Station* newStation = new Station(stationName,
+                                  isJunction,
+                                  trackList,
+                                  trainList,
+                                  stationList);
+  connect(newStation,
+          SIGNAL(dataChangedSignal(int, const QVariant &)),
+          stationListModel,
+          SLOT(onDataChanged(int , const QVariant &)));
+  stationList.append(newStation);
+  stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
+  stationList[stationList.size()-1]->changeNbrOfPassengers(0);
+  newStation = NULL;
 }
 
-int TrafficControl::createQMLStation(QString objectName, bool isJunction, QString stationLat, QString stationLong)
+int TrafficControl::createQMLStation(QString objectName,
+                                     bool isJunction,
+                                     QString stationLat,
+                                     QString stationLong)
 {
-    qDebug()<<"In TC::callQMLMap "<<objectName <<" "<<isJunction<<" "<<stationLat<<" "<<stationLong;
+  qDebug() << "In TC::callQMLMap " << objectName << " " << isJunction << " "
+           << stationLat << " " << stationLong;
 
-    QVariant returnedValue;
-    QMetaObject::invokeMethod(handleQMLObject, "createQMLStationFromSprite",
-        Q_RETURN_ARG(QVariant, returnedValue),
-        Q_ARG(QVariant, objectName),
-        Q_ARG(QVariant, isJunction),
-        Q_ARG(QVariant, stationLat),
-        Q_ARG(QVariant, stationLong));
+  QVariant returnedValue;
+  QMetaObject::invokeMethod(handleQMLObject,
+                            "createQMLStationFromSprite",
+                            Q_RETURN_ARG(QVariant, returnedValue),
+                            Q_ARG(QVariant, objectName),
+                            Q_ARG(QVariant, isJunction),
+                            Q_ARG(QVariant, stationLat),
+                            Q_ARG(QVariant, stationLong));
 
-    return 0;
+  return 0;
 }
 
 /*!
@@ -173,9 +188,14 @@ int TrafficControl::createQMLStation(QString objectName, bool isJunction, QStrin
  * @param endStation The ID number of the end station for the track.
  *
  * @return Status 1 indicates success. 0 indicates failure.
- * @TODO Insert constraints in this function, similar as the name based connectTrackToStations method
+ * @TODO Insert constraints in this function, similar as the name based
+ *       connectTrackToStations method
+ *
+ * @TODO Add error detection
  */
-int TrafficControl::connectTrackToStations(int trackID, int startStationID, int endStationID)
+int TrafficControl::connectTrackToStations(int trackID,
+                                           int startStationID,
+                                           int endStationID)
 {
     trackList[trackID]->setStartStation(startStationID);
     trackList[trackID]->setEndStation(endStationID);
@@ -192,83 +212,58 @@ int TrafficControl::connectTrackToStations(int trackID, int startStationID, int 
  *
  * @return Status 1 indicates success. 0 indicates failure.
  */
-int TrafficControl::connectTrackToStations(QString trackName, QString startStationName, QString endStationName)
+int TrafficControl::connectTrackToStations(QString trackName,
+                                           QString startStationName,
+                                           QString endStationName)
 {
-    int foundStartStationID=-1;
-    int foundEndStationID=-1;
-    int foundTrackID=-1;
-    if(QString::compare(startStationName, endStationName)==0) {qDebug()<<"TC:cTTS: Station names are equal";} else
+  int foundStartStationID = UNDEFINED;
+  int foundEndStationID = UNDEFINED;
+  int foundTrackID = UNDEFINED;
+  if(QString::compare(startStationName, endStationName) == 0)
+  {
+    qDebug()<<"TC:cTTS: Station names are equal";
+    return 0;
+  }
+  else
+  {
+    foreach(Station* thisStation, stationList)
     {
-        foreach(Station* thisStation, stationList){
-            if(QString::compare(startStationName, thisStation->getName())==0){ foundStartStationID=thisStation->getID(); }
-            if(QString::compare(endStationName, thisStation->getName())==0){ foundEndStationID=thisStation->getID(); }
-            if ( ( foundStartStationID != -1 ) && ( foundEndStationID != -1 ) ) break;
-        }
-        foreach(Track* thisTrack, trackList){
-            if(QString::compare(trackName, thisTrack->getName())==0){ foundTrackID=thisTrack->getID(); break; }
-        }
-        if( (foundStartStationID!=-1) && ( foundEndStationID!=-1) && (foundTrackID!=-1))
+      if (QString::compare(startStationName, thisStation->getName()) == 0)
+      {
+        foundStartStationID=thisStation->getID();
+      }
+      if (QString::compare(endStationName, thisStation->getName()) == 0)
+      {
+        foundEndStationID=thisStation->getID();
+      }
+      if ((foundStartStationID != UNDEFINED) &&
+          (foundEndStationID != UNDEFINED))
         {
-            //if ( ( trackList[foundTrackID]->getStartStation() != -1 ) && ( trackList[foundTrackID]->getEndStation() !=-1 ) ) {qDebug()<<"TC:CTTS, overwriting old start or end stations.\n";}
-            trackList.at(foundTrackID)->setStartStation(foundStartStationID);
-            trackList.at(foundTrackID)->setEndStation(foundEndStationID);
-            stationList.at(foundStartStationID)->addTrack(foundTrackID);
-        } else {
-            qDebug()<<"ERROR  : TC:cTTS: Either track or station name is not found.";
-            return 0;
+          break;
         }
-    }
-    return 1;
-}
-
-/*!
- * The method is a macro that creates a simple network and adds a train to it.
- * DELETE THIS METHOD
- */
-void TrafficControl::createPredefinedNetworkUI()/*Clarify the relationship between this method and the
-        class TrafficControl::importPredefinedNetwork()*/
-{
-}
-
-
-/*!
- * The method lists the tracks in the network to the console.
- * DELETE THIS METHOD
- *
- * @todo implement a foreach statement instead.
- */
-void TrafficControl::listTracksInNetwork()
-{
-    qDebug()<<"INFO   : Contents of trackList:";
-    foreach(Track* thisTrack, trackList){ thisTrack->showInfo(); }
-    qDebug()<<"INFO   : ----End of trackList---";
-}
-
-/*!
- * The method lists the trains in the network to the console.
- *
- * DELETE THIS METHOD
- *
- * @todo Implement a foreach statement instead.
- */
-void TrafficControl::listTrainsInNetwork()
-{
-    qDebug()<<"INFO   : Contents of trainList:";
-    foreach(Train* thisTrain, trainList){ thisTrain->showInfo(); }
-    qDebug()<<"INFO   : ----End of trainList----";
-}
-
-/*!
- * The method lists the stations in the network to the console.
- *
- * DELETE THIS METHOD
- *
- */
-void TrafficControl::listStationsInNetwork()
-{
-    qDebug()<<"INFO   : Contents of stationList:";
-    foreach(Station* thisStation, stationList){ thisStation->showInfo(); }
-    qDebug()<<"INFO   : ----End of stationList----";
+      }
+      foreach(Track* thisTrack, trackList){
+        if(QString::compare(trackName, thisTrack->getName()) == 0)
+        {
+          foundTrackID=thisTrack->getID();
+          break;
+        }
+      }
+      if ((foundStartStationID != UNDEFINED) &&
+          (foundEndStationID != UNDEFINED) &&
+          (foundTrackID != UNDEFINED))
+      {
+        trackList.at(foundTrackID)->setStartStation(foundStartStationID);
+        trackList.at(foundTrackID)->setEndStation(foundEndStationID);
+        stationList.at(foundStartStationID)->addTrack(foundTrackID);
+      }
+      else
+      {
+        qDebug()<<"ERROR  : TC:cTTS: Either track or station name is not found.";
+        return 0;
+      }
+  }
+  return 1;
 }
 
 /*!
@@ -277,55 +272,54 @@ void TrafficControl::listStationsInNetwork()
  */
 void TrafficControl::stepTimeForNetwork()
 {
-    QMutexLocker locker(&mutex);
-    int ddd=0;
+  QMutexLocker locker(&mutex);
+  int response = 0;
 
-    int n=ui->stepTimeBox->value();
-    foreach(Train* thisTrain, trainList){
-        ddd=thisTrain->move(n);
-    }
-    ui->stationListTableView->resizeColumnsToContents();
-    ui->trackListTableView->resizeColumnsToContents();
-    ui->trainListTableView->resizeColumnsToContents();
+  int n = ui->stepTimeBox->value();
+  foreach(Train* thisTrain, trainList){
+    response = thisTrain->move(n);
+  }
+  ui->stationListTableView->resizeColumnsToContents();
+  ui->trackListTableView->resizeColumnsToContents();
+  ui->trainListTableView->resizeColumnsToContents();
 }
 
 void TrafficControl::onRunThreadCheckBoxChanged(int newState)
 {
-    if(newState==2)//HARDCODED TO 2, THAT MEANS ACTIVE
-    {
-        trafficClock.resumeThread();
-    }
-    else
-    {
-        trafficClock.pauseThread();
-    }
+  if(newState == 2)//HARDCODED TO 2, THAT MEANS ACTIVE
+  {
+    trafficClock.resumeThread();
+  }
+  else
+  {
+    trafficClock.pauseThread();
+  }
 }
 
 void TrafficControl::onTickIntervalChanged(int newInterval)
 {
-    trafficClock.setTickInterval(newInterval);
+  trafficClock.setTickInterval(newInterval);
 }
 
 /*!
  * The destructor method
- * @TODO Investigate what objects ad data structures shall be removed at termination of
- * the program at termination.
+ * @TODO Investigate what objects ad data structures shall be removed at
+ * termination of the program.
  *
  * @TODO Investigate dependencies when removing objects
  */
 TrafficControl::~TrafficControl()
 {
-    // delete trafficMap;
-    trafficClock.disconnectThread();
-    clockThread.terminate();
-    while(!clockThread.isFinished()){}
-    qDebug()<<"INFO   : The thread is terminated. Deleting pointers.";
-    foreach(Station* thisStation, stationList){ delete thisStation; thisStation=NULL;}
-    foreach(Track* thisTrack, trackList){ delete thisTrack; thisTrack=NULL;}
-    foreach(Train* thisTrain, trainList){ delete thisTrain; thisTrain=NULL;}
-    delete trackListModel;
-    delete trainListModel;
-    delete stationListModel;
-    //Insert code to remove objects here
-    delete ui;
+  trafficClock.disconnectThread();
+  clockThread.terminate();
+  while(!clockThread.isFinished()){}
+  qDebug()<<"INFO   : The thread is terminated. Deleting pointers.";
+  foreach(Station* thisStation, stationList){ delete thisStation; thisStation=NULL;}
+  foreach(Track* thisTrack, trackList){ delete thisTrack; thisTrack=NULL;}
+  foreach(Train* thisTrain, trainList){ delete thisTrain; thisTrain=NULL;}
+  delete trackListModel;
+  delete trainListModel;
+  delete stationListModel;
+  //Insert code to remove objects here
+  delete ui;
 }

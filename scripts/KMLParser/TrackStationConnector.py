@@ -15,7 +15,7 @@ def haversine(lon1, lat1, lon2, lat2):  #From rosettacode.org
  
   return R * c
 
-inputfile = "NetworkCoordinates.kml"
+inputfile = "NetworkCoordinates_EnglishCharacters.kml"
 
 trackList=[] # The track list contains name, line in file, start coordinates, start station name, end coordinates, 
              # end station name, length
@@ -40,6 +40,7 @@ with open(inputfile, "r", encoding='utf8') as ins:
     if ( ("\t\t\t<name>" in line) and not (("\t\t\t\t<name>") in line) ) :
       placeMarkType=line[9:-8]
     if ( ("\t\t\t\t<name>" in line) and not (("\t\t\t\t\t<name>") in line) ) :
+      #placeMarkName=line[10:-8].replace("Å","Aa").replace("Ä","Ae").replace("Ö","Oe").replace("å","aa").replace("ä","ae").replace("ö","oe")
       placeMarkName=line[10:-8]
     if ( ( "<coordinates>" in line) and ( ( "Station" in placeMarkType) or ("Junction" in placeMarkType ) ) ) :
       #print("ADD STATION " + placeMarkName + str(" AS JUNCTION" if ("Junction" in placeMarkType) else "") )
@@ -52,40 +53,64 @@ with open(inputfile, "r", encoding='utf8') as ins:
             stationListItem[2][0] )
 
     if(isNextLineCoordinateList==True):#This happens directly after coordinates are found below
-      summa=0
-      tempDist=0
+      summa=0.0
       coordinateList=str(line[6:-2]).split(" ")
       #print(coordinateList)
       thisTrackCoordinates=""
-      reversedTrackCoordinates="" #remove comment
-      for iii in range(0, len(coordinateList)-1):
-        orgLon=coordinateList[iii].split(",")[0]
-        orgLat=coordinateList[iii].split(",")[1]
-        desLon=coordinateList[iii+1].split(",")[0]
-        desLat=coordinateList[iii+1].split(",")[1]
-        tempDist=int(haversine(float(orgLon),float(orgLat),float(desLon),float(desLat))*1000)
-        summa=summa+tempDist
-        #print(" + " + str(tempDist) + " = " +str( summa ) )
+      reversedTrackCoordinates=""
+      for iii in range(1, len(coordinateList)):
+        orgLon=coordinateList[iii-1].split(",")[0]
+        orgLat=coordinateList[iii-1].split(",")[1]
+        desLon=coordinateList[iii].split(",")[0]
+        desLat=coordinateList[iii].split(",")[1]
+        summa=summa+haversine(float(orgLon),float(orgLat),float(desLon),float(desLat))
         if(placeMarkName[0]=="d"):
-          reversedTrackCoordinates= str(tempDist) + " " +  orgLat + " " + orgLon + " " + reversedTrackCoordinates 
-        thisTrackCoordinates=thisTrackCoordinates+" " + orgLat + " " + orgLon + " " +  str(tempDist)
+          reversedTrackCoordinates=orgLat + " " + orgLon + " " + reversedTrackCoordinates
+        thisTrackCoordinates=thisTrackCoordinates+" " + orgLat + " " + orgLon
       if(placeMarkName[0]=="d"):
-        reversedTrackCoordinates= desLat + " " + desLon + " " + reversedTrackCoordinates  + " 0"
-      #Modify here to add temp distances
-      thisTrackCoordinates=thisTrackCoordinates+" " + desLat + " " + desLon + " 0"
+        reversedTrackCoordinates=  desLat + " " + desLon + " " + reversedTrackCoordinates 
+      thisTrackCoordinates=thisTrackCoordinates+" " + desLat + " " + desLon
+
+      # IDENTIFY THE DIRECTION OF THE TRACK
+      #print ("_________")
+      
+      # IS DELTA north-south OR west-east?
+      startLong = float(coordinateList[0].split(",")[0])
+      startLat = float(coordinateList[0].split(",")[1])
+      endLong = float(coordinateList[-1].split(",")[0])
+      endLat = float(coordinateList[-1].split(",")[1])
+      #print(startLong)
+      #print(startLat)
+      #print(endLong)
+      #print(endLat)
+      if (abs(endLat - startLat) < abs(endLong - startLong)):
+        if(startLong<endLong):
+          #print("E")
+          placeMarkName = placeMarkName+"_E"
+        else:
+          #print("W")
+          placeMarkName = placeMarkName+"_W"
+      else:
+        if(startLat<endLat):
+          #print("N")
+          placeMarkName = placeMarkName+"_N"
+        else:
+          #print("S")
+          placeMarkName = placeMarkName+"_S"
+      
       #print(thisTrackCoordinates)
       isNextLineCoordinateList=False
       trackListItem=[placeMarkName, numLines, coordinateList[0].split(",")[:-1], "", coordinateList[-1].split(",")[:-1], "", summa]
       trackList.append(trackListItem)
       
-      print("ADD TRACK "+ placeMarkName + " " + str(summa ) +  " COORDINATES" +thisTrackCoordinates )
+      print("ADD TRACK "+ placeMarkName + " " + str(int(summa*1000) ) +  " COORDINATES" +thisTrackCoordinates)
       if(placeMarkName[0]=="d"):#dLunGunN shall have a friend dLunGunS (same name, but in opposite direction)
         tempPlaceMarkName=""
         if (placeMarkName[-1]=='N'): tempPlaceMarkName='S'
         if (placeMarkName[-1]=='S'): tempPlaceMarkName='N'
         if (placeMarkName[-1]=='E'): tempPlaceMarkName='W'
         if (placeMarkName[-1]=='W'): tempPlaceMarkName='E'
-        print("ADD TRACK e" + str(placeMarkName[1:-1])+tempPlaceMarkName + " " + str(summa)  +  " COORDINATES " +reversedTrackCoordinates)
+        print("ADD TRACK " + str(placeMarkName[:-1])+tempPlaceMarkName + " " + str(int(summa*1000))  +  " COORDINATES " +reversedTrackCoordinates[:-1])
         trackListItem=[str(placeMarkName[:-1])+tempPlaceMarkName, numLines, coordinateList[0].split(",")[:-1], "", coordinateList[-1].split(",")[:-1], "", summa]
         trackList.append(trackListItem)
 
@@ -110,12 +135,14 @@ with open(inputfile, "r", encoding='utf8') as ins:
         lastDist=thisDist
         lastCandidate=station[0]
         lastCoordinate=station[2]
-    trackDir=( "N" ) if ( float(firstCoordinate[1] )<  float(lastCoordinate[1]) ) else ( "S" )
-    trackDir=trackDir+ ( "E" ) if ( float(firstCoordinate[0] )<  float(lastCoordinate[0]) ) else (trackDir + "W" ) 
+    trackDir=( "__N" ) if ( float(firstCoordinate[1] )<  float(lastCoordinate[1]) ) else ( "__S" )  ### REMOVE
+    trackDir=trackDir +("__E" ) if ( float(firstCoordinate[0] )<  float(lastCoordinate[0]) ) else (trackDir + "__W" )## REMOVE
+    # print("Direction from name: " + track[0][-1]+ ", direction in coordinates: "+ trackDir +" ?" ) ###REMOVE
     if(track[0][-1] in trackDir):
-      print("CONNECT TRACK " + track[0] + " FROM " + firstCandidate + " TO "+ lastCandidate + " DEFAULT")
+      print("CONNECT TRACK " + track[0] + " FROM " + firstCandidate + " TO "+ lastCandidate)
       #THIS REQUIRES UPDATE IN TRAINCONTROL::IMPORTNETWORKFROMFILE
-      print("CONNECT TRACK " + track[0] + " FROM " + lastCandidate + " TO "+ firstCandidate)
+      print("CONNECT TRACK " + track[0] + " FROM " + lastCandidate + " TO "+ firstCandidate + " REVERSED")
     else:
-      print("CONNECT TRACK " + track[0] + " FROM " + lastCandidate + " TO " + firstCandidate + " DEFAULT")
+      #print("   !!! Mismatch !!!")#REMOCE!
+      print("CONNECT TRACK " + track[0] + " FROM " + lastCandidate + " TO " + firstCandidate + " REVERSED")
       print("CONNECT TRACK " + track[0] + " FROM " + firstCandidate + " TO " + lastCandidate)
