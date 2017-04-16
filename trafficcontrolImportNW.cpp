@@ -54,6 +54,7 @@ void TrafficControl::importPredefinedNetwork()
     QString line = in.readLine();
     QStringList argumentList=line.split(" ");
     bool approvedCommand = false;
+    bool isTrackReversed = false;
 
     //Code for analysing track commands
     if ((0 == argumentList.indexOf("TRACK")) &&
@@ -140,6 +141,10 @@ void TrafficControl::importPredefinedNetwork()
         //Check that the second argument reflects an existing track, and that the stations exist.
       int foundTrack = UNDEFINED;
       qDebug()<<"INFO   : CONNECT TRACK name FROM station TO station recognised";
+      if (7 == argumentList.indexOf("REVERSED"))
+      {
+        isTrackReversed = true;
+      }
       foreach(Track* t, trackList){
         if (t->getName()==argumentList.at(2)) {foundTrack=t->getID();
       }
@@ -159,7 +164,8 @@ void TrafficControl::importPredefinedNetwork()
           (foundTrack != UNDEFINED)){
         connectTrackToStations(argumentList.at(2),
                                argumentList.at(4),
-                               argumentList.at(6));
+                               argumentList.at(6),
+                               isTrackReversed);
         approvedCommand=true;
     } } }
 
@@ -249,6 +255,7 @@ void TrafficControl::importPredefinedNetwork()
       //        <<argumentList.at(4)<<". TODO: Check that the station exists.";
       foreach (Station* s, stationList) {
         if( s->getName()==argumentList.at(4)){
+          qDebug()<<"IMPORT : "<<argumentList.at(4) <<" found. Adding to travelplan";
           trainList.at(currentTrain)->addStationToTrainRoute(s->getID());
           approvedCommand=true;
         }

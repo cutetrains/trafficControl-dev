@@ -82,10 +82,13 @@ Train::Train(QString tn,
 void Train::addStationToTrainRoute(int stationID)
 {
 //	For trafficcontrol:Check if track exists and can be reached from the prior track.
-  if (stationID <= 0){
-    qDebug()<<"ERROR  : Train::addTrackToTrainRoute Error: negative number specified.\n";
+  qDebug()<<"!!!DEPRECATED: This shall be replaced with addStationToTravelplan!!!";
+  if (stationID < 0){
+    qDebug()<<"ERROR  : Train::addTrackToTrainRoute Error: negative number specified."
+            << stationID<<" : "<< thisStationList->at(stationID)->getName();
     } else {
-    qDebug()<<"INFO   : Adding track to trainroute";
+    qDebug()<<"INFO   : Adding station to trainroute" << stationID<<" : "
+            << thisStationList->at(stationID)->getName();
     travelPlanByStationID.push_back(stationID);
   }
   sendDataChangedSignal(trainID);
@@ -93,7 +96,7 @@ void Train::addStationToTrainRoute(int stationID)
 }
 
 /*!
- * Adds a Track ID to the trainRoute in order to define the route for the train.
+ * Adds a Track ID to the travelPlan in order to define the route for the train.
  *
  * @todo Integrity check to make sure that the track is valid.
  * @todo investigate if it is better to use a list of stations instead.
@@ -167,7 +170,7 @@ int Train::move(int n)
 //This function must be able to move to, from and through one or several stations.
 {
   QMutexLocker locker(&mutex);
-  while (n>0){
+  while (n > 0){
     if (stateTable.value("WAITING") == state)
     {
       state = stateTable.value("READY");
@@ -179,9 +182,12 @@ int Train::move(int n)
         if (UNDEFINED == nextTrack)//Next track not defined
         {
           //THIS SHOULD BE REPLACED BY A FUNCTION OR METHOD THAT SEARCHES FOR TRACK
+          qDebug()<<"TRAIN  : " << this->getName() <<" in "
+                  <<thisStationList->at(currentStation)->getName()<< "and is searching for next track.";
           nextTrack = thisStationList->at(currentStation)
                         ->findLeavingTrackIndexToStation(//What track to next station?
                           travelPlanByStationID.at(nextIndexTravelPlanByStationID));//Next station in travelplan
+          qDebug()<<"TRAIN  :"<< this->getName()<<" has found track "<< thisTrackList->at(nextTrack)->getName();
           if (UNDEFINED == nextTrack)//Still no suitable track found - IS THIS STATE POSSIBLE?
           {
             if (travelPlanByStationID.at(nextIndexTravelPlanByStationID) == currentStation)
@@ -210,6 +216,7 @@ int Train::move(int n)
           if (nextIndexTravelPlanByStationID < ((int) travelPlanByStationID.size() - 1))
           {
             nextIndexTravelPlanByStationID++;
+            this->showInfo();
           } else
           {
             qDebug()<<"INFO   : "<< trainName << " has reached end of travelplan. tp_s : "<< (int) travelPlanByStationID.size()

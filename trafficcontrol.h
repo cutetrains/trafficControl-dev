@@ -68,7 +68,8 @@ public slots:
   void stepTimeForNetwork();
   int connectTrackToStations(QString trackName,
                              QString startStationName,
-                             QString endStationName);
+                             QString endStationName,
+                             bool isReversed);
   int connectTrackToStations(int trackID,
                              int startStationID,
                              int endStationID);

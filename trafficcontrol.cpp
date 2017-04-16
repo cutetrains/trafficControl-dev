@@ -214,7 +214,8 @@ int TrafficControl::connectTrackToStations(int trackID,
  */
 int TrafficControl::connectTrackToStations(QString trackName,
                                            QString startStationName,
-                                           QString endStationName)
+                                           QString endStationName,
+                                           bool isReversed)
 {
   int foundStartStationID = UNDEFINED;
   int foundEndStationID = UNDEFINED;
@@ -253,9 +254,17 @@ int TrafficControl::connectTrackToStations(QString trackName,
           (foundEndStationID != UNDEFINED) &&
           (foundTrackID != UNDEFINED))
       {
-        trackList.at(foundTrackID)->setStartStation(foundStartStationID);
-        trackList.at(foundTrackID)->setEndStation(foundEndStationID);
-        stationList.at(foundStartStationID)->addTrack(foundTrackID);
+        if (isReversed)//
+        {//
+          trackList.at(foundTrackID)->setEndStation(foundStartStationID);//
+          trackList.at(foundTrackID)->setStartStation(foundEndStationID);//
+        }//
+        else//
+        {//
+          trackList.at(foundTrackID)->setStartStation(foundStartStationID);
+          trackList.at(foundTrackID)->setEndStation(foundEndStationID);
+        }//
+        stationList.at(foundStartStationID)->addTrack(foundTrackID);//
       }
       else
       {
