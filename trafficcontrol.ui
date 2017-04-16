@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
+    <width>896</width>
     <height>690</height>
    </rect>
   </property>
@@ -23,9 +23,9 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>5</x>
+      <x>10</x>
       <y>0</y>
-      <width>1181</width>
+      <width>891</width>
       <height>661</height>
      </rect>
     </property>
@@ -156,9 +156,9 @@
      <widget class="QTableView" name="stationListTableView">
       <property name="geometry">
        <rect>
-        <x>870</x>
+        <x>730</x>
         <y>40</y>
-        <width>300</width>
+        <width>151</width>
         <height>581</height>
        </rect>
       </property>
@@ -173,7 +173,7 @@
        <rect>
         <x>360</x>
         <y>40</y>
-        <width>500</width>
+        <width>361</width>
         <height>581</height>
        </rect>
       </property>
@@ -471,7 +471,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1200</width>
+     <width>896</width>
      <height>21</height>
     </rect>
    </property>
