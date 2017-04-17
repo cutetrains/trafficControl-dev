@@ -179,33 +179,48 @@ int Train::move(int n)
     {
       if (currentStation != UNDEFINED) //Train at station.
       {
-        if (UNDEFINED == nextTrack)//Next track not defined
+        if (nextIndexTravelPlanByStationID >= ((int) travelPlanByStationID.size() - 1))
         {
-          //THIS SHOULD BE REPLACED BY A FUNCTION OR METHOD THAT SEARCHES FOR TRACK
-          qDebug()<<"TRAIN  : " << this->getName() <<" in "
-                  <<thisStationList->at(currentStation)->getName()<< "and is searching for next track.";
-          nextTrack = thisStationList->at(currentStation)
-                        ->findLeavingTrackIndexToStation(//What track to next station?
-                          travelPlanByStationID.at(nextIndexTravelPlanByStationID));//Next station in travelplan
-          qDebug()<<"TRAIN  :"<< this->getName()<<" has found track "<< thisTrackList->at(nextTrack)->getName();
-          if (UNDEFINED == nextTrack)//Still no suitable track found - IS THIS STATE POSSIBLE?
+          if (travelPlanByStationID.at(nextIndexTravelPlanByStationID) == currentStation)
           {
-            if (travelPlanByStationID.at(nextIndexTravelPlanByStationID) == currentStation)
+            qDebug()<<"INFO   : "<< trainName <<" shall stop. nextIndex: "<< nextIndexTravelPlanByStationID<<" tps: "
+                    << (int) travelPlanByStationID.size() <<" CurrentStation: "<<currentStation<< "TP points at:"
+                    <<travelPlanByStationID.at(nextIndexTravelPlanByStationID);
+            state = stateTable.value("STOPPED");
+            return 0;
+          }
+        }
+        else
+        {
+          if (UNDEFINED == nextTrack)//Next track not defined
+          {
+            //THIS SHOULD BE REPLACED BY A FUNCTION OR METHOD THAT SEARCHES FOR TRACK
+            qDebug()<<"TRAIN  : " << this->getName() <<" in "
+                    <<thisStationList->at(currentStation)->getName()<< "and is searching for next track.";
+            nextTrack = thisStationList->at(currentStation)
+                          ->findLeavingTrackIndexToStation(//What track to next station?
+                            travelPlanByStationID.at(nextIndexTravelPlanByStationID));//Next station in travelplan
+            qDebug()<<"TRAIN  :"<< this->getName()<<" has found track "<< thisTrackList->at(nextTrack)->getName();
+            if (UNDEFINED == nextTrack)//Still no suitable track found - IS THIS STATE POSSIBLE?
             {
-              state = stateTable.value("STOPPED");
-              return 0;
-            } else {
-              qDebug() << "ERROR  : Train:Move No track from "
-                       << thisStationList->at(currentStation)->getName()
-                       << " to " << thisStationList->at(travelPlanByStationID
-                                                       .at(nextIndexTravelPlanByStationID))
-                                                        ->getName();
-              this->showInfo();
-              state = stateTable.value("STOPPED");
-              return 0;
+              if (travelPlanByStationID.at(nextIndexTravelPlanByStationID) == currentStation)
+              {
+                state = stateTable.value("STOPPED");
+                return 0;
+              } else {
+                qDebug() << "ERROR  : Train:Move No track from "
+                         << thisStationList->at(currentStation)->getName()
+                         << " to " << thisStationList->at(travelPlanByStationID
+                                                         .at(nextIndexTravelPlanByStationID))
+                                                          ->getName();
+                this->showInfo();
+                state = stateTable.value("STOPPED");
+                return 0;
+              }
             }
           }
         }
+
         if (true == thisStationList->at(currentStation)->checkIfTrackLeavesStation(nextTrack))
         {//Train is at a station and next track is leaving the station.
           currentTrack = nextTrack;
