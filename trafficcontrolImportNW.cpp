@@ -256,7 +256,7 @@ void TrafficControl::importPredefinedNetwork()
       foreach (Station* s, stationList) {
         if( s->getName()==argumentList.at(4)){
           qDebug()<<"IMPORT : "<<argumentList.at(4) <<" found. Adding to travelplan";
-          trainList.at(currentTrain)->addStationToTrainRoute(s->getID());
+          trainList.at(currentTrain)->addStationToTravelPlan(s->getID());
           approvedCommand=true;
         }
       }

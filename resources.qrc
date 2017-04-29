@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/Traffic/qml">
         <file>map.qml</file>
-		<file>stationSprite.qml</file>
         <file>QmlLogic.js</file>
     </qresource>
 </RCC>

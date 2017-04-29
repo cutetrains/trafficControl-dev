@@ -285,6 +285,7 @@ void TrafficControl::stepTimeForNetwork()
   int response = 0;
 
   int n = ui->stepTimeBox->value();
+  qDebug()<<"n:"<<n;
   foreach(Train* thisTrain, trainList){
     response = thisTrain->move(n);
   }
