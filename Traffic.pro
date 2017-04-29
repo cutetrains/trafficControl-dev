@@ -38,8 +38,7 @@ FORMS    += trafficcontrol.ui
 OTHER_FILES  =
 
 DISTFILES += \
-    map.qml \
-    stationSprite.qml
+    map.qml
 
 RESOURCES += \
     resources.qrc

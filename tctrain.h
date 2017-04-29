@@ -63,9 +63,7 @@ public:
         QList<Train*>& trainList,
         QList<Station*>& stationList);
   ~Train();
-  void addStationToTrainRoute(int station);//To be removed and replaced by addStationToTrainRoute
-  int addStationToTravelPlan(QString stationName,
-                             bool stopAtStation);//Future step: add requested arrival and departure time to the entry
+  int addStationToTravelPlan(int stationID);//To be removed and replaced by addStationToTrainRoute
   int getCurrentSpeed();
   int getCurrentStation();
   int getCurrentTrack();
@@ -74,10 +72,23 @@ public:
   QString getName();
   int getTrackPosition();
   int getIndexTravelPlanByStationID();
-  vector<int> getRouteVectorStations();
-  vector<int> getRouteVectorTracks();//To delete
+  vector<int> getTravelPlan();
+  //vector<int> getRouteVectorTracks();//To delete
   void load(int n);
   int move(int n);//if train shall wait for other elements, return int>0.
+
+  int waitingState(int n);
+  int readyState(int n);
+  int runningState(int n);
+  int openingState(int n);
+  int loadingState(int n);
+  int closingState(int n);
+  /*int readyToRunning(int n);
+  int runningToReady(int n);
+  int waitingToOpening(int n);
+  int runningToPassing(int n);
+  int passingToEmergency(int n);*/
+
   void sendDataChangedSignal(int trainID);
   void setCurrentStation(int StationID);
   void setCurrentTrack(int trackID);
