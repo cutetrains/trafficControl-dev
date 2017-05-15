@@ -159,7 +159,7 @@ int Train::move(int n)
 //This function must be able to move to, from and through one or several stations.
 {
   QMutexLocker locker(&mutex);
-  while (n > 0){//Add PASSING and
+  while (n > 0){//Add PASSING and EMERGENCY
     if (stateTable.value("WAITING") == state) { n = this->waitingState(n); }
     else if (stateTable.value("READY") == state) { n = this->readyState(n); }
     else if (stateTable.value("RUNNING") == state) { n = this->runningState(n); }
@@ -181,84 +181,40 @@ int Train::waitingState(int n)
 
 int Train::readyState(int n)
 {
-  if (currentStation != UNDEFINED) //Train at station.
+  if (currentStation == UNDEFINED)
   {
-    if (nextIndexTravelPlanByStationID >= ((int) travelPlanByStationID.size() - 1))
+    qDebug()<<this->getName()<<" is in READY and at a track: "<<this->getCurrentTrack()<<". TODO: implement resume runninf code";
+    return 0;
+  }
+  else
+  {
+    if ( (nextIndexTravelPlanByStationID ==  (int) travelPlanByStationID.size() - 1  ) &&
+         (travelPlanByStationID.at(nextIndexTravelPlanByStationID) == currentStation) )
     {
-      if (travelPlanByStationID.at(nextIndexTravelPlanByStationID) == currentStation)
-      {
-        qDebug()<<"INFO   : "<< trainName <<" shall stop. nextIndex: "<< nextIndexTravelPlanByStationID<<" tps: "
-                << (int) travelPlanByStationID.size() <<" CurrentStation: "<<currentStation<< "TP points at:"
-                <<travelPlanByStationID.at(nextIndexTravelPlanByStationID);
-        state = stateTable.value("STOPPED");
-        return 0;
-      }
+      state = stateTable.value("STOPPED");
+      return 0;
     }
     else
     {
-      if (UNDEFINED == nextTrack)//Next track not defined
+      if (UNDEFINED == nextTrack)
       {
-        //THIS SHOULD BE REPLACED BY A FUNCTION OR METHOD THAT SEARCHES FOR TRACK
-        qDebug()<<"TRAIN  : " << this->getName() <<" in "
-                <<thisStationList->at(currentStation)->getName()<< "and is searching for next track.";
         nextTrack = thisStationList->at(currentStation)
                       ->findLeavingTrackIndexToStation(//What track to next station?
-                        travelPlanByStationID.at(nextIndexTravelPlanByStationID));//Next station in travelplan
-        qDebug()<<"TRAIN  :"<< this->getName()<<" has found track "<< thisTrackList->at(nextTrack)->getName();
-        if (UNDEFINED == nextTrack)//Still no suitable track found - IS THIS STATE POSSIBLE?
+                        travelPlanByStationID.at(nextIndexTravelPlanByStationID));
+        if (UNDEFINED == nextTrack)
         {
-          if (travelPlanByStationID.at(nextIndexTravelPlanByStationID) == currentStation)
-          {
-            state = stateTable.value("STOPPED");
-            return 0;
-          } else {
-            qDebug() << "ERROR  : Train:Move No track from "
-                     << thisStationList->at(currentStation)->getName()
-                     << " to " << thisStationList->at(travelPlanByStationID
-                                                     .at(nextIndexTravelPlanByStationID))
-                                                     ->getName();
-            this->showInfo();
-            state = stateTable.value("STOPPED");
-            return 0;
-          }
+          qDebug() << "ERROR  : "<< this->getName()<<" No leaving track";
+          state = stateTable.value("STOPPED");
+          return 0;
+        }
+        else
+        {
+          n = this->readyToRunningState(n);
+          return n;
         }
       }
     }
-
-    if (true == thisStationList->at(currentStation)->checkIfTrackLeavesStation(nextTrack))
-    {//Train is at a station and next track is leaving the station.
-      currentTrack = nextTrack;
-      currentStation = UNDEFINED;//Remove this train from station.
-      nextTrack = UNDEFINED;
-      positionOnTrack = 0;//TODO: Check what happens when train is traveling in opposite deirection!
-      state = stateTable.value("RUNNING");
-      if (nextIndexTravelPlanByStationID < ((int) travelPlanByStationID.size() - 1))
-      {
-        nextIndexTravelPlanByStationID++;
-        this->showInfo();
-      } else
-      {
-        qDebug()<<"INFO   : "<< trainName << " has reached end of travelplan. tp_s : "<< (int) travelPlanByStationID.size()
-          <<" pos: "<<nextIndexTravelPlanByStationID;
-      }//target next station
-    } else {//Try to find leaving track to nextStation
-      nextTrack = thisStationList->at(currentStation)
-                                 ->findLeavingTrackIndexToStation(travelPlanByStationID.at
-                                                                 (nextIndexTravelPlanByStationID));
-      if(UNDEFINED == nextTrack)
-      {
-        qDebug() << "ERROR  : Train:Move! No track from " << thisStationList->at(currentStation)->getName()
-                 << " to "<<thisStationList->at(travelPlanByStationID
-                                                        .at(nextIndexTravelPlanByStationID))
-                                                        ->getName();
-        this->showInfo();
-        state = stateTable.value("STOPPED");
-      }
-      sendDataChangedSignal(trainID);
-      return n;
-    }
   }
-  n--;
   return n;
 }
 
@@ -275,18 +231,14 @@ int Train::runningState(int n)
 {
   if(positionOnTrack == thisTrackList->at(currentTrack)->getLength())
   {
-    currentStation = thisTrackList->at(currentTrack)->getEndStation();
-    currentSpeed = 0;
-    currentTrack = UNDEFINED;
-    state = stateTable.value("OPENING");
-    doorOpenProgress = 0;
+    n = runningToOpeningState(n);
   } else {
     //qDebug()<<"Tr:M: On a track, still some distance to the end of track.";
     desiredSpeed = (int) min((double)maxSpeed,
                              sqrt((thisTrackList->at(currentTrack)->
                                      getLength() - positionOnTrack -
                                      currentSpeed) * 2));
-    desiredSpeed=max(desiredSpeed, 1);
+    desiredSpeed = max(desiredSpeed, 1);
     if (currentSpeed != desiredSpeed)
     {
       currentSpeed = currentSpeed + (desiredSpeed - currentSpeed) /
@@ -332,6 +284,33 @@ int Train::closingState(int n)
     state = stateTable.value("WAITING");
   }
   n--;
+  return n;
+}
+
+int Train::readyToRunningState(int n)
+{
+  currentTrack = nextTrack;
+  currentStation = UNDEFINED;//Remove this train from station.
+  nextTrack = UNDEFINED;
+  positionOnTrack = 0;//TODO: Check what happens when train is traveling in opposite deirection!
+  state = stateTable.value("RUNNING");
+  if (nextIndexTravelPlanByStationID < ((int) travelPlanByStationID.size() - 1))
+  {
+    nextIndexTravelPlanByStationID++;
+  }
+  n--;
+  return n;
+}
+
+int Train::runningToOpeningState(int n)
+{
+  //TODO: Consider trains moving in the opposite direction
+  currentStation = thisTrackList->at(currentTrack)->getEndStation();
+  currentSpeed = 0;
+  currentTrack = UNDEFINED;
+  nextTrack = UNDEFINED;         //2017-05-14
+  state = stateTable.value("OPENING");
+  doorOpenProgress = 0;
   return n;
 }
 

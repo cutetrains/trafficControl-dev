@@ -142,6 +142,7 @@ bool Station::checkIfTrackLeavesStation(int trackID)
  * @param stationID The ID of the station to rearch.
  *
  * @return trackID The ID number the station.
+ * @TODO: Search for tracks in opposite direction.
  */
 int Station::findLeavingTrackIndexToStation(int targetStationID)
 {

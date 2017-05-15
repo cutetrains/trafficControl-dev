@@ -83,8 +83,9 @@ public:
   int openingState(int n);
   int loadingState(int n);
   int closingState(int n);
-  /*int readyToRunning(int n);
-  int runningToReady(int n);
+  int readyToRunningState(int n);
+  int runningToOpeningState(int n);
+  /*int runningToReady(int n);
   int waitingToOpening(int n);
   int runningToPassing(int n);
   int passingToEmergency(int n);*/
