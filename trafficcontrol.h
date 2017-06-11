@@ -58,7 +58,7 @@ public slots:
   void addTrainToNetwork(QString trainName);
   void addStationToNetwork(QString stationName,
                            bool isJunction);
-  int createQMLStation(QString objectName,
+  int createStationInQml(QString objectName,
                        bool isJunction,
                        QString stationLat,
                        QString stationLong); //Add QList <QVariant>  later;

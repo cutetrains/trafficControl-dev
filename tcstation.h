@@ -27,8 +27,9 @@ class Station: public QObject
 	Q_OBJECT
 
 signals:
-  void dataChangedSignal(int , const QVariant & );
-
+  void dataChangedSignal(int, const QVariant & );
+  //void stationChangedSignal(int , const QVariant &, int);//2017-06 MODIFY STATION
+  void stationChangedSignal();//2017-06 MODIFY STATION
 private:
   static int totalNbrOfStations;
   int waitingPassengers;
@@ -51,6 +52,7 @@ public:// to do later: Add vector with pointers to the trains on each station.
   bool checkIfTrackLeavesStation(int trackID);
   int findLeavingTrackIndexToStation(int targetStationID);
   void addTrack(int trackID); //To be handled in trafficcontrol
+  void trainArrival(int trainID);
   void changeNbrOfPassengers(int n);
   int getID();
   QString getName();

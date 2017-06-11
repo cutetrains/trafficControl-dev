@@ -189,6 +189,20 @@ void Station::showInfo() {
 }
 
 /*!
+ *
+ * STUB
+ * @todo The method adds a train to the list of trains currently in the station
+ * The method emits a signal when a train enters the station
+ *
+ */
+void Station::trainArrival(int trainID)
+{
+  qDebug()<<"EMIT SIGNAL TO QML";
+  //emit stationChangedSignal( this->getID(), QVariant(" train arrival "),  thisStationList->at(trainID)->getID());
+  emit stationChangedSignal();
+}
+
+/*!
  * The adds a number of passengers to the current number of waiting passengers
  * and notifies the model.
  *

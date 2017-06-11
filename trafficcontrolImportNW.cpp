@@ -118,13 +118,10 @@ void TrafficControl::importPredefinedNetwork()
         (1 == argumentList.indexOf("STATION"))){
       bool isJunction = ((3 == argumentList.indexOf("AS")) &&
                          (4 == argumentList.indexOf("JUNCTION")));
-      //bool hasCoordinates = ((3 == argumentList.indexOf("COORDINATES")) ||
-      //                       (5 == argumentList.indexOf("COORDINATES")));
       addStationToNetwork(argumentList.at(2),isJunction);
-      //qDebug() <<argumentList.at(2)<< " isJunction ? "<< isJunction << "  "<<(isJunction == true ? 5 : 3);
       if ((argumentList.indexOf("COORDINATES") == (isJunction==true ? 5 : 3) ) ) {
         qDebug()<<"INFO   : Coordinates found for station "<< argumentList.at(2);
-        createQMLStation(argumentList.at(2),
+        createStationInQml(argumentList.at(2),
                          isJunction,
                          argumentList.at(true == isJunction ? 6 : 4),
                          argumentList.at(true == isJunction ? 7 : 5));

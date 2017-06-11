@@ -15,6 +15,12 @@ Item {
     }
   }
 
+  //function stationChangedSlot(stationID, stationAction, trainID)
+  function stationChangedSlot()
+  {
+    console.log("In stationChangedSlot");
+  }
+
   Map {
     id: mainMap
     objectName: "nameMainMap"
@@ -56,9 +62,10 @@ Item {
   }
 
   //TODO: Create generic
-  function createQMLStationFromSprite(stationName, isJunction, stationLat, stationLong) {
-    console.log("INFO   : createQMLStation called with these arguments: ", stationName, isJunction, stationLat, stationLong);
+
+  function createQMLStation(stationName, isJunction, stationLat, stationLong) {
     Logic.jsCreateQMLStation(stationName,stationLat,stationLong)
   }
+
 }
 

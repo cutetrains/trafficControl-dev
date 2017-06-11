@@ -306,6 +306,7 @@ int Train::runningToOpeningState(int n)
 {
   //TODO: Consider trains moving in the opposite direction
   currentStation = thisTrackList->at(currentTrack)->getEndStation();
+  thisStationList->at(currentStation)->trainArrival(this->getID());
   currentSpeed = 0;
   currentTrack = UNDEFINED;
   nextTrack = UNDEFINED;         //2017-05-14

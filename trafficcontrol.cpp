@@ -154,13 +154,24 @@ void TrafficControl::addStationToNetwork(QString stationName, bool isJunction)
           SIGNAL(dataChangedSignal(int, const QVariant &)),
           stationListModel,
           SLOT(onDataChanged(int , const QVariant &)));
+  /*******
+   *     *
+   * QML *
+   *     *
+   *******/
+  connect(newStation,
+          //SIGNAL(stationChangedSignal(int, const QVariant &, int)),
+          SIGNAL(stationChangedSignal()),
+          handleQMLObject,
+          //SLOT(stationChangedSlot(int, const QVariant &, int)));
+          SLOT(stationChangedSlot()));
   stationList.append(newStation);
   stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
   stationList[stationList.size()-1]->changeNbrOfPassengers(0);
   newStation = NULL;
 }
 
-int TrafficControl::createQMLStation(QString objectName,
+int TrafficControl::createStationInQml(QString objectName,
                                      bool isJunction,
                                      QString stationLat,
                                      QString stationLong)
@@ -170,7 +181,8 @@ int TrafficControl::createQMLStation(QString objectName,
 
   QVariant returnedValue;
   QMetaObject::invokeMethod(handleQMLObject,
-                            "createQMLStationFromSprite",
+                            "createQMLStation",
+                            //"jsCreateQMLStation",
                             Q_RETURN_ARG(QVariant, returnedValue),
                             Q_ARG(QVariant, objectName),
                             Q_ARG(QVariant, isJunction),
