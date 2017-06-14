@@ -17,6 +17,7 @@
 
 #include <vector>
 #include <QObject>
+#include <QVariant>
 #ifndef _TCSTATION_H_
 #define _TCSTATION_H_
 using namespace std;
@@ -29,7 +30,8 @@ class Station: public QObject
 signals:
   void dataChangedSignal(int, const QVariant & );
   //void stationChangedSignal(int , const QVariant &, int);//2017-06 MODIFY STATION
-  void stationChangedSignal();//2017-06 MODIFY STATION
+  //void stationChangedSignal();//2017-06 MODIFY STATION
+  void qmlTrainArrivalSignal(QVariant, QVariant);//2017-06 MODIFY STATION
 private:
   static int totalNbrOfStations;
   int waitingPassengers;

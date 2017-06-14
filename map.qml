@@ -16,10 +16,24 @@ Item {
   }
 
   //function stationChangedSlot(stationID, stationAction, trainID)
-  function stationChangedSlot()
+  //function stationChangedSlot()
+  function qmlTrainArrivalSlot(stationName, trainName)
   {
-    console.log("In stationChangedSlot");
+    console.log("In stationChangedSlot, station: " + stationName + ", train: " + trainName);
+    stationName.color = "red"//DOESN'T CHANGE
+    stationName.radius = 5000 //DOESN'T CHANGE
+    for (var i = 0; i < mainMap.children.length; ++i)
+    {
+      console.log(mainMap.children[i].objectName);
+      if(mainMap.children[i].objectName === "name"+stationName)
+      {
+        console.log("child found");
+        mainMap.children[i].color="red";
+        mainMap.children[i].radius=1000.0;
+      }
+    }
   }
+
 
   Map {
     id: mainMap
@@ -30,7 +44,7 @@ Item {
 
     Component.onCompleted: {
       console.log("Initiated mainMap")
-      console.log(Logic.testVariable)
+      //console.log(Logic.testVariable)
     }
 
     //TODO: Delete the hard coded elements
@@ -59,6 +73,8 @@ Item {
         {  latitude: 55.60981997270764, longitude: 13.00125368558942 }
             ]
     }
+
+
   }
 
   //TODO: Create generic

@@ -120,7 +120,6 @@ void TrafficControl::importPredefinedNetwork()
                          (4 == argumentList.indexOf("JUNCTION")));
       addStationToNetwork(argumentList.at(2),isJunction);
       if ((argumentList.indexOf("COORDINATES") == (isJunction==true ? 5 : 3) ) ) {
-        qDebug()<<"INFO   : Coordinates found for station "<< argumentList.at(2);
         createStationInQml(argumentList.at(2),
                          isJunction,
                          argumentList.at(true == isJunction ? 6 : 4),
@@ -275,7 +274,9 @@ void TrafficControl::importPredefinedNetwork()
       qDebug()<<"ERROR  : TC:IPN Command not recognised: "<<line;
     }
   }
-
+  if(handleQMLObject != NULL) {
+    handleQMLObject->dumpObjectTree();
+  }
   file.close();
 
   //This method will be called with care, in order to reduce the cost for updating the tables

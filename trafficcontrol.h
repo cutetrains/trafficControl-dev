@@ -81,7 +81,7 @@ private:
   Train *train1;
   Station *station1;
   QObject* handleQMLObject;
-
+  QObject* handleQMLMainMap;//GUSTAF
   TrafficDataModel *trackListModel;
   TrafficDataModel *trainListModel;
   TrafficDataModel *stationListModel;

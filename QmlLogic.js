@@ -3,8 +3,8 @@ var sprite;
 
 function jsCreateQMLStation(stationName, stationLat, stationLong) {
 
-  var circle = Qt.createQmlObject('import QtLocation 5.6;import QtQuick 2.5; MapCircle {id:station'+stationName+'}',mainMap,"test2")
-  //var circle = Qt.createQmlObject('import QtLocation 5.6;import QtQuick 2.5; MapCircle {}',mainMap,"test2")
+  //var circle = Qt.createQmlObject('import QtLocation 5.6;import QtQuick 2.5; MapCircle {id:station'+stationName+'}',mainMap,"test2")
+  var circle = Qt.createQmlObject('import QtLocation 5.6;import QtQuick 2.5; MapCircle {id:station'+stationName+';objectName:"name'+stationName+'"}',mainMap,"test2")
   circle.center.latitude = stationLat
   circle.center.longitude = stationLong
   //TODO: Set new name of circle so that can be modified later

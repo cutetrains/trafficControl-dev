@@ -199,7 +199,8 @@ void Station::trainArrival(int trainID)
 {
   qDebug()<<"EMIT SIGNAL TO QML";
   //emit stationChangedSignal( this->getID(), QVariant(" train arrival "),  thisStationList->at(trainID)->getID());
-  emit stationChangedSignal();
+  //emit stationChangedSignal();
+  emit qmlTrainArrivalSignal(this->getName(), thisTrainList->at(trainID)->getName());
 }
 
 /*!

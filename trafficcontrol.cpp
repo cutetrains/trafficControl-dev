@@ -66,8 +66,8 @@ TrafficControl::TrafficControl(QWidget *parent) :
   //  handleQMLObject->dumpObjectTree();
 
   /* TODO: Rename nameMainMap */
-  QObject *myStation1 = handleQMLObject->findChild<QObject *>(QString("nameMainMap"));
-  if (NULL == myStation1)
+  QObject *handleQMLMainMap = handleQMLObject->findChild<QObject *>(QString("nameMainMap"));
+  if (NULL == handleQMLMainMap)
   {
     qDebug()<<"ERROR  : No nameMainMap found";
   }
@@ -161,10 +161,10 @@ void TrafficControl::addStationToNetwork(QString stationName, bool isJunction)
    *******/
   connect(newStation,
           //SIGNAL(stationChangedSignal(int, const QVariant &, int)),
-          SIGNAL(stationChangedSignal()),
+          SIGNAL(qmlTrainArrivalSignal(QVariant,QVariant)),
           handleQMLObject,
           //SLOT(stationChangedSlot(int, const QVariant &, int)));
-          SLOT(stationChangedSlot()));
+          SLOT(qmlTrainArrivalSlot(QVariant, QVariant)));
   stationList.append(newStation);
   stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
   stationList[stationList.size()-1]->changeNbrOfPassengers(0);
@@ -172,9 +172,9 @@ void TrafficControl::addStationToNetwork(QString stationName, bool isJunction)
 }
 
 int TrafficControl::createStationInQml(QString objectName,
-                                     bool isJunction,
-                                     QString stationLat,
-                                     QString stationLong)
+                                       bool isJunction,
+                                       QString stationLat,
+                                       QString stationLong)
 {
   qDebug() << "In TC::callQMLMap " << objectName << " " << isJunction << " "
            << stationLat << " " << stationLong;
