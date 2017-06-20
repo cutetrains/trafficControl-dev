@@ -42,10 +42,13 @@ int Station::totalNbrOfStations = 0;
  * The constructor for a Station object.
  *
  * @param cn Name of the station
- * @TODO Rename cn to a more readable name
  * @param trackList is a pointer to the trackList
  * @param trainList is a pointer to the trackList
  * @param stationList is a pointer to the stationList
+ *
+ * @TODO Rename cn to a more readable name
+ * @TODO numberOfPlatforms is hardcoded to 2,  should be station-dependent.
+ * @TODO emit signal at initialisation so that QML has updated info
  */
 Station::Station(QString cn,
                  bool isJunction,
@@ -55,6 +58,7 @@ Station::Station(QString cn,
 { 	
   name = QString::fromUtf16(cn.utf16());
   waitingPassengers = 0;
+  numberOfPlatforms = 2;
   /*The stationID will be correspond to the order of created Station objects.*/
   stationID = totalNbrOfStations;
   totalNbrOfStations++;
@@ -189,18 +193,40 @@ void Station::showInfo() {
 }
 
 /*!
- *
- * STUB
- * @todo The method adds a train to the list of trains currently in the station
- * The method emits a signal when a train enters the station
+ * The method adds a train to the list of trains currently in the station and
+ * emits a signal when a train enters the station
  *
  */
 void Station::trainArrival(int trainID)
 {
-  qDebug()<<"EMIT SIGNAL TO QML";
-  //emit stationChangedSignal( this->getID(), QVariant(" train arrival "),  thisStationList->at(trainID)->getID());
-  //emit stationChangedSignal();
-  emit qmlTrainArrivalSignal(this->getName(), thisTrainList->at(trainID)->getName());
+  if(trainsAtStationList.length() >= numberOfPlatforms)
+  {
+    qDebug()<<"ERROR  : TOO MANY TRAINS!" <<thisTrainList->at(trainID)->getName()<<
+              " arrived to the full station" << this->getName();
+  }
+  else
+  {
+    trainsAtStationList<<trainID;
+    emit qmlStationOccupancySignal(this->getName(), trainsAtStationList.length(), numberOfPlatforms);
+  }
+}
+
+/*!
+ * The method removes a train to the list of trains currently in the station and
+ * emits a signal when a train enters the station
+ *
+ */
+void Station::trainDeparture(int trainID)
+{
+  bool removalSuccess = trainsAtStationList.removeOne(trainID);
+  if(removalSuccess)
+  {
+    emit qmlStationOccupancySignal(this->getName(), trainsAtStationList.length(), numberOfPlatforms);
+  }
+  else
+  {
+    qDebug()<<"ERROR  : Train departure failed";
+  }
 }
 
 /*!

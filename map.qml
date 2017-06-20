@@ -15,25 +15,26 @@ Item {
     }
   }
 
-  //function stationChangedSlot(stationID, stationAction, trainID)
-  //function stationChangedSlot()
-  function qmlTrainArrivalSlot(stationName, trainName)
+  function qmlStationOccupancySlot(stationName, nbrOfTrains, nbrOfPlatforms)
   {
-    console.log("In stationChangedSlot, station: " + stationName + ", train: " + trainName);
-    stationName.color = "red"//DOESN'T CHANGE
-    stationName.radius = 5000 //DOESN'T CHANGE
+    console.log("In qmlStationOccupancySlot, station: " + stationName);
     for (var i = 0; i < mainMap.children.length; ++i)
     {
       console.log(mainMap.children[i].objectName);
       if(mainMap.children[i].objectName === "name"+stationName)
       {
         console.log("child found");
-        mainMap.children[i].color="red";
-        mainMap.children[i].radius=1000.0;
+        mainMap.children[i].border.width = 4;
+        if(0 === nbrOfTrains){
+          mainMap.children[i].border.color = "green";
+        } else if (nbrOfTrains === nbrOfPlatforms){
+          mainMap.children[i].border.color = "red";
+        } else {
+          mainMap.children[i].border.color = "yellow";
+        }
       }
     }
   }
-
 
   Map {
     id: mainMap
@@ -44,24 +45,9 @@ Item {
 
     Component.onCompleted: {
       console.log("Initiated mainMap")
-      //console.log(Logic.testVariable)
     }
 
     //TODO: Delete the hard coded elements
-    MapCircle {
-      id: mainMapCircle1
-      objectName: "nameMainMapCircle1"
-      center {
-        latitude: 55.60985893200806
-        longitude: 13.00118644566413
-      }
-      radius: 50.0
-      color: 'red'
-      border.width: 3
-      opacity: 0.3
-    }
-
-
     MapPolyline {
       id: mainMapPoly
       objectName:"nameMainMapPoly"

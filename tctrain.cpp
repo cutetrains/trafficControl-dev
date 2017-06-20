@@ -183,7 +183,7 @@ int Train::readyState(int n)
 {
   if (currentStation == UNDEFINED)
   {
-    qDebug()<<this->getName()<<" is in READY and at a track: "<<this->getCurrentTrack()<<". TODO: implement resume runninf code";
+    qDebug()<<this->getName()<<" is in READY and at a track: "<<this->getCurrentTrack()<<". TODO: implement resume running code";
     return 0;
   }
   else
@@ -289,6 +289,7 @@ int Train::closingState(int n)
 
 int Train::readyToRunningState(int n)
 {
+  thisStationList->at(currentStation)->trainDeparture(this->getID());
   currentTrack = nextTrack;
   currentStation = UNDEFINED;//Remove this train from station.
   nextTrack = UNDEFINED;
@@ -322,6 +323,7 @@ int Train::runningToOpeningState(int n)
  */
 void Train::setCurrentStation(int stationID) {
   currentStation = stationID;
+  thisStationList->at(stationID)->trainArrival(this->getID());
   state = stateTable.value("LOADING");
 
   sendDataChangedSignal(trainID);//+1?

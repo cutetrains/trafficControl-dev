@@ -160,11 +160,9 @@ void TrafficControl::addStationToNetwork(QString stationName, bool isJunction)
    *     *
    *******/
   connect(newStation,
-          //SIGNAL(stationChangedSignal(int, const QVariant &, int)),
-          SIGNAL(qmlTrainArrivalSignal(QVariant,QVariant)),
+          SIGNAL(qmlStationOccupancySignal(QVariant ,QVariant ,QVariant)),
           handleQMLObject,
-          //SLOT(stationChangedSlot(int, const QVariant &, int)));
-          SLOT(qmlTrainArrivalSlot(QVariant, QVariant)));
+          SLOT(qmlStationOccupancySlot(QVariant, QVariant, QVariant)));
   stationList.append(newStation);
   stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
   stationList[stationList.size()-1]->changeNbrOfPassengers(0);

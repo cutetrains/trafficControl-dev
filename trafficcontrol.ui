@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>896</width>
-    <height>690</height>
+    <width>1360</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,9 +23,9 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>0</x>
       <y>0</y>
-      <width>891</width>
+      <width>1351</width>
       <height>661</height>
      </rect>
     </property>
@@ -49,9 +49,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>100</y>
+        <y>60</y>
         <width>331</width>
-        <height>171</height>
+        <height>131</height>
        </rect>
       </property>
       <property name="font">
@@ -111,8 +111,8 @@
      <widget class="QSpinBox" name="stepTimeBox">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>420</y>
+        <x>10</x>
+        <y>440</y>
         <width>49</width>
         <height>33</height>
        </rect>
@@ -130,8 +130,8 @@
      <widget class="QPushButton" name="timeTickButton">
       <property name="geometry">
        <rect>
-        <x>100</x>
-        <y>420</y>
+        <x>70</x>
+        <y>440</y>
         <width>101</width>
         <height>33</height>
        </rect>
@@ -143,8 +143,8 @@
      <widget class="QPushButton" name="importNetworkButton">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>470</y>
+        <x>10</x>
+        <y>500</y>
         <width>171</width>
         <height>33</height>
        </rect>
@@ -156,10 +156,10 @@
      <widget class="QTableView" name="stationListTableView">
       <property name="geometry">
        <rect>
-        <x>730</x>
-        <y>40</y>
+        <x>190</x>
+        <y>440</y>
         <width>151</width>
-        <height>581</height>
+        <height>191</height>
        </rect>
       </property>
       <property name="font">
@@ -171,16 +171,29 @@
      <widget class="QTableView" name="trackListTableView">
       <property name="geometry">
        <rect>
-        <x>360</x>
-        <y>40</y>
-        <width>361</width>
-        <height>581</height>
+        <x>10</x>
+        <y>200</y>
+        <width>331</width>
+        <height>221</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <pointsize>8</pointsize>
        </font>
+      </property>
+     </widget>
+     <widget class="QQuickWidget" name="mapQuickWidget">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>10</y>
+        <width>991</width>
+        <height>621</height>
+       </rect>
+      </property>
+      <property name="resizeMode">
+       <enum>QQuickWidget::SizeRootObjectToView</enum>
       </property>
      </widget>
     </widget>
@@ -435,19 +448,6 @@
        <string>Init Scene</string>
       </property>
      </widget>
-     <widget class="QQuickWidget" name="mapQuickWidget">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>29</y>
-        <width>1161</width>
-        <height>611</height>
-       </rect>
-      </property>
-      <property name="resizeMode">
-       <enum>QQuickWidget::SizeRootObjectToView</enum>
-      </property>
-     </widget>
     </widget>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -471,7 +471,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>896</width>
+     <width>1360</width>
      <height>21</height>
     </rect>
    </property>

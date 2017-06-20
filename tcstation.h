@@ -29,18 +29,19 @@ class Station: public QObject
 
 signals:
   void dataChangedSignal(int, const QVariant & );
-  //void stationChangedSignal(int , const QVariant &, int);//2017-06 MODIFY STATION
-  //void stationChangedSignal();//2017-06 MODIFY STATION
-  void qmlTrainArrivalSignal(QVariant, QVariant);//2017-06 MODIFY STATION
+  void qmlStationOccupancySignal(QVariant, QVariant, QVariant);//2017-06 MODIFY STATION
+
 private:
-  static int totalNbrOfStations;
-  int waitingPassengers;
   QString name;
-  int stationID;
   vector<int> leavingTrackVector;
+  int numberOfPlatforms;
   QList<Track*> *thisTrackList;//inserted, REMOVE?
   QList<Train*> *thisTrainList;//inserted
   QList<Station*> *thisStationList;//inserted
+  int stationID;
+  static int totalNbrOfStations;
+  QList<int> trainsAtStationList;
+  int waitingPassengers;
 
 public:// to do later: Add vector with pointers to the trains on each station.
   /*! The constructor for a Station object.*/
@@ -51,17 +52,18 @@ public:// to do later: Add vector with pointers to the trains on each station.
           QList<Station*>& stationList);
   ~Station();
 
+  void addTrack(int trackID); //To be handled in trafficcontrol
+  void changeNbrOfPassengers(int n);
   bool checkIfTrackLeavesStation(int trackID);
   int findLeavingTrackIndexToStation(int targetStationID);
-  void addTrack(int trackID); //To be handled in trafficcontrol
-  void trainArrival(int trainID);
-  void changeNbrOfPassengers(int n);
   int getID();
   QString getName();
   int getNbrOfWaitingPassengers();
+  void trainArrival(int trainID);
+  void trainDeparture(int trainID);
   void sendDataChangedSignal(int stationID);
   void showInfo();
-  bool isJunction;
+  bool isJunction();
 };
 
 #endif
