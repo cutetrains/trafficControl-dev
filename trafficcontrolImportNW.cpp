@@ -54,7 +54,6 @@ void TrafficControl::importPredefinedNetwork()
     QString line = in.readLine();
     QStringList argumentList=line.split(" ");
     bool approvedCommand = false;
-    bool isTrackReversed = false;
 
     //Code for analysing track commands
     if ((0 == argumentList.indexOf("TRACK")) &&
@@ -66,28 +65,26 @@ void TrafficControl::importPredefinedNetwork()
     /* ADD TRACK <track name> <length> [COORDINATES lat long]
      * Redo code: check that length is a number. After that, check if coordinates are included.
      * No coordinates: Check that there is 4 arguments, and that the fourth argument is an integer
-     * Note that dXXX-YYYN will have a twin eYYY-XXXS, with falling accumulated distance.*/
+     * Note that dXXX-YYYN will have a twin eYYY-XXXS, with falling accumulated distance.
+     * The python script will need to add the second track four meters away.*/
     if ((0 == argumentList.indexOf("ADD")) &&
         (1 == argumentList.indexOf("TRACK"))) {
       bool isLengthInt = false;
       int iLength = argumentList.at(3).toInt(&isLengthInt, 10) ;// THIS CHECK AT OTHER PLACES TOO!!!!
       if (true == isLengthInt){
-        if (4 == argumentList.count()){
-          addTrackToNetwork(argumentList.at(2), iLength);
+        if ( 4 == argumentList.count() )
+        {
+          QStringList emptyCoordinates;
+          addTrackToNetwork(argumentList.at(2), iLength, emptyCoordinates);
           approvedCommand = true;
           currentTrack = trackList.length()-1;
         }
-        else if ((4 == argumentList.indexOf("COORDINATES") ) &&
-                 (argumentList.count()%2 == 1)){
-
-          qDebug()<<"INFO  : Track with coordinates added"<<argumentList.count()<<argumentList;
-          addTrackToNetwork(argumentList.at(2), iLength);
+        else if (4 == argumentList.indexOf("COORDINATES")  &&
+                 ( argumentList.count()%2 == 1 ) ){
+          addTrackToNetwork(argumentList.at(2), iLength, argumentList.mid(5,-1));
           approvedCommand = true;
-          qDebug()<<approvedCommand;
           currentTrack = trackList.length()-1;
-      } }
-
-    }
+    } } }
 
     /* TRACK SELECT <track name> */
     if ((0 == argumentList.indexOf("TRACK")) &&
@@ -118,12 +115,16 @@ void TrafficControl::importPredefinedNetwork()
         (1 == argumentList.indexOf("STATION"))){
       bool isJunction = ((3 == argumentList.indexOf("AS")) &&
                          (4 == argumentList.indexOf("JUNCTION")));
-      addStationToNetwork(argumentList.at(2),isJunction);
       if ((argumentList.indexOf("COORDINATES") == (isJunction==true ? 5 : 3) ) ) {
-        createStationInQml(argumentList.at(2),
-                         isJunction,
-                         argumentList.at(true == isJunction ? 6 : 4),
-                         argumentList.at(true == isJunction ? 7 : 5));
+        addStationToNetwork(argumentList.at(2),
+                            isJunction,
+                            argumentList.at(true == isJunction ? 6 : 4),
+                            argumentList.at(true == isJunction ? 7 : 5));
+      } else {
+        addStationToNetwork(argumentList.at(2),
+                            isJunction,
+                            "",
+                            "");
       }
       approvedCommand = true;
     }
@@ -133,14 +134,10 @@ void TrafficControl::importPredefinedNetwork()
         (1 == argumentList.indexOf("TRACK")) &&
         (3 == argumentList.indexOf("FROM")) &&
         (5 == argumentList.indexOf("TO")) &&
-        (7 == argumentList.count() || 8 == argumentList.count()) ){
+        (7 == argumentList.count()) ){
         //Check that the second argument reflects an existing track, and that the stations exist.
       int foundTrack = UNDEFINED;
       qDebug()<<"INFO   : CONNECT TRACK name FROM station TO station recognised";
-      if (7 == argumentList.indexOf("REVERSED"))
-      {
-        isTrackReversed = true;
-      }
       foreach(Track* t, trackList){
         if (t->getName()==argumentList.at(2)) {foundTrack=t->getID();
       }
@@ -160,8 +157,7 @@ void TrafficControl::importPredefinedNetwork()
           (foundTrack != UNDEFINED)){
         connectTrackToStations(argumentList.at(2),
                                argumentList.at(4),
-                               argumentList.at(6),
-                               isTrackReversed);
+                               argumentList.at(6));
         approvedCommand=true;
     } } }
 

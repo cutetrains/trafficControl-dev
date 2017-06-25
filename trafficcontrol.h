@@ -54,22 +54,20 @@ public:
 public slots:
   void addTrainToNetworkUI();
   void addTrackToNetwork(QString trackName,
-                         int trackLength);
+                         int trackLength,
+                         QStringList coordinates);
   void addTrainToNetwork(QString trainName);
   void addStationToNetwork(QString stationName,
-                           bool isJunction);
-  int createStationInQml(QString objectName,
-                       bool isJunction,
-                       QString stationLat,
-                       QString stationLong); //Add QList <QVariant>  later;
+                           bool isJunction,
+                           QString lat,
+                           QString lon);
   void importPredefinedNetwork();
   void onRunThreadCheckBoxChanged(int newState);
   void onTickIntervalChanged(int newInterval);
   void stepTimeForNetwork();
   int connectTrackToStations(QString trackName,
                              QString startStationName,
-                             QString endStationName,
-                             bool isReversed);
+                             QString endStationName);
   int connectTrackToStations(int trackID,
                              int startStationID,
                              int endStationID);

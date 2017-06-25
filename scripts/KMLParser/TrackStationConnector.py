@@ -41,7 +41,7 @@ with open(inputfile, "r", encoding='utf8') as ins:
       placeMarkType=line[9:-8]
     if ( ("\t\t\t\t<name>" in line) and not (("\t\t\t\t\t<name>") in line) ) :
       #placeMarkName=line[10:-8].replace("Å","Aa").replace("Ä","Ae").replace("Ö","Oe").replace("å","aa").replace("ä","ae").replace("ö","oe")
-      placeMarkName=line[10:-8]
+      placeMarkName=line[10:-8].replace("-","_")
     if ( ( "<coordinates>" in line) and ( ( "Station" in placeMarkType) or ("Junction" in placeMarkType ) ) ) :
       #print("ADD STATION " + placeMarkName + str(" AS JUNCTION" if ("Junction" in placeMarkType) else "") )
       if " " in placeMarkName:
@@ -141,8 +141,8 @@ with open(inputfile, "r", encoding='utf8') as ins:
     if(track[0][-1] in trackDir):
       print("CONNECT TRACK " + track[0] + " FROM " + firstCandidate + " TO "+ lastCandidate)
       #THIS REQUIRES UPDATE IN TRAINCONTROL::IMPORTNETWORKFROMFILE
-      print("CONNECT TRACK " + track[0] + " FROM " + lastCandidate + " TO "+ firstCandidate + " REVERSED")
+      print("CONNECT TRACK " + track[0] + " FROM " + lastCandidate + " TO "+ firstCandidate)
     else:
       #print("   !!! Mismatch !!!")#REMOCE!
-      print("CONNECT TRACK " + track[0] + " FROM " + lastCandidate + " TO " + firstCandidate + " REVERSED")
+      print("CONNECT TRACK " + track[0] + " FROM " + lastCandidate + " TO " + firstCandidate)
       print("CONNECT TRACK " + track[0] + " FROM " + firstCandidate + " TO " + lastCandidate)

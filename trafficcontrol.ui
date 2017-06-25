@@ -50,7 +50,7 @@
        <rect>
         <x>10</x>
         <y>60</y>
-        <width>331</width>
+        <width>401</width>
         <height>131</height>
        </rect>
       </property>
@@ -158,7 +158,7 @@
        <rect>
         <x>190</x>
         <y>440</y>
-        <width>151</width>
+        <width>221</width>
         <height>191</height>
        </rect>
       </property>
@@ -173,7 +173,7 @@
        <rect>
         <x>10</x>
         <y>200</y>
-        <width>331</width>
+        <width>401</width>
         <height>221</height>
        </rect>
       </property>
@@ -186,9 +186,9 @@
      <widget class="QQuickWidget" name="mapQuickWidget">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>420</x>
         <y>10</y>
-        <width>991</width>
+        <width>921</width>
         <height>621</height>
        </rect>
       </property>

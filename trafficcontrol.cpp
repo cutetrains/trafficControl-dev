@@ -88,22 +88,35 @@ TrafficControl::TrafficControl(QWidget *parent) :
  * @param trackName Name of the track
  * @param trackLength Length of the track [Unit: m]
  */
-void TrafficControl::addTrackToNetwork(QString trackName, int trackLength)
+void TrafficControl::addTrackToNetwork(QString trackName,
+                                       int trackLength,
+                                       QStringList coordinates)
 {
   Track* track1 = new Track(trackName,
                             trackLength,
                             trackList,
                             trainList,
                             stationList);
-
+  trackList.append(track1);
+  trackListModel->insertRows(trackList.size(), 1 , QModelIndex());
   connect(track1,
           SIGNAL(dataChangedSignal(int, const QVariant &)),
           trackListModel,
           SLOT(onDataChanged(int, const QVariant &)));
-  trackList.append(track1);
-  trackListModel->insertRows(trackList.size(), 1 , QModelIndex());
+  if(FALSE == coordinates.empty())
+  {
+    QVariant returnedValue;
+    QMetaObject::invokeMethod(handleQMLObject,
+                              "createQMLTrack",
+                              Q_RETURN_ARG(QVariant, returnedValue),
+                              Q_ARG(QVariant, trackName),
+                              Q_ARG(QVariant, trackLength),
+                              Q_ARG(QVariant, coordinates));
+    //Connect signal and slot
+  }
   track1=NULL;
 }
+
 
 /*!
  * The method addTrackToNetwork creates a Train object with parameters from
@@ -143,7 +156,10 @@ void TrafficControl::addTrainToNetwork(QString trainName)
  *
  * @param stationName Name of the station
  */
-void TrafficControl::addStationToNetwork(QString stationName, bool isJunction)
+void TrafficControl::addStationToNetwork(QString stationName,
+                                         bool isJunction,
+                                         QString stationLat,
+                                         QString stationLon)
 {
   Station* newStation = new Station(stationName,
                                   isJunction,
@@ -154,40 +170,25 @@ void TrafficControl::addStationToNetwork(QString stationName, bool isJunction)
           SIGNAL(dataChangedSignal(int, const QVariant &)),
           stationListModel,
           SLOT(onDataChanged(int , const QVariant &)));
-  /*******
-   *     *
-   * QML *
-   *     *
-   *******/
-  connect(newStation,
-          SIGNAL(qmlStationOccupancySignal(QVariant ,QVariant ,QVariant)),
-          handleQMLObject,
-          SLOT(qmlStationOccupancySlot(QVariant, QVariant, QVariant)));
+
   stationList.append(newStation);
   stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
   stationList[stationList.size()-1]->changeNbrOfPassengers(0);
+  if( 0 != stationLat.compare("") && 0 != stationLon.compare("")){
+    QVariant returnedValue;
+    QMetaObject::invokeMethod(handleQMLObject,
+                              "createQMLStation",
+                              Q_RETURN_ARG(QVariant, returnedValue),
+                              Q_ARG(QVariant, stationName),
+                              Q_ARG(QVariant, isJunction),
+                              Q_ARG(QVariant, stationLat),
+                              Q_ARG(QVariant, stationLon));
+    connect(newStation,
+            SIGNAL(qmlStationOccupancySignal(QVariant ,QVariant ,QVariant)),
+            handleQMLObject,
+            SLOT(qmlStationOccupancySlot(QVariant, QVariant, QVariant)));
+  }
   newStation = NULL;
-}
-
-int TrafficControl::createStationInQml(QString objectName,
-                                       bool isJunction,
-                                       QString stationLat,
-                                       QString stationLong)
-{
-  qDebug() << "In TC::callQMLMap " << objectName << " " << isJunction << " "
-           << stationLat << " " << stationLong;
-
-  QVariant returnedValue;
-  QMetaObject::invokeMethod(handleQMLObject,
-                            "createQMLStation",
-                            //"jsCreateQMLStation",
-                            Q_RETURN_ARG(QVariant, returnedValue),
-                            Q_ARG(QVariant, objectName),
-                            Q_ARG(QVariant, isJunction),
-                            Q_ARG(QVariant, stationLat),
-                            Q_ARG(QVariant, stationLong));
-
-  return 0;
 }
 
 /*!
@@ -224,8 +225,7 @@ int TrafficControl::connectTrackToStations(int trackID,
  */
 int TrafficControl::connectTrackToStations(QString trackName,
                                            QString startStationName,
-                                           QString endStationName,
-                                           bool isReversed)
+                                           QString endStationName)
 {
   int foundStartStationID = UNDEFINED;
   int foundEndStationID = UNDEFINED;
@@ -253,37 +253,39 @@ int TrafficControl::connectTrackToStations(QString trackName,
           break;
         }
       }
-      foreach(Track* thisTrack, trackList){
-        if(QString::compare(trackName, thisTrack->getName()) == 0)
-        {
-          foundTrackID=thisTrack->getID();
-          break;
-        }
-      }
-      if ((foundStartStationID != UNDEFINED) &&
-          (foundEndStationID != UNDEFINED) &&
-          (foundTrackID != UNDEFINED))
+    }
+
+    foreach(Track* thisTrack, trackList){
+      if(QString::compare(trackName, thisTrack->getName()) == 0)
       {
-        if (isReversed)//
-        {//
-          trackList.at(foundTrackID)->setEndStation(foundStartStationID);//
-          trackList.at(foundTrackID)->setStartStation(foundEndStationID);//
-        }//
-        else//
-        {//
-          trackList.at(foundTrackID)->setStartStation(foundStartStationID);
-          trackList.at(foundTrackID)->setEndStation(foundEndStationID);
-        }//
-        stationList.at(foundStartStationID)->addTrack(foundTrackID);//
+        foundTrackID=thisTrack->getID();
+        break;
       }
-      else
-      {
-        qDebug()<<"ERROR  : TC:cTTS: Either track or station name is not found.";
-        return 0;
-      }
+    }
+
+  if ((foundStartStationID != UNDEFINED) &&
+        (foundEndStationID != UNDEFINED) &&
+        (foundTrackID != UNDEFINED))
+  {
+    if(trackList.at(foundTrackID)->getStartStation() == UNDEFINED)
+    {
+      trackList.at(foundTrackID)->setStartStation(foundStartStationID);
+    }
+    if(trackList.at(foundTrackID)->getEndStation() == UNDEFINED)
+    {
+      trackList.at(foundTrackID)->setEndStation(foundEndStationID);
+    }
+    stationList.at(foundStartStationID)->addTrack(foundTrackID);//
+  }
+  else
+  {
+    qDebug()<<"ERROR  : TC:cTTS: Either track or station name is not found.";
+    return 0;
   }
   return 1;
 }
+
+
 
 /*!
  * This method commands all trains to move the amount of time defined in the stepTimeBox item in the UI.
