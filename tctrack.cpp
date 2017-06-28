@@ -92,6 +92,30 @@ Track& Track::operator=( const Track& sTrack )
   return *this;
 }
 
+bool Track::addTrain(int trainID){
+  trainsOnTrackQueue.enqueue(trainID);
+  emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "AVAILABLE");
+  return false;
+}
+
+bool Track::deleteTrain(int trainID){
+  if(trainsOnTrackQueue.isEmpty()){
+    qDebug()<<"ERROR  : Trying to remove rom an empty queue";
+    return false;
+  } else {
+    if(trainsOnTrackQueue.head() == trainID){
+      trainsOnTrackQueue.dequeue();
+      emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "AVAILABLE");
+      return true;
+    } else {
+      qDebug()<<"CRASH!!! : Queue violation!";
+    }
+  }
+  qDebug()<<"INFO   : DELETE LAST TRAIN "<<trainID<<" FROM TRACK: "<<trackID;
+  return false;
+}
+
+
 /*!
  * The method returns the end station for this Track object.
  *

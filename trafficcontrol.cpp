@@ -113,6 +113,10 @@ void TrafficControl::addTrackToNetwork(QString trackName,
                               Q_ARG(QVariant, trackLength),
                               Q_ARG(QVariant, coordinates));
     //Connect signal and slot
+    connect(track1,
+            SIGNAL(qmlTrackStatusSignal(QVariant ,QVariant ,QVariant)),
+            handleQMLObject,
+            SLOT(qmlTrackStatusSlot(QVariant, QVariant, QVariant)));
   }
   track1=NULL;
 }

@@ -289,8 +289,10 @@ int Train::closingState(int n)
 
 int Train::readyToRunningState(int n)
 {
+  bool transactionSuccess = false;
   thisStationList->at(currentStation)->trainDeparture(this->getID());
   currentTrack = nextTrack;
+  transactionSuccess = thisTrackList->at(currentTrack)->addTrain(trainID);
   currentStation = UNDEFINED;//Remove this train from station.
   nextTrack = UNDEFINED;
   positionOnTrack = 0;//TODO: Check what happens when train is traveling in opposite deirection!
@@ -306,11 +308,17 @@ int Train::readyToRunningState(int n)
 int Train::runningToOpeningState(int n)
 {
   //TODO: Consider trains moving in the opposite direction
+  bool transactionSuccess = false;
   currentStation = thisTrackList->at(currentTrack)->getEndStation();
   thisStationList->at(currentStation)->trainArrival(this->getID());
   currentSpeed = 0;
+  transactionSuccess = thisTrackList->at(currentTrack)->deleteTrain(trainID);
+  if(false == transactionSuccess){
+    qDebug()<<"ERROR   : Train removal failed";
+  }
   currentTrack = UNDEFINED;
-  nextTrack = UNDEFINED;         //2017-05-14
+  nextTrack = UNDEFINED;//Why remove nextTrack?
+
   state = stateTable.value("OPENING");
   doorOpenProgress = 0;
   return n;

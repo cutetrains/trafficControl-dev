@@ -58,31 +58,12 @@ with open(inputfile, "r", encoding='utf8') as ins:
       #print(coordinateList)
       thisTrackCoordinates=""
       reversedTrackCoordinates=""
-      for iii in range(1, len(coordinateList)):
-        orgLon=coordinateList[iii-1].split(",")[0]
-        orgLat=coordinateList[iii-1].split(",")[1]
-        desLon=coordinateList[iii].split(",")[0]
-        desLat=coordinateList[iii].split(",")[1]
-        summa=summa+haversine(float(orgLon),float(orgLat),float(desLon),float(desLat))
-        if(placeMarkName[0]=="d"):
-          reversedTrackCoordinates=orgLat + " " + orgLon + " " + reversedTrackCoordinates
-        thisTrackCoordinates=thisTrackCoordinates+" " + orgLat + " " + orgLon
-      if(placeMarkName[0]=="d"):
-        reversedTrackCoordinates=  desLat + " " + desLon + " " + reversedTrackCoordinates 
-      thisTrackCoordinates=thisTrackCoordinates+" " + desLat + " " + desLon
 
-      # IDENTIFY THE DIRECTION OF THE TRACK
-      #print ("_________")
-      
       # IS DELTA north-south OR west-east?
       startLong = float(coordinateList[0].split(",")[0])
       startLat = float(coordinateList[0].split(",")[1])
       endLong = float(coordinateList[-1].split(",")[0])
       endLat = float(coordinateList[-1].split(",")[1])
-      #print(startLong)
-      #print(startLat)
-      #print(endLong)
-      #print(endLat)
       if (abs(endLat - startLat) < abs(endLong - startLong)):
         if(startLong<endLong):
           #print("E")
@@ -98,6 +79,41 @@ with open(inputfile, "r", encoding='utf8') as ins:
           #print("S")
           placeMarkName = placeMarkName+"_S"
       
+
+      for iii in range(1, len(coordinateList)):
+        orgLon=coordinateList[iii-1].split(",")[0]
+        orgLat=coordinateList[iii-1].split(",")[1]
+        desLon=coordinateList[iii].split(",")[0]
+        desLat=coordinateList[iii].split(",")[1]
+        summa=summa+haversine(float(orgLon),float(orgLat),float(desLon),float(desLat))
+        if(placeMarkName[0]=="d"):
+          if(placeMarkName[-1]=="W"):
+            orgLonR = orgLon
+            orgLatR = str(float(orgLat)+0.001)
+            desLonR = desLon
+            desLatR = str(float(desLat)+0.001)
+          if(placeMarkName[-1]=="N"):
+            orgLonR = str(float(orgLon)+0.001)
+            orgLatR = orgLat
+            desLonR = str(float(desLon)+0.001)
+            desLatR = desLat
+          if(placeMarkName[-1]=="E"):
+            orgLonR = orgLon
+            orgLatR = str(float(orgLat)-0.001)
+            desLonR = desLon
+            desLatR = str(float(desLat)-0.001)
+          if(placeMarkName[-1]=="S"):
+            orgLonR = str(float(orgLon)-0.001)
+            orgLatR = orgLat
+            desLonR = str(float(desLon)-0.001)
+            desLatR = desLat
+          reversedTrackCoordinates=orgLatR + " " + orgLonR + " " + reversedTrackCoordinates
+        thisTrackCoordinates=thisTrackCoordinates+" " + orgLat + " " + orgLon
+      if(placeMarkName[0]=="d"):
+        reversedTrackCoordinates=  desLatR + " " + desLonR + " " + reversedTrackCoordinates 
+      thisTrackCoordinates=thisTrackCoordinates+" " + desLat + " " + desLon
+
+      
       #print(thisTrackCoordinates)
       isNextLineCoordinateList=False
       trackListItem=[placeMarkName, numLines, coordinateList[0].split(",")[:-1], "", coordinateList[-1].split(",")[:-1], "", summa]
@@ -105,6 +121,7 @@ with open(inputfile, "r", encoding='utf8') as ins:
       
       print("ADD TRACK "+ placeMarkName + " " + str(int(summa*1000) ) +  " COORDINATES" +thisTrackCoordinates)
       if(placeMarkName[0]=="d"):#dLunGunN shall have a friend dLunGunS (same name, but in opposite direction)
+              #print(endLat)
         tempPlaceMarkName=""
         if (placeMarkName[-1]=='N'): tempPlaceMarkName='S'
         if (placeMarkName[-1]=='S'): tempPlaceMarkName='N'

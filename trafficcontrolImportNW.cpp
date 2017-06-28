@@ -137,7 +137,7 @@ void TrafficControl::importPredefinedNetwork()
         (7 == argumentList.count()) ){
         //Check that the second argument reflects an existing track, and that the stations exist.
       int foundTrack = UNDEFINED;
-      qDebug()<<"INFO   : CONNECT TRACK name FROM station TO station recognised";
+      //qDebug()<<"INFO   : CONNECT TRACK name FROM station TO station recognised";
       foreach(Track* t, trackList){
         if (t->getName()==argumentList.at(2)) {foundTrack=t->getID();
       }
@@ -173,7 +173,7 @@ void TrafficControl::importPredefinedNetwork()
         (1 == argumentList.indexOf("TRAIN")) &&
         (2 == argumentList.indexOf("NAME")) &&
         (4 == argumentList.count())){
-      qDebug()<<"INFO   : ADD TRAIN recognised";
+      //qDebug()<<"INFO   : ADD TRAIN recognised";
       addTrainToNetwork(QString(argumentList.at(3)));
       currentTrain=trainList.length()-1;
       approvedCommand=true;
@@ -206,7 +206,7 @@ void TrafficControl::importPredefinedNetwork()
         (2 == argumentList.indexOf("CURRENT")) &&
         (3 == argumentList.indexOf("STATION")) &&
         (5 == argumentList.count())){
-      qDebug()<<"INFO   : TRAIN SET STATION recognised with Station="<<argumentList.at(4)<<". Check that the station exists.";
+      //qDebug()<<"INFO   : TRAIN SET STATION recognised with Station="<<argumentList.at(4)<<". Check that the station exists.";
       foreach(Station* s, stationList){
         //QString tempstr2=argumentList.at(4)
         if (s->getName() == argumentList.at(4)){
@@ -247,7 +247,7 @@ void TrafficControl::importPredefinedNetwork()
       //        <<argumentList.at(4)<<". TODO: Check that the station exists.";
       foreach (Station* s, stationList) {
         if( s->getName()==argumentList.at(4)){
-          qDebug()<<"IMPORT : "<<argumentList.at(4) <<" found. Adding to travelplan";
+      //    qDebug()<<"IMPORT : "<<argumentList.at(4) <<" found. Adding to travelplan";
           trainList.at(currentTrain)->addStationToTravelPlan(s->getID());
           approvedCommand=true;
         }
