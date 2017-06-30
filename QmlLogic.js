@@ -23,12 +23,19 @@ function jsCreateQMLTrack(trackName, length, coordinates) {
                                      +';objectName:"track_'+trackName+'"}',
                                      mainMap,
                                      "test2")
+  var iii;
   polyline.line.color = "green";
   polyline.line.width = 1;
-  polyline.path = [
+  /*polyline.path = [
         {  latitude: coordinates[0], longitude: coordinates[1] },
-        {latitude: coordinates[coordinates.length-2], longitude: coordinates[coordinates.length-1]}
-            ]
+        {  latitude: coordinates[coordinates.length-2], longitude: coordinates[coordinates.length-1]}
+            ]*/
+  //polyline.addCoordinate(QtPositioning.coordinate(-27.5, 153.1))
+  for(iii= 0; iii<coordinates.length; iii++)
+  {
+    polyline.addCoordinate(QtPositioning.coordinate(coordinates[iii*2],coordinates[iii*2+1]))
+  }
   mainMap.addMapItem(polyline)
+
 }
 

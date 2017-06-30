@@ -1,5 +1,5 @@
 from operator import itemgetter
-from math import radians, sin, cos, sqrt, asin
+from math import radians, sin, cos, sqrt, asin, atan
 
 def haversine(lon1, lat1, lon2, lat2):  #From rosettacode.org
  
@@ -64,6 +64,10 @@ with open(inputfile, "r", encoding='utf8') as ins:
       startLat = float(coordinateList[0].split(",")[1])
       endLong = float(coordinateList[-1].split(",")[0])
       endLat = float(coordinateList[-1].split(",")[1])
+      #print("      DeltaLon: "+ str(endLong-startLong) + " DeltaLat: "+ str(endLat-startLat) + " Angle: " + str(180/3.14*atan((endLat-startLat)/(endLong-startLong))))
+      lonShift = -0.0005*(endLat-startLat)/(sqrt((endLong-startLong)**2+(endLat-startLat)**2))
+      latShift = 0.0005*(endLong-startLong)/(sqrt((endLong-startLong)**2+(endLat-startLat)**2))
+      #print("      Shift: Long: " + str(lonShift ) + " Lat: " + str(latShift )+ " Angle: " + str(180/3.14*atan(latShift/lonShift)))
       if (abs(endLat - startLat) < abs(endLong - startLong)):
         if(startLong<endLong):
           #print("E")
@@ -79,37 +83,41 @@ with open(inputfile, "r", encoding='utf8') as ins:
           #print("S")
           placeMarkName = placeMarkName+"_S"
       
-
       for iii in range(1, len(coordinateList)):
         orgLon=coordinateList[iii-1].split(",")[0]
         orgLat=coordinateList[iii-1].split(",")[1]
         desLon=coordinateList[iii].split(",")[0]
         desLat=coordinateList[iii].split(",")[1]
         summa=summa+haversine(float(orgLon),float(orgLat),float(desLon),float(desLat))
+        
+        '''if(placeMarkName[-1]=="W"):
+          orgLonR = orgLon
+          orgLatR = str(float(orgLat)+0.001)
+          desLonR = desLon
+          desLatR = str(float(desLat)+0.001)
+        if(placeMarkName[-1]=="N"):
+          orgLonR = str(float(orgLon)+0.001)
+          orgLatR = orgLat
+          desLonR = str(float(desLon)+0.001)
+          desLatR = desLat
+        if(placeMarkName[-1]=="E"):
+          orgLonR = orgLon
+          orgLatR = str(float(orgLat)-0.001)
+          desLonR = desLon
+          desLatR = str(float(desLat)-0.001)
+        if(placeMarkName[-1]=="S"):
+          orgLonR = str(float(orgLon)-0.001)
+          orgLatR = orgLat
+          desLonR = str(float(desLon)-0.001)
+         desLatR = desLat'''
         if(placeMarkName[0]=="d"):
-          if(placeMarkName[-1]=="W"):
-            orgLonR = orgLon
-            orgLatR = str(float(orgLat)+0.001)
-            desLonR = desLon
-            desLatR = str(float(desLat)+0.001)
-          if(placeMarkName[-1]=="N"):
-            orgLonR = str(float(orgLon)+0.001)
-            orgLatR = orgLat
-            desLonR = str(float(desLon)+0.001)
-            desLatR = desLat
-          if(placeMarkName[-1]=="E"):
-            orgLonR = orgLon
-            orgLatR = str(float(orgLat)-0.001)
-            desLonR = desLon
-            desLatR = str(float(desLat)-0.001)
-          if(placeMarkName[-1]=="S"):
-            orgLonR = str(float(orgLon)-0.001)
-            orgLatR = orgLat
-            desLonR = str(float(desLon)-0.001)
-            desLatR = desLat
+          orgLonR = str(float(orgLon) + lonShift)
+          orgLatR = str(float(orgLat) + latShift)
           reversedTrackCoordinates=orgLatR + " " + orgLonR + " " + reversedTrackCoordinates
         thisTrackCoordinates=thisTrackCoordinates+" " + orgLat + " " + orgLon
       if(placeMarkName[0]=="d"):
+        desLonR = str(float(desLon) + lonShift)
+        desLatR = str(float(desLat) + latShift)   
         reversedTrackCoordinates=  desLatR + " " + desLonR + " " + reversedTrackCoordinates 
       thisTrackCoordinates=thisTrackCoordinates+" " + desLat + " " + desLon
 
