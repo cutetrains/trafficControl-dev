@@ -90,12 +90,10 @@ int Train::addStationToTravelPlan(int stationID)
     }
   else
   {
-    qDebug()<<"INFO   : Adding station to trainroute" << stationID<<" : "
-            << thisStationList->at(stationID)->getName();
     travelPlanByStationID.push_back(stationID);
   }
   sendDataChangedSignal(trainID);
-  showInfo();
+  //showInfo();
   return 1;
 }
 
@@ -319,6 +317,10 @@ int Train::runningToOpeningState(int n)
   currentTrack = UNDEFINED;
   nextTrack = UNDEFINED;//Why remove nextTrack?
 
+  emit qmlTrainPositionSignal(this->getName(),
+                              thisStationList->at(currentStation)->getLatitude(),
+                              thisStationList->at(currentStation)->getLongitude());
+
   state = stateTable.value("OPENING");
   doorOpenProgress = 0;
   return n;
@@ -335,6 +337,9 @@ void Train::setCurrentStation(int stationID) {
   state = stateTable.value("LOADING");
 
   sendDataChangedSignal(trainID);//+1?
+  emit qmlTrainPositionSignal(this->getName(),
+                              thisStationList->at(stationID)->getLatitude(),
+                              thisStationList->at(stationID)->getLongitude());
 }//Later: reserve place in station for the train
 
 /*!

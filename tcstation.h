@@ -33,6 +33,10 @@ signals:
 
 private:
   QString name;
+  bool stationIsJunction;
+  //float latitude;
+  //float longitude;
+  QList<float> thisCoordinate;
   vector<int> leavingTrackVector;
   int numberOfPlatforms;
   QList<Track*> *thisTrackList;//inserted, REMOVE?
@@ -47,6 +51,8 @@ public:// to do later: Add vector with pointers to the trains on each station.
   /*! The constructor for a Station object.*/
   Station(QString cn,
           bool isJunction,
+          QString latitude,
+          QString longitude,
           QList<Track*>& trackList,
           QList<Train*>& trainList,
           QList<Station*>& stationList);
@@ -57,6 +63,9 @@ public:// to do later: Add vector with pointers to the trains on each station.
   bool checkIfTrackLeavesStation(int trackID);
   int findLeavingTrackIndexToStation(int targetStationID);
   int getID();
+  QList<float> getCoordinate();
+  float getLatitude();
+  float getLongitude();
   QString getName();
   int getNbrOfWaitingPassengers();
   void trainArrival(int trainID);

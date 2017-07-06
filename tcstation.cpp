@@ -42,6 +42,9 @@ int Station::totalNbrOfStations = 0;
  * The constructor for a Station object.
  *
  * @param cn Name of the station
+ * @param isJunction is true if the station is a junction
+ * @param latitude
+ * @param longitude
  * @param trackList is a pointer to the trackList
  * @param trainList is a pointer to the trackList
  * @param stationList is a pointer to the stationList
@@ -52,20 +55,32 @@ int Station::totalNbrOfStations = 0;
  */
 Station::Station(QString cn,
                  bool isJunction,
+                 QString inLatitude,
+                 QString inLongitude,
                  QList<Track*>& trackList,
                  QList<Train*>& trainList,
                  QList<Station*>& stationList)
-{ 	
+{
   name = QString::fromUtf16(cn.utf16());
   waitingPassengers = 0;
+  stationIsJunction = isJunction;
   numberOfPlatforms = 2;
-  /*The stationID will be correspond to the order of created Station objects.*/
+  if( 0 == inLatitude.compare(""))
+  {
+    thisCoordinate << 0;
+    thisCoordinate << 0;
+  }
+  else
+  {
+    thisCoordinate << inLatitude.toFloat();
+    thisCoordinate << inLongitude.toFloat();
+  }
   stationID = totalNbrOfStations;
   totalNbrOfStations++;
   thisTrackList = &trackList;
   thisTrainList = &trainList;
   thisStationList = &stationList;
-}	
+}
 
 /*!
  * The method returns the number of waiting passengers at the current station
@@ -158,6 +173,22 @@ int Station::findLeavingTrackIndexToStation(int targetStationID)
     }
   }
   return UNDEFINED;
+}
+
+QList<float> Station::getCoordinate()
+{
+  return thisCoordinate;
+}
+
+float Station::getLatitude()
+{
+  return thisCoordinate.at(0);
+}
+
+
+float Station::getLongitude()
+{
+  return thisCoordinate.at(1);
 }
 
 /*!

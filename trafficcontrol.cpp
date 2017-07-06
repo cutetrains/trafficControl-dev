@@ -151,6 +151,19 @@ void TrafficControl::addTrainToNetwork(QString trainName)
   trainListModel->insertRows(trainList.size(), 1 , QModelIndex());
   trainList[trainList.size()-1]->load(2);/*Maybe send datachanged? 2 refers to number
                                           of passengers and is hardcoded. Change this later*/
+  //Add train to QML map
+  if( NULL != handleQMLObject){
+    QVariant returnedValue;
+    QMetaObject::invokeMethod(handleQMLObject,
+                              "createQMLTrain",
+                              Q_RETURN_ARG(QVariant, returnedValue),
+                              Q_ARG(QVariant, trainName));
+    connect(newTrain,
+            SIGNAL(qmlTrainPositionSignal(QVariant, QVariant, QVariant)),
+            handleQMLObject,
+            SLOT(qmlTrainPositionSlot(QVariant, QVariant, QVariant)));
+
+  }
   newTrain = NULL;
 }
 
@@ -167,6 +180,8 @@ void TrafficControl::addStationToNetwork(QString stationName,
 {
   Station* newStation = new Station(stationName,
                                   isJunction,
+                                  stationLat,
+                                  stationLon,
                                   trackList,
                                   trainList,
                                   stationList);
@@ -178,6 +193,7 @@ void TrafficControl::addStationToNetwork(QString stationName,
   stationList.append(newStation);
   stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
   stationList[stationList.size()-1]->changeNbrOfPassengers(0);
+  //ADD CHECK FOR handleQMLObject!!!
   if( 0 != stationLat.compare("") && 0 != stationLon.compare("")){
     QVariant returnedValue;
     QMetaObject::invokeMethod(handleQMLObject,
