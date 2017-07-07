@@ -19,6 +19,7 @@
 #include <QObject>
 #include <QQueue>
 #include <QVariant>
+#include <QList>
 
 #ifndef _TCTRACK_H_
 #define _TCTRACK_H_
@@ -35,6 +36,8 @@ signals:
 
 private:
   static int totalNbrOfTracks;
+  QList<float> coordinateList;
+  QList<int> coordinateCumulatedDistanceList;
   int length;
   //int trainsOnTrack;
   QString name;
@@ -48,6 +51,7 @@ public:
   //TODO: Rename parameters to be more intuitive
   Track(QString cn,
         int nn,
+        QStringList coordinates,
         QList<Track*>& trackList,
         QList<Train*>& trainList,
         QList<Station*>& stationList);//ID and length
@@ -56,6 +60,7 @@ public:
   ~Track();
   bool addTrain(int trainID);
   bool deleteTrain(int trainID);
+  QList<float> getCoordinatesFromPosition(int position);
   int getID();
   int getLength();
   int getMaxAllowedSpeed();

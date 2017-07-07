@@ -375,6 +375,11 @@ void Train::setTrackPosition(int n)
     positionOnTrack = max(n, 0);
     positionOnTrack = min(positionOnTrack,
                           thisTrackList->at(currentTrack)->getLength());
+    trainCoordinates = thisTrackList->at(currentTrack)->getCoordinatesFromPosition(positionOnTrack);
+    //qDebug()<<this->getName()<<", " << trainCoordinates;
+    emit qmlTrainPositionSignal(this->getName(),
+                              trainCoordinates.at(0),
+                              trainCoordinates.at(1));
   }
   sendDataChangedSignal(trainID);//+1?
 }

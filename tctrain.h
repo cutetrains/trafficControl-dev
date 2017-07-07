@@ -20,6 +20,7 @@
 #include <QHash>
 #include <QMutexLocker>
 #include <QVariant>
+#include <QList>
 #ifndef _TCTRAIN_H_
 #define _TCTRAIN_H_
 using namespace std;
@@ -32,9 +33,9 @@ class Train: public QObject
 
 signals:
   void dataChangedSignal(int , const QVariant & );
-//  void qmlTrainPositionSignal(QString, float, float);
   void qmlTrainPositionSignal(QVariant, QVariant, QVariant);
 private:
+  QList<float> trainCoordinates;
   QString trainName;
   static int totalNbrOfTrains;
   int nbrOfSeats;

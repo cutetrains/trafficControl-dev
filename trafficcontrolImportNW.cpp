@@ -219,7 +219,7 @@ void TrafficControl::importPredefinedNetwork()
         (1 == argumentList.indexOf("SET")) &&
         (2 == argumentList.indexOf("MODEL")) &&
         (4 == argumentList.count())){
-      qDebug()<<"INFO   : TRAIN SET MODEL recognised with Model="<<argumentList.at(3)<<". To be implemented!";
+      //qDebug()<<"INFO   : TRAIN SET MODEL recognised with Model="<<argumentList.at(3)<<". To be implemented!";
       approvedCommand=true;
     }
 
@@ -229,7 +229,7 @@ void TrafficControl::importPredefinedNetwork()
         (2 == argumentList.indexOf("DESIRED")) &&
         (3 == argumentList.indexOf("SPEED")) &&
         (5 == argumentList.count())){
-      qDebug()<<"INFO   : TRAIN SET DESIRED SPEED recognised with DesiredSpeed="<<argumentList.at(4);
+      //qDebug()<<"INFO   : TRAIN SET DESIRED SPEED recognised with DesiredSpeed="<<argumentList.at(4);
       bool isSpeedInt=false;
       int iSpeed=argumentList.at(4).toInt(&isSpeedInt,10) ;// THIS CHECK AT OTHER PLACES TOO!!!!
       if (true == isSpeedInt){

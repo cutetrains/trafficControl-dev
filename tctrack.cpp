@@ -20,6 +20,7 @@
 #include <cstring>
 #include <vector>
 #include <QDebug>
+#include <QtMath>
 #include "tctrack.h"
 #include "trafficcontrol.h"
 #define UNDEFINED -1
@@ -38,6 +39,7 @@ int Track::totalNbrOfTracks=0;
  */
 Track::Track(QString cn,
              int nn,
+             QStringList coordinates,
              QList<Track*>& trackList,
              QList<Train*>& trainList,
              QList<Station*>& stationList)
@@ -52,6 +54,32 @@ Track::Track(QString cn,
   thisTrackList = &trackList;
   thisTrainList = &trainList;
   thisStationList = &stationList;
+  //Populate coordinateList and calculate coordinateCumulatedDistanceList
+  if ( !coordinates.isEmpty() )
+  {
+    float R = float(6372.8);
+    float dLat;
+    float dLon;
+    float lat1;
+    float lat2;
+    qDebug()<<name;
+    float dist=0;
+    for(int iii = 0; iii < (coordinates.length()/2); iii++ )
+    {
+      coordinateList<<coordinates.at(iii*2).toDouble();
+      coordinateList<<coordinates.at(iii*2+1).toDouble();
+      if(iii>0)
+      {
+        //Use Haversine to calculate delta
+        dLat = (coordinateList.at(iii*2)-coordinateList.at(iii*2-2))*3.1415926536 / 180;
+        dLon = (coordinateList.at(iii*2+1)-coordinateList.at(iii*2-2+1))*3.1415926536 / 180;
+        lat1 = coordinateList.at(iii*2-2)*3.1415926536 / 180;
+        lat2 = coordinateList.at(iii*2)*3.1415926536 / 180;
+        dist+=R*2*asin(sqrt(sin(dLat/2)*sin(dLat/2)+cos(lat1)*cos(lat2)*sin(dLon/2)*sin(dLon/2)));
+      }
+      coordinateCumulatedDistanceList<<floor(dist*1000);
+    }
+  }
 }
 
 /*!
@@ -115,6 +143,25 @@ bool Track::deleteTrain(int trainID){
   return false;
 }
 
+//TODO: CHECK FOR COORDINATES!
+QList<float> Track::getCoordinatesFromPosition(int position)
+{
+  int iii;
+  float fractionOfLeg;
+  QList<float> thisList;
+
+  for (iii=0; iii < coordinateList.length(); iii++){
+    if (coordinateCumulatedDistanceList.at(iii) >= position){
+      iii--;
+      break;
+    }
+  }
+  fractionOfLeg = ( (float) position-coordinateCumulatedDistanceList.at(iii))/
+                  (coordinateCumulatedDistanceList.at(iii+1)-coordinateCumulatedDistanceList.at(iii));
+  thisList<< (coordinateList.at(iii*2+2)-coordinateList.at(iii*2)) * fractionOfLeg + coordinateList.at(iii*2);
+  thisList<< (coordinateList.at(iii*2+2+1)-coordinateList.at(iii*2+1)) * fractionOfLeg + coordinateList.at(iii*2+1);
+  return thisList;
+}
 
 /*!
  * The method returns the end station for this Track object.

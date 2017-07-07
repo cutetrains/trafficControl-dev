@@ -33,7 +33,7 @@ Item {
   }
 
   function createQMLTrain(trainName) {
-    console.log("createQMLTrain: Adding Train to QML map")
+ //   console.log("createQMLTrain: Adding Train to QML map")
     Logic.jsCreateQMLTrain(trainName)
   }
 
@@ -80,12 +80,12 @@ Item {
 
   function qmlTrainPositionSlot(trainName, latitude, longitude)
   {
-    console.log("In qmlTrainPositionSlot "+ trainName + "  " + latitude + "  " + longitude)
+//    console.log("In qmlTrainPositionSlot "+ trainName + "  " + latitude + "  " + longitude)
     for (var i = 0; i < mainMap.children.length; ++i)
     {
       if(mainMap.children[i].objectName === "train_"+trainName)
       {
-        console.log("Train found!")
+        //console.log("Train found!")
         mainMap.children[i].center.latitude = latitude;
         mainMap.children[i].center.longitude = longitude;
       }

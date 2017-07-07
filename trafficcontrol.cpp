@@ -94,6 +94,7 @@ void TrafficControl::addTrackToNetwork(QString trackName,
 {
   Track* track1 = new Track(trackName,
                             trackLength,
+                            coordinates,
                             trackList,
                             trainList,
                             stationList);
@@ -162,7 +163,6 @@ void TrafficControl::addTrainToNetwork(QString trainName)
             SIGNAL(qmlTrainPositionSignal(QVariant, QVariant, QVariant)),
             handleQMLObject,
             SLOT(qmlTrainPositionSlot(QVariant, QVariant, QVariant)));
-
   }
   newTrain = NULL;
 }
