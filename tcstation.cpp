@@ -26,10 +26,8 @@
  *
  * Contact: gustaf_brannberg@hotmail.com
  */
-#include <iostream>
-#include <sstream>
-#include <cstring>
-#include <vector>
+
+//#include <cstring>
 #include <qDebug>
 #include "tcstation.h"
 #include "trafficcontrol.h"
@@ -53,7 +51,7 @@ int Station::totalNbrOfStations = 0;
  * @TODO numberOfPlatforms is hardcoded to 2,  should be station-dependent.
  * @TODO emit signal at initialisation so that QML has updated info
  */
-Station::Station(QString cn,
+Station::Station(QString stationName,
                  bool isJunction,
                  QString inLatitude,
                  QString inLongitude,
@@ -61,7 +59,8 @@ Station::Station(QString cn,
                  QList<Train*>& trainList,
                  QList<Station*>& stationList)
 {
-  name = QString::fromUtf16(cn.utf16());
+  //name = QString::fromUtf16(stationName.utf16());
+  name = stationName;
   waitingPassengers = 0;
   stationIsJunction = isJunction;
   numberOfPlatforms = 2;
@@ -83,14 +82,84 @@ Station::Station(QString cn,
 }
 
 /*!
- * The method returns the number of waiting passengers at the current station
- * @todo When passengers have different destinations, a more advanced method is
- *       needed. That needs to list passengers according to their desired
- *       destinations.
+ * The method adds a track, trackID, to the vector of leaving tracks for the
+ * station. Currently, only leaving tracks are recorded in the object, not
+ * incoming tracks.
  *
- * @return waitingPassengers The number of waiting passengers.
+ * @param trackID The ID of the track that shall be added to the list of
+ *                leaving tracks for the station.
+ * @todo Check if track exists already and check if track is already leaving
+ *       this or other stations, using checkIfTrackLeavesStation for all
+ *       stations.
+ * @todo Check if track is already connected to the station
  */
-int Station::getNbrOfWaitingPassengers() { return waitingPassengers; }
+void Station::addTrack(int trackID) {
+  if (trackID<= -1 ){
+    qDebug()<<"ERROR  : Station::addTrack" << name
+            <<" Error: negative number specified: "<<trackID;
+  }
+  else
+  {
+    leavingTrackList << trackID;
+    //leavingTrackVector.push_back(trackID);
+  }
+  sendDataChangedSignal(stationID);
+}
+
+/*!
+ * The adds a number of passengers to the current number of waiting passengers
+ * and notifies the model.
+ *
+ * @param nbrPassengersToAdd The number of passengers that shall be added to
+ *        the station. A negative number means that some passengers are leaving the station.
+ */
+void Station::changeNbrOfPassengers(int nbrPassengersToAdd) {
+  waitingPassengers = max((waitingPassengers + nbrPassengersToAdd), 0);
+  sendDataChangedSignal(stationID); //+1?
+}
+
+/*!
+ * The method checks if track trackID is listed in the leavingTrackList.
+ *
+ * @param trackID The ID of the track that shall be added to the list of
+ *                leaving tracks for the station.
+ *
+ * @return bool true if the track is listed as leaving for this station, false
+ *              otherwise.
+ */
+bool Station::checkIfTrackLeavesStation(int trackID)
+{
+  bool foundTrack = false;
+  foreach(int i, leavingTrackList)  {
+    if(trackID == i)
+    {
+      foundTrack = true;
+    }
+  }
+  return foundTrack;
+}
+
+/*!
+ * The method finds the track index in leavingTrackList to the adjacent
+ * station stationID. If no tracks are found, or the station isn't adjacent,
+ * the method will return -1.
+ *
+ * @param stationID The ID of the station to rearch.
+ *
+ * @return trackID The ID number the station.
+ * @TODO: Search for tracks in opposite direction.
+ */
+int Station::findLeavingTrackIndexToStation(int targetStationID)
+{
+  foreach(int i, leavingTrackList)
+  {
+    if((thisTrackList->at(i)->getEndStation()) == targetStationID)
+    {
+      return i;
+    }
+  }
+  return UNDEFINED;
+}
 
 /*!
  * The method returns ID number of the station
@@ -107,89 +176,28 @@ int Station::getID() { return stationID; }
 QString Station::getName() { return name; }
 
 /*!
- * The method adds a track, trackID, to the vector of leaving tracks for the
- * station. Currently, only leaving tracks are recorded in the object, not
- * incoming tracks.
+ * The method returns the number of waiting passengers at the current station
+ * @todo When passengers have different destinations, a more advanced method is
+ *       needed. That needs to list passengers according to their desired
+ *       destinations.
  *
- * @param trackID The ID of the track that shall be added to the list of
- *                leaving tracks for the station.
- * @todo Check if track exists already and check if track is already leaving
- *       this or other stations, using checkIfTrackLeavesStation for all
- *       stations.
- * @todo Check if track is already connected to the station
+ * @return waitingPassengers The number of waiting passengers.
  */
-void Station::addTrack(int trackID) { 
-  if (trackID<= -1 ){
-    qDebug()<<"ERROR  : Station::addTrack" << name
-            <<" Error: negative number specified: "<<trackID;
-  }
-  else
-  {
-    leavingTrackVector.push_back(trackID);
-  }
-  sendDataChangedSignal(stationID);
-}
+int Station::getNbrOfWaitingPassengers() { return waitingPassengers; }
 
 /*!
- * The method checks if track trackID is listed in the leavingTrackVector.
+ * The method returns the latitude of the station
  *
- * @param trackID The ID of the track that shall be added to the list of
- *                leaving tracks for the station.
- * @todo: Check if foreach can simplify the code
- * 
- * @return bool true if the track is listed as leaving for this station, false
- *              otherwise.
+ * @return latitude The latitude of the station.
  */
-bool Station::checkIfTrackLeavesStation(int trackID)
-{
-  bool foundTrack = false;
-  vector<int>::iterator it;
-  for (it =leavingTrackVector.begin(); it != leavingTrackVector.end(); ++it) {
-    if(trackID == *it)
-    {
-      foundTrack = true;
-    }
-  }
-  return foundTrack;
-}
+float Station::getLatitude() { return thisCoordinate.at(0); }
 
 /*!
- * The method finds the track index in leavingTrackVector to the adjacent
- * station stationID. If no tracks are found, or the station isn't adjacent,
- * the method will return -1.
+ * The method returns the longitude of the station
  *
- * @param stationID The ID of the station to rearch.
- *
- * @return trackID The ID number the station.
- * @TODO: Search for tracks in opposite direction.
+ * @return latitude The longitude of the station.
  */
-int Station::findLeavingTrackIndexToStation(int targetStationID)
-{
-  foreach(int i, leavingTrackVector)
-  {
-    if((thisTrackList->at(i)->getEndStation()) == targetStationID)
-    {
-      return i;
-    }
-  }
-  return UNDEFINED;
-}
-
-QList<float> Station::getCoordinate()
-{
-  return thisCoordinate;
-}
-
-float Station::getLatitude()
-{
-  return thisCoordinate.at(0);
-}
-
-
-float Station::getLongitude()
-{
-  return thisCoordinate.at(1);
-}
+float Station::getLongitude() { return thisCoordinate.at(1); }
 
 /*!
  * The method prepares a message and sends it to the Station data model. The
@@ -213,20 +221,18 @@ void Station::sendDataChangedSignal(int stationID){
 void Station::showInfo() {
   qDebug() << name << " (" << stationID << ") has " << waitingPassengers
            << " waiting passengers. ";
-  vector<int>::iterator it;
   qDebug() << "INFO   : Leaving tracks: ";
-  for (it = leavingTrackVector.begin(); it != leavingTrackVector.end(); ++it) {
-    qDebug() <<"        "<<*it;
-  }
+  foreach(int i, leavingTrackList)  { qDebug() <<"        "<<i; }
   qDebug() << "INFO : thisTrackList: Size is " << thisTrackList->size()
            << "thisStationList: Size is " << thisStationList->size()
            << " thisTrainList: Size is " << thisTrainList->size() << "\n";
 }
 
 /*!
- * The method adds a train to the list of trains currently in the station and
- * emits a signal when a train enters the station
+ * The method adds a train to the station, if there is room for it. It also
+ * emits a signal to QML.
  *
+ * @param trainID The ID of the train.
  */
 void Station::trainArrival(int trainID)
 {
@@ -244,8 +250,9 @@ void Station::trainArrival(int trainID)
 
 /*!
  * The method removes a train to the list of trains currently in the station and
- * emits a signal when a train enters the station
+ * emits a signal to QML.
  *
+ * @param trainID The ID of the train.
  */
 void Station::trainDeparture(int trainID)
 {
@@ -258,18 +265,6 @@ void Station::trainDeparture(int trainID)
   {
     qDebug()<<"ERROR  : Train departure failed";
   }
-}
-
-/*!
- * The adds a number of passengers to the current number of waiting passengers
- * and notifies the model.
- *
- * @param nbrPassengersToAdd The number of passengers that shall be added to
- * the station. A negative number means that some passengers are leaving the station.
- */
-void Station::changeNbrOfPassengers(int nbrPassengersToAdd) { 
-  waitingPassengers = max((waitingPassengers + nbrPassengersToAdd), 0);
-  sendDataChangedSignal(stationID); //+1?
 }
 
 Station::~Station()

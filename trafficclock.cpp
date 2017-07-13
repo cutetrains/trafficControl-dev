@@ -39,15 +39,10 @@ void TrafficClock::disconnectThread()
   isAlive = false;
 }
 
-/*void TrafficClock::releaseMutex()
-{
-   //threadMutexLocked=false;
-}*/
 
 /*!
- * 2014-06-22 Gustaf
 * The is the is called by the thread. This is called everythime the counter is activated by the user.
-* How to pause the thread?
+*
 */
 void TrafficClock::threadTick()
 {

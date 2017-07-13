@@ -15,10 +15,10 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
-#include <iostream>
-#include <sstream>
-#include <cstring>
-#include <vector>
+//#include <iostream>
+//#include <sstream>
+//#include <cstring>
+//#include <vector>
 #include <QString>
 #include <QDebug>
 #include <QtCore>
@@ -90,7 +90,7 @@ int Train::addStationToTravelPlan(int stationID)
     }
   else
   {
-    travelPlanByStationID.push_back(stationID);
+    travelPlanByStationID << stationID;
   }
   sendDataChangedSignal(trainID);
   //showInfo();
@@ -98,11 +98,22 @@ int Train::addStationToTravelPlan(int stationID)
 }
 
 /*!
- * Get the ID of the current Track object for the Train object. 
+ * This state reflects when the train is at a station, and closing doors.
  *
- * @return currentTrack. The value -1 indicates that the Train is not at a Track (most likely on a Station).
+ * @param n Time remaining for the train in this trafficClock tick
+ *
+ * @return n
  */
-int Train::getCurrentTrack() { return currentTrack; }
+int Train::closingState(int n)
+{
+  doorOpenProgress -= 20;
+  if (doorOpenProgress == 0)
+  {
+    state = stateTable.value("WAITING");
+  }
+  n--;
+  return n;
+}
 
 /*!
  * Get the actual speed of the Train object.
@@ -119,11 +130,25 @@ int Train::getCurrentSpeed() { return currentSpeed; }
 int Train::getCurrentStation() { return currentStation; }
 
 /*!
+ * Get the ID of the current Track object for the Train object. 
+ *
+ * @return currentTrack. The value -1 indicates that the Train is not at a Track (most likely on a Station).
+ */
+int Train::getCurrentTrack() { return currentTrack; }
+
+/*!
  * Get the desired/ordered speed of the Train object.
  *
  * @return desiredSpeed the desired speed [m/s].
  */
 int Train::getDesiredSpeed() { return desiredSpeed; }
+
+/*!
+ * The method returns the ID number for this Track object.
+ *
+ * @return trackID The ID number of the Track object.
+ */
+int Train::getID() { return trainID;}
 
 /*!
  * Get the current location on the Train's trip plan. The method getTrainRouteVector will give the entire trip plan.
@@ -140,18 +165,57 @@ int Train::getIndexTravelPlanByStationID() {return nextIndexTravelPlanByStationI
 QString Train::getName(){ return trainName; }
 
 /*!
- * Get the Train's trip plan by stations. The method getTrainRouteIndex will give the position of the next track to visit.
+ * Get the position on the current Track for the train in meters.
  *
- * @return trainVectorStations The vector of the Tracks that the train will use during its trip.
+ * @return n The position for the train [m] on the current track.
  */
-vector<int> Train::getTravelPlan() {return travelPlanByStationID;}
+int Train::getTrackPosition() { return positionOnTrack;}
 
 /*!
- * Move the Train. The method will iterate until the timer is zero or the Train is blocked. In that case, it will return the remaining time to move.
- * @todo TOTAL REFACTORING NEEDED
+ * Get the Train's travel plan by stations. The method getTrainRouteIndex will
+ * give the position of the next track to visit.
+ *
+ * @return trainVectorStations The vector of the Tracks that the train will
+ * use during its trip.
+ */
+QList<int> Train::getTravelPlan() {return travelPlanByStationID;}
+
+/*!
+ * Load some passengers to the train.
+ *
+ * @todo The load function is faulty. Also send a signal.
+ * @param n The numer of passengers to load to the train.
+ */
+void Train::load( int n) {n++;}
+
+/*!
+ * This state reflects when the train is at a station and loading passengers.
+ *
+ * @param n Time remaining for the train in this trafficClock tick
+ *
+ * @return n
+ */
+int Train::loadingState(int n)
+{
+  //Train shall continue loading passengers until no more passengers are on station
+  if (0 == thisStationList->at(currentStation)->getNbrOfWaitingPassengers())
+  {
+    state = stateTable.value("CLOSING");
+    doorOpenProgress = 100;
+    n--;
+  }
+  return n;
+}
+
+/*!
+ * Move the Train. The method will iterate until the timer is zero or the Train
+ * is blocked. In that case, it will return the remaining time to move.
+ *
  * @param n Time in seconds that the Train shall move
  * 
- * @return n Remaining time to move later. If the method concludes that the Train is blocked, it will return the remaining time to move. 0 indicates that the move operation is complete.
+ * @return n Remaining time to move later. If the method concludes that the
+ *           Train is blocked, it will return the remaining time to move.
+ *           0 indicates that the move operation is complete.
  */
 int Train::move(int n)
 //This function must be able to move to, from and through one or several stations.
@@ -165,18 +229,38 @@ int Train::move(int n)
     else if(stateTable.value("LOADING") == state) { n = this->loadingState(n); }
     else if(stateTable.value("CLOSING") == state) { n = this->closingState(n); }
     else if(stateTable.value("STOPPED") == state) { }
-    n--;//REMOVE!!!
+    n--;
   }
   sendDataChangedSignal(trainID);//INVESTIGATE WHEN DATACHANGEDSIGNAL SHALL BE SENT!
   return n;
 }
 
-int Train::waitingState(int n)
+/*!
+ * This state reflects when the train is at a station and opening doors.
+ *
+ * @param n Time remaining for the train in this trafficClock tick
+ *
+ * @return n
+ */
+int Train::openingState(int n)
 {
-  state = stateTable.value("READY");
+  //TODO Avoid magic numbers
+  doorOpenProgress += 20;
+  if (doorOpenProgress== 100)
+  {
+    state = stateTable.value("LOADING");
+  }
+  n--;
   return n;
 }
 
+/*!
+ * This state reflects when the train ready to move.
+ *
+ * @param n Time remaining for the train in this trafficClock tick
+ *
+ * @return n
+ */
 int Train::readyState(int n)
 {
   if (currentStation == UNDEFINED)
@@ -217,8 +301,34 @@ int Train::readyState(int n)
 }
 
 /*!
+ * This state reflects when the train is at a station, waiting for the proper
+ * time to leave, according to time table or network.
+ *
+ * @param n Time remaining for the train in this trafficClock tick
+ *
+ * @return n
+ */
+int Train::readyToRunningState(int n)
+{
+  bool transactionSuccess = false;
+  thisStationList->at(currentStation)->trainDeparture(this->getID());
+  currentTrack = nextTrack;
+  transactionSuccess = thisTrackList->at(currentTrack)->addTrain(trainID);
+  currentStation = UNDEFINED;//Remove this train from station.
+  nextTrack = UNDEFINED;
+  positionOnTrack = 0;//TODO: Check what happens when train is traveling in opposite deirection!
+  state = stateTable.value("RUNNING");
+  if (nextIndexTravelPlanByStationID < ((int) travelPlanByStationID.size() - 1))
+  {
+    nextIndexTravelPlanByStationID++;
+  }
+  n--;
+  return n;
+}
+
+/*!
  * Handles the train when it is runnong on the track.
- * @todo Handle train movement in ipposite direction.
+ * @todo Handle train movement in opposite direction.
  * @param n Time in seconds that the Train shall move
  *
  * @return n Remaining time to move later. If the method concludes that the
@@ -249,60 +359,13 @@ int Train::runningState(int n)
   return n;
 }
 
-int Train::openingState(int n)
-{
-  //TODO Avoid magic numbers
-  doorOpenProgress += 20;
-  if (doorOpenProgress== 100)
-  {
-    state = stateTable.value("LOADING");
-  }
-  n--;
-  return n;
-}
-
-int Train::loadingState(int n)
-{
-  //Train shall continue loading passengers until no more passengers are on station
-  if (0 == thisStationList->at(currentStation)->getNbrOfWaitingPassengers())
-  {
-    state = stateTable.value("CLOSING");
-    doorOpenProgress = 100;
-    n--;
-  }
-
-  return n;
-}
-
-int Train::closingState(int n)
-{
-  doorOpenProgress -= 20;
-  if (doorOpenProgress==0)
-  {
-    state = stateTable.value("WAITING");
-  }
-  n--;
-  return n;
-}
-
-int Train::readyToRunningState(int n)
-{
-  bool transactionSuccess = false;
-  thisStationList->at(currentStation)->trainDeparture(this->getID());
-  currentTrack = nextTrack;
-  transactionSuccess = thisTrackList->at(currentTrack)->addTrain(trainID);
-  currentStation = UNDEFINED;//Remove this train from station.
-  nextTrack = UNDEFINED;
-  positionOnTrack = 0;//TODO: Check what happens when train is traveling in opposite deirection!
-  state = stateTable.value("RUNNING");
-  if (nextIndexTravelPlanByStationID < ((int) travelPlanByStationID.size() - 1))
-  {
-    nextIndexTravelPlanByStationID++;
-  }
-  n--;
-  return n;
-}
-
+/*!
+ * This state reflects when the transition from runnng to opening state.
+ *
+ * @param n Time remaining for the train in this trafficClock tick
+ *
+ * @return n
+ */
 int Train::runningToOpeningState(int n)
 {
   //TODO: Consider trains moving in the opposite direction
@@ -325,79 +388,6 @@ int Train::runningToOpeningState(int n)
   doorOpenProgress = 0;
   return n;
 }
-
-/*!
- * Set the current station for the Train. 
- *
- * @param stationID The ID for the station that will be the current station for this Train.
- */
-void Train::setCurrentStation(int stationID) {
-  currentStation = stationID;
-  thisStationList->at(stationID)->trainArrival(this->getID());
-  state = stateTable.value("LOADING");
-
-  sendDataChangedSignal(trainID);//+1?
-  emit qmlTrainPositionSignal(this->getName(),
-                              thisStationList->at(stationID)->getLatitude(),
-                              thisStationList->at(stationID)->getLongitude());
-}//Later: reserve place in station for the train
-
-/*!
- * Set the desired speed for the Train. 
- *
- * @param n The desired speed for the Train [m/s].
- */
-void Train::setDesiredSpeed(int n) { 
-  desiredSpeed = min(maxSpeed, n);
-  if (currentTrack != UNDEFINED){
-  int maxSpeed = thisTrackList->at(currentTrack)->getMaxAllowedSpeed();
-    desiredSpeed = min(n, maxSpeed);
-  }
-  sendDataChangedSignal(trainID);//+1?
-}
-
-/*!
- * The method returns the ID number for this Track object.
- *
- * @return trackID The ID number of the Track object.
- */
-int Train::getID() { return trainID;}
-
-/*!
- * Set the position on the current Track for the train in meters. This is done
- * only if the train is located on a track. After completion, a signal is sent.
- *
- * @param n The desired position for the train [m].
- */
-void Train::setTrackPosition(int n)
-{
-  if (currentTrack != UNDEFINED){
-    positionOnTrack = max(n, 0);
-    positionOnTrack = min(positionOnTrack,
-                          thisTrackList->at(currentTrack)->getLength());
-    trainCoordinates = thisTrackList->at(currentTrack)->getCoordinatesFromPosition(positionOnTrack);
-    //qDebug()<<this->getName()<<", " << trainCoordinates;
-    emit qmlTrainPositionSignal(this->getName(),
-                              trainCoordinates.at(0),
-                              trainCoordinates.at(1));
-  }
-  sendDataChangedSignal(trainID);//+1?
-}
-
-/*!
- * Get the position on the current Track for the train in meters. 
- *
- * @return n The position for the train [m] on the current track.
- */
-int Train::getTrackPosition() { return positionOnTrack;}
-
-/*!
- * Load some passengers to the train.
- * 
- * @todo The load function is faulty. Also send a signal.
- * @param n The numer of passengers to load to the train.
- */
-void Train::load( int n) {n++;}	
 
 /*!
  * The method prepares a message and sends it to the Train data model. The signal
@@ -429,13 +419,45 @@ void Train::sendDataChangedSignal(int trainID){//Name, Track/Station , Position,
 }
 
 /*!
+ * Set the current station for the Train.
+ *
+ * @param stationID The ID for the station that will be the current station for this Train.
+ */
+void Train::setCurrentStation(int stationID) {
+  currentStation = stationID;
+  thisStationList->at(stationID)->trainArrival(this->getID());
+  state = stateTable.value("LOADING");
+
+  sendDataChangedSignal(trainID);//+1?
+  emit qmlTrainPositionSignal(this->getName(),
+                              thisStationList->at(stationID)->getLatitude(),
+                              thisStationList->at(stationID)->getLongitude());
+}//Later: reserve place in station for the train
+
+/*!
  * The method sets the current Track of the Train object.
+ * @TODO CHECK IF NEEDED
+ * @TODO ADD PPOSITION
  *
  * @param trackID The ID of the Train object that has information to update.
  */
 void Train::setCurrentTrack(int trackID) {
   currentTrack = trackID;
-  sendDataChangedSignal(trainID); //+1?
+  sendDataChangedSignal(trainID);
+}
+
+/*!
+ * Set the desired speed for the Train.
+ *
+ * @param n The desired speed for the Train [m/s].
+ */
+void Train::setDesiredSpeed(int n) {
+  desiredSpeed = min(maxSpeed, n);
+  if (currentTrack != UNDEFINED){
+  int maxSpeed = thisTrackList->at(currentTrack)->getMaxAllowedSpeed();
+    desiredSpeed = min(n, maxSpeed);
+  }
+  sendDataChangedSignal(trainID);//+1?
 }
 
 /*!
@@ -449,12 +471,31 @@ void Train::setName(QString const& tn) {
 }
 
 /*!
+ * Set the position on the current Track for the train in meters. This is done
+ * only if the train is located on a track. After completion, a signal is sent.
+ *
+ * @param n The desired position for the train [m].
+ */
+void Train::setTrackPosition(int n)
+{
+  if (currentTrack != UNDEFINED){
+    positionOnTrack = max(n, 0);
+    positionOnTrack = min(positionOnTrack,
+                          thisTrackList->at(currentTrack)->getLength());
+    trainCoordinates = thisTrackList->at(currentTrack)->getCoordinatesFromPosition(positionOnTrack);
+    //qDebug()<<this->getName()<<", " << trainCoordinates;
+    emit qmlTrainPositionSignal(this->getName(),
+                              trainCoordinates.at(0),
+                              trainCoordinates.at(1));
+  }
+  sendDataChangedSignal(trainID);
+}
+
+/*!
  * The method shows the information of the train to the console.
  */
 void Train::showInfo()
 {
-  int iii=0;
-  vector<int>::iterator it;
   qDebug() << "INFO   : "<< trainName <<" has " << nbrOfSeats << " seats.  "
            << nbrOfPassengers << " are taken. ";
   if(UNDEFINED != currentTrack)
@@ -471,15 +512,27 @@ void Train::showInfo()
   }
   qDebug() << "       : TrainRoute, index: " << nextIndexTravelPlanByStationID
            << " : ";
-  for (it = travelPlanByStationID.begin(); it != travelPlanByStationID.end(); ++it )
-  {
-    qDebug()<<"         "<<*it<<": " <<thisStationList->at(*it)->getName();
-    if(nextIndexTravelPlanByStationID==iii)
+  foreach(int i, travelPlanByStationID)  {
+    qDebug()<<"         "<<i<<": " <<thisStationList->at(i)->getName();
+    if(nextIndexTravelPlanByStationID==i)
     {
       qDebug()<<"        ^ Current ^";
     }
-    iii++;
   }
+}
+
+/*!
+ * This state reflects when the train is at a station, waiting for the proper
+ * time to leave, according to time table or network.
+ *
+ * @param n Time remaining for the train in this trafficClock tick
+ *
+ * @return n
+ */
+int Train::waitingState(int n)
+{
+  state = stateTable.value("READY");
+  return n;
 }
 
 Train::~Train()

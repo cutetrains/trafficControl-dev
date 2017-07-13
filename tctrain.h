@@ -15,7 +15,6 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
-#include <vector>
 #include <QObject>
 #include <QHash>
 #include <QMutexLocker>
@@ -34,31 +33,31 @@ class Train: public QObject
 signals:
   void dataChangedSignal(int , const QVariant & );
   void qmlTrainPositionSignal(QVariant, QVariant, QVariant);
+
 private:
-  QList<float> trainCoordinates;
-  QString trainName;
-  static int totalNbrOfTrains;
-  int nbrOfSeats;
-  int nbrOfPassengers;
-  int currentTrack;//-1 indicates that train is not on a track
   int currentStation;//-1 indicates that train is not on a station
-  int positionOnTrack;//[m]
   int currentSpeed;//[m/s]
+  int currentTrack;//-1 indicates that train is not on a track
   int desiredSpeed;//[m/s]
+  int doorOpenProgress;//Doors needs 5 seconds to open and close. 0=closed, 100=open
+  int positionOnTrack;//[m]
   int maxSpeed;
-  int trainID;
-  int nextTrack;
-  vector<int> travelPlanByStationID;
+  QMutex mutex;
   int nextIndexTravelPlanByStationID;
-  //int lastIndexTravelPlanByStationID;
+  int nextTrack;
+  int nbrOfPassengers;
+  int nbrOfSeats;
+  bool passing;
+  int state;
+  QHash<QString, int> stateTable;
+  static int totalNbrOfTrains;
+  QList<float> trainCoordinates;
+  int trainID;
+  QString trainName;
+  QList<int> travelPlanByStationID;
   QList<Track*> *thisTrackList;
   QList<Train*> *thisTrainList;
   QList<Station*> *thisStationList;
-  QMutex mutex;
-  QHash<QString, int> stateTable;
-  int state;
-  int doorOpenProgress;//Doors needs 5 seconds to open and close. 0=closed, 100=open
-  bool passing;
 
 public:
   Train(QString name,
@@ -67,32 +66,25 @@ public:
         QList<Station*>& stationList);
   ~Train();
   int addStationToTravelPlan(int stationID);//To be removed and replaced by addStationToTrainRoute
+  int closingState(int n);
   int getCurrentSpeed();
   int getCurrentStation();
   int getCurrentTrack();
   int getDesiredSpeed();
   int getID();
+  int getIndexTravelPlanByStationID();
   QString getName();
   int getTrackPosition();
-  int getIndexTravelPlanByStationID();
-  vector<int> getTravelPlan();
-  //vector<int> getRouteVectorTracks();//To delete
+  QList<int> getTravelPlan();
   void load(int n);
-  int move(int n);//if train shall wait for other elements, return int>0.
-
-  int waitingState(int n);
-  int readyState(int n);
-  int runningState(int n);
-  int openingState(int n);
   int loadingState(int n);
-  int closingState(int n);
+  int move(int n);//if train shall wait for other elements, return int>0.
+  int openingState(int n);
+  int readyState(int n);
   int readyToRunningState(int n);
+  int runningState(int n);
   int runningToOpeningState(int n);
-  /*int runningToReady(int n);
-  int waitingToOpening(int n);
-  int runningToPassing(int n);
-  int passingToEmergency(int n);*/
-
+  int waitingState(int n);
   void sendDataChangedSignal(int trainID);
   void setCurrentStation(int StationID);
   void setCurrentTrack(int trackID);

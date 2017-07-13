@@ -15,10 +15,6 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
-#include <iostream>
-#include <sstream>
-#include <cstring>
-#include <vector>
 #include <QDebug>
 #include <QtMath>
 #include "tctrack.h"
@@ -29,23 +25,23 @@ int Track::totalNbrOfTracks=0;
 
 /*!
  * The constructor for a Track object.
- * @todo rename parameters cn and nn
  *
- * @param cn Name of the track
- * @param nn Length of the track [m]
+ * @param trackName Name of the track
+ * @param trackLength Length of the track [m]
+ * @param coordinates List of coordinates for the track
  * @param trackList is a pointer to the trackList
  * @param trainList is a pointer to the trackList
  * @param stationList is a pointer to the stationList
  */
-Track::Track(QString cn,
-             int nn,
+Track::Track(QString trackName,
+             int trackLength,
              QStringList coordinates,
              QList<Track*>& trackList,
              QList<Train*>& trainList,
              QList<Station*>& stationList)
 {
-  length=nn;
-  name=QString::fromUtf16(cn.utf16());
+  length=trackLength;
+  name=trackName;
   startStation = UNDEFINED;
   endStation = UNDEFINED;
   maxAllowedSpeed = 60;
@@ -54,7 +50,6 @@ Track::Track(QString cn,
   thisTrackList = &trackList;
   thisTrainList = &trainList;
   thisStationList = &stationList;
-  //Populate coordinateList and calculate coordinateCumulatedDistanceList
   if ( !coordinates.isEmpty() )
   {
     float R = float(6372.8);
@@ -62,7 +57,6 @@ Track::Track(QString cn,
     float dLon;
     float lat1;
     float lat2;
-    qDebug()<<name;
     float dist=0;
     for(int iii = 0; iii < (coordinates.length()/2); iii++ )
     {
@@ -84,6 +78,7 @@ Track::Track(QString cn,
 
 /*!
  * The assign constructor for the Track object.
+ * @TODO: Add coordinatelist
  *
  * @param sTrack The Track object that acts as the original for this object.
  */
@@ -91,11 +86,13 @@ Track::Track( const Track& sTrack)
   :QObject()
 {
   length = sTrack.length;
-  name = QString::fromUtf16(sTrack.name.utf16());
+  name = sTrack.name;
   startStation = sTrack.startStation;
   endStation = sTrack.endStation;
   maxAllowedSpeed = sTrack.maxAllowedSpeed;
   trackID = sTrack.trackID;
+  coordinateList = sTrack.coordinateList;
+  coordinateCumulatedDistanceList = coordinateCumulatedDistanceList;
   thisTrackList = sTrack.thisTrackList;
   thisTrainList = sTrack.thisTrainList;
   thisStationList = sTrack.thisStationList;
@@ -109,17 +106,24 @@ Track::Track( const Track& sTrack)
 Track& Track::operator=( const Track& sTrack )  
 {
   length = sTrack.length;
-  name = QString::fromUtf16(sTrack.name.utf16());
+  name = sTrack.name;
   startStation = sTrack.startStation;
   endStation = sTrack.endStation;
   maxAllowedSpeed = sTrack.maxAllowedSpeed;
   trackID = sTrack.trackID;
+  coordinateList = sTrack.coordinateList;
+  coordinateCumulatedDistanceList = coordinateCumulatedDistanceList;
   thisTrackList = sTrack.thisTrackList;
   thisTrainList = sTrack.thisTrainList;
   thisStationList = sTrack.thisStationList;
   return *this;
 }
 
+/*!
+ * Adds train tothe train network. The location of the train will be set in
+ *
+ * @param sTrack The Track object that acts as the original for this object.
+ */
 bool Track::addTrain(int trainID){
   trainsOnTrackQueue.enqueue(trainID);
   emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "AVAILABLE");

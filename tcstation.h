@@ -15,7 +15,6 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
-#include <vector>
 #include <QObject>
 #include <QVariant>
 #ifndef _TCSTATION_H_
@@ -33,23 +32,21 @@ signals:
 
 private:
   QString name;
-  bool stationIsJunction;
-  //float latitude;
-  //float longitude;
-  QList<float> thisCoordinate;
-  vector<int> leavingTrackVector;
+  QList<int> leavingTrackList;
   int numberOfPlatforms;
+  int stationID;
+  bool stationIsJunction;
+  QList<float> thisCoordinate;
   QList<Track*> *thisTrackList;//inserted, REMOVE?
   QList<Train*> *thisTrainList;//inserted
   QList<Station*> *thisStationList;//inserted
-  int stationID;
   static int totalNbrOfStations;
   QList<int> trainsAtStationList;
   int waitingPassengers;
 
 public:// to do later: Add vector with pointers to the trains on each station.
   /*! The constructor for a Station object.*/
-  Station(QString cn,
+  Station(QString stationName,
           bool isJunction,
           QString latitude,
           QString longitude,
@@ -63,16 +60,15 @@ public:// to do later: Add vector with pointers to the trains on each station.
   bool checkIfTrackLeavesStation(int trackID);
   int findLeavingTrackIndexToStation(int targetStationID);
   int getID();
-  QList<float> getCoordinate();
   float getLatitude();
   float getLongitude();
   QString getName();
   int getNbrOfWaitingPassengers();
-  void trainArrival(int trainID);
-  void trainDeparture(int trainID);
+  bool isJunction();
   void sendDataChangedSignal(int stationID);
   void showInfo();
-  bool isJunction();
+  void trainArrival(int trainID);
+  void trainDeparture(int trainID);
 };
 
 #endif

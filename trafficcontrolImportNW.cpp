@@ -14,8 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
-#include <iostream>
-
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
@@ -270,14 +268,13 @@ void TrafficControl::importPredefinedNetwork()
       qDebug()<<"ERROR  : TC:IPN Command not recognised: "<<line;
     }
   }
-  if(handleQMLObject != NULL) {
+  /*if(handleQMLObject != NULL) {
     handleQMLObject->dumpObjectTree();
-  }
+  }*/
   file.close();
 
   //This method will be called with care, in order to reduce the cost for updating the tables
   ui->trainListTableView->resizeColumnsToContents();
   ui->trackListTableView->resizeColumnsToContents();
   ui->stationListTableView->resizeColumnsToContents();
-
 }

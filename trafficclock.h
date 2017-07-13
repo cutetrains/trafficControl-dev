@@ -36,12 +36,11 @@ signals:
   void stepTimeSignal();
 
 public slots:
-  void threadTick();
-  void resumeThread();
-  void pauseThread();
-  void setTickInterval(int);
-  //void releaseMutex();
   void disconnectThread();
+  void pauseThread();
+  void resumeThread();
+  void setTickInterval(int);
+  void threadTick();
 
 private:
   bool continueTick; //This shall be toggled to tell whether to continue or not
