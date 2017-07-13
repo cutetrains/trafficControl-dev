@@ -44,15 +44,14 @@ class TrafficControl : public QMainWindow
 public:
   explicit TrafficControl(QWidget *parent = 0);
   ~TrafficControl();
-  QList<Train*> trainList;
-  QList<Track*> trackList;
-  QList<Station*> stationList;
   QThread clockThread;
-  TrafficClock trafficClock;
   QWidget *mapContainer;
+  QList<Station*> stationList;
+  QList<Track*> trackList;
+  QList<Train*> trainList;
+  TrafficClock trafficClock;
 
 public slots:
-  void addTrainToNetworkUI();
   void addTrackToNetwork(QString trackName,
                          int trackLength,
                          QStringList coordinates);
@@ -61,25 +60,22 @@ public slots:
                            bool isJunction,
                            QString lat,
                            QString lon);
-  void importPredefinedNetwork();
-  void onRunThreadCheckBoxChanged(int newState);
-  void onTickIntervalChanged(int newInterval);
-  void stepTimeForNetwork();
   int connectTrackToStations(QString trackName,
                              QString startStationName,
                              QString endStationName);
   int connectTrackToStations(int trackID,
                              int startStationID,
                              int endStationID);
+  void importPredefinedNetwork();
+  void onRunThreadCheckBoxChanged(int newState);
+  void onTickIntervalChanged(int newInterval);
+  void stepTimeForNetwork();
     
 private:
   Ui::TrafficControl *ui;
   QStringList list;
-  Track *track1;
-  Train *train1;
-  Station *station1;
   QObject* handleQMLObject;
-  QObject* handleQMLMainMap;//GUSTAF
+  QObject* handleQMLMainMap;
   TrafficDataModel *trackListModel;
   TrafficDataModel *trainListModel;
   TrafficDataModel *stationListModel;

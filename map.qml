@@ -24,20 +24,6 @@ Item {
     center: QtPositioning.coordinate(55.9,13.5)
   }
 
-  function createQMLStation(stationName, isJunction, stationLat, stationLong) {
-    Logic.jsCreateQMLStation(stationName, isJunction, stationLat,stationLong)
-  }
-
-  function createQMLTrack(trackName, length, coordinates) {
-    Logic.jsCreateQMLTrack(trackName, length, coordinates)
-  }
-
-  function createQMLTrain(trainName) {
- //   console.log("createQMLTrain: Adding Train to QML map")
-    Logic.jsCreateQMLTrain(trainName)
-  }
-
-
   function qmlStationOccupancySlot(stationName, nbrOfTrains, nbrOfPlatforms)
   {
     for (var i = 0; i < mainMap.children.length; ++i)
@@ -80,15 +66,69 @@ Item {
 
   function qmlTrainPositionSlot(trainName, latitude, longitude)
   {
-//    console.log("In qmlTrainPositionSlot "+ trainName + "  " + latitude + "  " + longitude)
     for (var i = 0; i < mainMap.children.length; ++i)
     {
       if(mainMap.children[i].objectName === "train_"+trainName)
       {
-        //console.log("Train found!")
         mainMap.children[i].center.latitude = latitude;
         mainMap.children[i].center.longitude = longitude;
       }
     }
+  }
+
+  function createQMLTrain(trainName) {
+    var circle = Qt.createQmlObject('import QtLocation 5.6; import QtQuick 2.5; MapCircle {id:train_'
+                                     +trainName
+                                     +';objectName:"train_'+trainName+'"}',
+                                     mainMap,
+                                     "test2")
+    circle.border.width =1
+    circle.border.color = "green"
+    circle.center.latitude = 55.7
+    circle.center.longitude = 12.8
+    circle.radius = 78.0;
+    circle.color = "red";
+    circle.opacity = 1
+    mainMap.addMapItem(circle)
+  }
+
+  function createQMLTrack(trackName, length, coordinates) {
+    var polyline = Qt.createQmlObject('import QtLocation 5.6; import QtQuick 2.5; MapPolyline {id:track_'
+                                       +trackName
+                                       +';objectName:"track_'+trackName+'"}',
+                                       mainMap,
+                                       "test2")
+    var iii;
+    polyline.line.color = "green";
+    polyline.line.width = 1;
+    polyline.opacity=0.8;
+    for(iii= 0; iii<coordinates.length; iii++)
+    {
+      polyline.addCoordinate(QtPositioning.coordinate(coordinates[iii*2],coordinates[iii*2+1]))
+    }
+    mainMap.addMapItem(polyline)
+  }
+
+  function createQMLStation(stationName, isJunction, stationLat, stationLong) {
+    var circle = Qt.createQmlObject('import QtLocation 5.6; import QtQuick 2.5; MapCircle {id:station_'
+                                     +stationName
+                                     +';objectName:"station_'
+                                     +stationName
+                                     +'"}',
+                                     mainMap,
+                                     "test2")
+    circle.center.latitude = stationLat
+    circle.center.longitude = stationLong
+    if(isJunction){
+      circle.radius = 250.0;
+      circle.color = "gray";
+    }
+    else
+    {
+      circle.radius = 1000.0
+      circle.color = 'green'
+    }
+    circle.opacity = 0.3
+    mainMap.addMapItem(circle)
   }
 }

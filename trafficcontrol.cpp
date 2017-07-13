@@ -23,7 +23,6 @@
 #include <QQuickItem> //New
 #include <QQmlComponent> //New
 #include <QQmlEngine> //New
-
 #include "TrafficControl.h"
 #include "ui_TrafficControl.h"
 #define TRACK 1
@@ -71,14 +70,6 @@ TrafficControl::TrafficControl(QWidget *parent) :
   {
     qDebug()<<"ERROR  : No nameMainMap found";
   }
-
-  /*  QObject *myStation2 = handleQMLObject->findChild<QObject *>(QString("nameMainMapCircle1"));
-    if(myStation2 != NULL)
-    {
-        qDebug()<<"INFO   : nameMainMapCircle1 found";
-        myStation2->setProperty("color","yellow");
-    }
-  */
 }
 
 /*!
@@ -92,15 +83,15 @@ void TrafficControl::addTrackToNetwork(QString trackName,
                                        int trackLength,
                                        QStringList coordinates)
 {
-  Track* track1 = new Track(trackName,
+  Track* newTrack = new Track(trackName,
                             trackLength,
                             coordinates,
                             trackList,
                             trainList,
                             stationList);
-  trackList.append(track1);
+  trackList.append(newTrack);
   trackListModel->insertRows(trackList.size(), 1 , QModelIndex());
-  connect(track1,
+  connect(newTrack,
           SIGNAL(dataChangedSignal(int, const QVariant &)),
           trackListModel,
           SLOT(onDataChanged(int, const QVariant &)));
@@ -114,23 +105,12 @@ void TrafficControl::addTrackToNetwork(QString trackName,
                               Q_ARG(QVariant, trackLength),
                               Q_ARG(QVariant, coordinates));
     //Connect signal and slot
-    connect(track1,
+    connect(newTrack,
             SIGNAL(qmlTrackStatusSignal(QVariant ,QVariant ,QVariant)),
             handleQMLObject,
             SLOT(qmlTrackStatusSlot(QVariant, QVariant, QVariant)));
   }
-  track1=NULL;
-}
-
-
-/*!
- * The method addTrackToNetwork creates a Train object with parameters from
- * the User Interface. It connects the train object to the onDataChanged slot
- * and appends it to the trainList and the trainListModel.
- */
-void TrafficControl::addTrainToNetworkUI()
-{
-  qDebug()<<"WARNING: This function has intentionally been removed";
+  newTrack=NULL;
 }
 
 /*!
@@ -189,7 +169,6 @@ void TrafficControl::addStationToNetwork(QString stationName,
           SIGNAL(dataChangedSignal(int, const QVariant &)),
           stationListModel,
           SLOT(onDataChanged(int , const QVariant &)));
-
   stationList.append(newStation);
   stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
   stationList[stationList.size()-1]->changeNbrOfPassengers(0);
@@ -228,10 +207,10 @@ int TrafficControl::connectTrackToStations(int trackID,
                                            int startStationID,
                                            int endStationID)
 {
-    trackList[trackID]->setStartStation(startStationID);
-    trackList[trackID]->setEndStation(endStationID);
-    stationList[startStationID]->addTrack(trackID);
-    return 1;
+  trackList[trackID]->setStartStation(startStationID);
+  trackList[trackID]->setEndStation(endStationID);
+  stationList[startStationID]->addTrack(trackID);
+  return 1;
 }
 
 /*!
@@ -274,7 +253,6 @@ int TrafficControl::connectTrackToStations(QString trackName,
         }
       }
     }
-
     foreach(Track* thisTrack, trackList){
       if(QString::compare(trackName, thisTrack->getName()) == 0)
       {
@@ -282,7 +260,6 @@ int TrafficControl::connectTrackToStations(QString trackName,
         break;
       }
     }
-
   if ((foundStartStationID != UNDEFINED) &&
         (foundEndStationID != UNDEFINED) &&
         (foundTrackID != UNDEFINED))
@@ -305,7 +282,22 @@ int TrafficControl::connectTrackToStations(QString trackName,
   return 1;
 }
 
+void TrafficControl::onRunThreadCheckBoxChanged(int newState)
+{
+  if(newState == 2)//HARDCODED TO 2, THAT MEANS ACTIVE
+  {
+    trafficClock.resumeThread();
+  }
+  else
+  {
+    trafficClock.pauseThread();
+  }
+}
 
+void TrafficControl::onTickIntervalChanged(int newInterval)
+{
+  trafficClock.setTickInterval(newInterval);
+}
 
 /*!
  * This method commands all trains to move the amount of time defined in the stepTimeBox item in the UI.
@@ -323,23 +315,6 @@ void TrafficControl::stepTimeForNetwork()
   ui->stationListTableView->resizeColumnsToContents();
   ui->trackListTableView->resizeColumnsToContents();
   ui->trainListTableView->resizeColumnsToContents();
-}
-
-void TrafficControl::onRunThreadCheckBoxChanged(int newState)
-{
-  if(newState == 2)//HARDCODED TO 2, THAT MEANS ACTIVE
-  {
-    trafficClock.resumeThread();
-  }
-  else
-  {
-    trafficClock.pauseThread();
-  }
-}
-
-void TrafficControl::onTickIntervalChanged(int newInterval)
-{
-  trafficClock.setTickInterval(newInterval);
 }
 
 /*!

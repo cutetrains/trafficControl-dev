@@ -16,9 +16,7 @@
  ************************************************************************/
 
 #include "trafficcontrol.h"
-#include "trafficclock.h"
 #include <QApplication>
-#include <QThread>
 
 int main(int argc, char *argv[])
 {

@@ -15,7 +15,6 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
-#include <vector>
 #include <QObject>
 #include <QQueue>
 #include <QVariant>
@@ -26,7 +25,7 @@
 using namespace std;
 class Train;
 class Station;
-class Track: public QObject// to do later: Add vector with indices to the trains on each track.
+class Track: public QObject
 {
   Q_OBJECT
 
@@ -35,22 +34,20 @@ signals:
   void qmlTrackStatusSignal(QVariant, QVariant, QVariant);
 
 private:
-  static int totalNbrOfTracks;
   QList<float> coordinateList;
   QList<int> coordinateCumulatedDistanceList;
+  int endStation;
   int length;
-  //int trainsOnTrack;
+  int maxAllowedSpeed;
   QString name;
   int startStation;
-  int endStation;
-  int maxAllowedSpeed;
+  static int totalNbrOfTracks;
   int trackID;
   QQueue<int> trainsOnTrackQueue;
 
 public:
-  //TODO: Rename parameters to be more intuitive
-  Track(QString cn,
-        int nn,
+  Track(QString trackName,
+        int trackLength,
         QStringList coordinates,
         QList<Track*>& trackList,
         QList<Train*>& trainList,
@@ -61,10 +58,10 @@ public:
   bool addTrain(int trainID);
   bool deleteTrain(int trainID);
   QList<float> getCoordinatesFromPosition(int position);
+  int getEndStation();
   int getID();
   int getLength();
   int getMaxAllowedSpeed();
-  int getEndStation();
   QString getName();
   int getStartStation();
   void sendDataChangedSignal(int trackID);
