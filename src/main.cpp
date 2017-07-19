@@ -15,7 +15,7 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
-#include "trafficcontrol.h"
+#include "../inc/trafficcontrol.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])

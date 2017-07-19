@@ -17,8 +17,8 @@
 
 #include <QDebug>
 #include <QtMath>
-#include "tctrack.h"
-#include "trafficcontrol.h"
+#include "../inc/tctrack.h"
+#include "../inc/trafficcontrol.h"
 #define UNDEFINED -1
 using namespace std;
 int Track::totalNbrOfTracks=0; 

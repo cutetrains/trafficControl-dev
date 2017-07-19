@@ -33,7 +33,7 @@
 #include <QVariant>
 #include <QStringList>
 #include <QCoreApplication>
-#include "trafficdatamodel.h"
+#include "../inc/trafficdatamodel.h"
 #define TRACK 1/*! @todo: Use const instead for define */
 #define TRAIN 2
 #define STATION 3

@@ -23,7 +23,7 @@
 #include <QQuickItem> //New
 #include <QQmlComponent> //New
 #include <QQmlEngine> //New
-#include "TrafficControl.h"
+#include "../inc/TrafficControl.h"
 #include "ui_TrafficControl.h"
 #define TRACK 1
 #define TRAIN 2
@@ -42,7 +42,6 @@ TrafficControl::TrafficControl(QWidget *parent) :
   trafficClock.moveToThread(&clockThread);
   clockThread.start();
 
-  connect(ui->createTrainButton, SIGNAL(clicked()), this, SLOT(addTrainToNetworkUI()));
   connect(ui->importNetworkButton, SIGNAL(clicked()), this, SLOT(importPredefinedNetwork()));
   connect(ui->timeTickButton, SIGNAL(clicked()), this, SLOT(stepTimeForNetwork()));
   connect(ui->runThreadCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onRunThreadCheckBoxChanged(int)));

@@ -29,8 +29,8 @@
 
 //#include <cstring>
 #include <qDebug>
-#include "tcstation.h"
-#include "trafficcontrol.h"
+#include "../inc/tcstation.h"
+#include "../inc/trafficcontrol.h"
 #define UNDEFINED -1
 
 using namespace std;

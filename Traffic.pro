@@ -17,21 +17,21 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Traffic
 TEMPLATE = app
 
-SOURCES += main.cpp\
-        trafficcontrol.cpp \
-    trafficdatamodel.cpp \
-    tctrain.cpp \
-    tctrack.cpp \
-    tcstation.cpp \
-    trafficclock.cpp \
-    trafficcontrolImportNW.cpp
+SOURCES += src/main.cpp\
+        src/trafficcontrol.cpp \
+    src/trafficdatamodel.cpp \
+    src/tctrain.cpp \
+    src/tctrack.cpp \
+    src/tcstation.cpp \
+    src/trafficclock.cpp \
+    src/trafficcontrolImportNW.cpp
 
-HEADERS  += trafficcontrol.h \
-    trafficdatamodel.h \
-    tctrain.h \
-    tctrack.h \
-    tcstation.h \
-    trafficclock.h
+HEADERS  += inc/trafficcontrol.h \
+    inc/trafficdatamodel.h \
+    inc/tctrain.h \
+    inc/tctrack.h \
+    inc/tcstation.h \
+    inc/trafficclock.h
 
 FORMS    += trafficcontrol.ui
 

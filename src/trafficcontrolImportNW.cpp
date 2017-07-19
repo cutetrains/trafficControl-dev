@@ -18,7 +18,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QFileDialog>
-#include "TrafficControl.h"
+#include "../inc/TrafficControl.h"
 #include "ui_TrafficControl.h"
 #define TRACK 1//Replace with constants that are global!
 #define TRAIN 2

@@ -24,7 +24,7 @@
 #include <QThread>
 #include <QMutexLocker>
 #include <QUrl>
-#include <QQuickView>
+//#include <QQuickView>
 #include <QGeoCoordinate>
 #include <QtQml>
 #include "tctrain.h"

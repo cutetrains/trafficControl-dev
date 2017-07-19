@@ -15,7 +15,7 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
-#include "trafficclock.h"
+#include "../inc/trafficclock.h"
 #include <QDebug>
 using namespace std;
 

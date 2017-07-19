@@ -22,8 +22,8 @@
 #include <QString>
 #include <QDebug>
 #include <QtCore>
-#include "tctrain.h"
-#include "trafficcontrol.h"
+#include "../inc/tctrain.h"
+#include "../inc/trafficcontrol.h"
 #define UNDEFINED -1
 using namespace std;
 
