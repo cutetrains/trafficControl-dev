@@ -66,6 +66,7 @@ public slots:
   int connectTrackToStations(int trackID,
                              int startStationID,
                              int endStationID);
+  int getNumberOfTrains();
   void importPredefinedNetwork();
   void onRunThreadCheckBoxChanged(int newState);
   void onTickIntervalChanged(int newInterval);
@@ -75,7 +76,6 @@ private:
   Ui::TrafficControl *ui;
   QStringList list;
   QObject* handleQMLObject;
-  QObject* handleQMLMainMap;
   TrafficDataModel *trackListModel;
   TrafficDataModel *trainListModel;
   TrafficDataModel *stationListModel;

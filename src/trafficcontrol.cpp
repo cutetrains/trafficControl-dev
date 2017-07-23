@@ -61,14 +61,6 @@ TrafficControl::TrafficControl(QWidget *parent) :
 
   ui->mapQuickWidget->setSource(source);
   handleQMLObject = ui->mapQuickWidget->rootObject();
-  //  handleQMLObject->dumpObjectTree();
-
-  /* TODO: Rename nameMainMap */
-  QObject *handleQMLMainMap = handleQMLObject->findChild<QObject *>(QString("nameMainMap"));
-  if (NULL == handleQMLMainMap)
-  {
-    qDebug()<<"ERROR  : No nameMainMap found";
-  }
 }
 
 /*!
@@ -280,6 +272,12 @@ int TrafficControl::connectTrackToStations(QString trackName,
   }
   return 1;
 }
+
+int TrafficControl::getNumberOfTrains()
+{
+  return trainListModel->rowCount();
+}
+
 
 void TrafficControl::onRunThreadCheckBoxChanged(int newState)
 {

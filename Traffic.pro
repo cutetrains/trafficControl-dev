@@ -13,12 +13,12 @@ QT       += positioning
 QT       += location
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-TARGET = Traffic
 TEMPLATE = app
 
-SOURCES += src/main.cpp\
-        src/trafficcontrol.cpp \
+TARGET = Traffic
+
+SOURCES += src/main.cpp \
+    src/trafficcontrol.cpp \
     src/trafficdatamodel.cpp \
     src/tctrain.cpp \
     src/tctrack.cpp \
@@ -26,12 +26,19 @@ SOURCES += src/main.cpp\
     src/trafficclock.cpp \
     src/trafficcontrolImportNW.cpp
 
+debug {
+#    TARGET = Traffic_test
+    QT += testlib
+    SOURCES -= src/main.cpp
+    SOURCES += test/tst_traffic.cpp
+}
+
 HEADERS  += inc/trafficcontrol.h \
-    inc/trafficdatamodel.h \
-    inc/tctrain.h \
-    inc/tctrack.h \
     inc/tcstation.h \
-    inc/trafficclock.h
+    inc/tctrack.h \
+    inc/tctrain.h \
+    inc/trafficclock.h \
+    inc/trafficdatamodel.h
 
 FORMS    += trafficcontrol.ui
 

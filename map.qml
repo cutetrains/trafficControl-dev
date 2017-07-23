@@ -3,7 +3,7 @@ import QtQuick.Controls 1.4
 import QtLocation 5.6
 import QtPositioning 5.5
 
-import "QmlLogic.js" as Logic
+//import "QmlLogic.js" as Logic
 
 Item {
   id: mainItemGustaf
