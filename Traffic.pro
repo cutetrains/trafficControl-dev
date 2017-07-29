@@ -27,7 +27,6 @@ SOURCES += src/main.cpp \
     src/trafficcontrolImportNW.cpp
 
 debug {
-#    TARGET = Traffic_test
     QT += testlib
     SOURCES -= src/main.cpp
     SOURCES += test/tst_traffic.cpp

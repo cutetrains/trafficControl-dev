@@ -64,16 +64,21 @@ Station::Station(QString stationName,
   waitingPassengers = 0;
   stationIsJunction = isJunction;
   numberOfPlatforms = 2;
-  if( 0 == inLatitude.compare(""))
-  {
-    thisCoordinate << 0;
-    thisCoordinate << 0;
+  bool isOk;
+  thisCoordinate << inLatitude.toFloat(&isOk);
+  if (isOk) {
+    thisCoordinate << inLongitude.toFloat(&isOk);
   }
   else
   {
-    thisCoordinate << inLatitude.toFloat();
-    thisCoordinate << inLongitude.toFloat();
+    thisCoordinate<<0;
   }
+  //Verify that coordinates are not too high
+  if(isOk) {
+    isOk = (qFabs(thisCoordinate.at(0)) < 90 &&
+            qFabs(thisCoordinate.at(0)) < 180);
+  }
+  hasValidCoordinates = isOk;
   stationID = totalNbrOfStations;
   totalNbrOfStations++;
   thisTrackList = &trackList;
@@ -114,8 +119,15 @@ void Station::addTrack(int trackID) {
  *        the station. A negative number means that some passengers are leaving the station.
  */
 void Station::changeNbrOfPassengers(int nbrPassengersToAdd) {
-  waitingPassengers = max((waitingPassengers + nbrPassengersToAdd), 0);
-  sendDataChangedSignal(stationID); //+1?
+  if(this->isJunction())
+  {
+    qDebug()<<"ERROR  : Tried to change number of passengers for Junction: "<< this->getName();
+  }
+  else
+  {
+    waitingPassengers = max((waitingPassengers + nbrPassengersToAdd), 0);
+    sendDataChangedSignal(stationID);
+  }
 }
 
 /*!
@@ -198,6 +210,27 @@ float Station::getLatitude() { return thisCoordinate.at(0); }
  * @return latitude The longitude of the station.
  */
 float Station::getLongitude() { return thisCoordinate.at(1); }
+
+/*!
+ * The method returns the trainList of the station
+ *
+ * @return trainList The list of present train at station
+ */
+QList<int> Station::getTrainList() { return trainsAtStationList;}
+
+/*!
+ * The method returns whether station has coordinates or not
+ *
+ * @return bool True if coordinates are present, False if not
+ */
+bool Station::hasCoordinates() { return hasValidCoordinates; }
+
+/*!
+ * The method returns whether station is Junction or not
+ *
+ * @return bool True if station is Junction, False if not
+ */
+bool Station::isJunction() { return stationIsJunction; }
 
 /*!
  * The method prepares a message and sends it to the Station data model. The

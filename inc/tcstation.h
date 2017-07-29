@@ -17,6 +17,7 @@
 
 #include <QObject>
 #include <QVariant>
+#include <QtMath>
 #ifndef _TCSTATION_H_
 #define _TCSTATION_H_
 using namespace std;
@@ -31,6 +32,7 @@ signals:
   void qmlStationOccupancySignal(QVariant, QVariant, QVariant);//2017-06 MODIFY STATION
 
 private:
+  bool hasValidCoordinates;
   QString name;
   QList<int> leavingTrackList;
   int numberOfPlatforms;
@@ -63,7 +65,9 @@ public:// to do later: Add vector with pointers to the trains on each station.
   float getLatitude();
   float getLongitude();
   QString getName();
+  QList<int> getTrainList();
   int getNbrOfWaitingPassengers();
+  bool hasCoordinates();
   bool isJunction();
   void sendDataChangedSignal(int stationID);
   void showInfo();
