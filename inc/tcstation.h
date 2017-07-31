@@ -65,6 +65,7 @@ public:// to do later: Add vector with pointers to the trains on each station.
   float getLatitude();
   float getLongitude();
   QString getName();
+  QList<int> getLeavingTrackList();
   QList<int> getTrainList();
   int getNbrOfWaitingPassengers();
   bool hasCoordinates();

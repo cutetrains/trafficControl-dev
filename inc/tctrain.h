@@ -53,14 +53,14 @@ private:
   static int totalNbrOfTrains;
   QList<float> trainCoordinates;
   int trainID;
-  QString trainName;
+  QString name;
   QList<int> travelPlanByStationID;
   QList<Track*> *thisTrackList;
   QList<Train*> *thisTrainList;
   QList<Station*> *thisStationList;
 
 public:
-  Train(QString name,
+  Train(QString trainName,
         QList<Track*>& trackList,
         QList<Train*>& trainList,
         QList<Station*>& stationList);
@@ -88,7 +88,7 @@ public:
   void sendDataChangedSignal(int trainID);
   void setCurrentStation(int StationID);
   void setCurrentTrack(int trackID);
-  void setName(QString const& tn);
+  void setName(QString trainName);
   void setModel(QString const& modelID);
   void setDesiredSpeed(int n);
   void setTrackPosition(int n);

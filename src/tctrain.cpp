@@ -38,12 +38,13 @@ int Train::totalNbrOfTrains=0;
  * @param stationList is a pointer to the stationList
  * @todo Implement a way to limit max passengers to 1.5 times nSeats.
  */
-Train::Train(QString tn,
+Train::Train(QString trainName,
              QList<Track*>& trackList,
              QList<Train*>& trainList,
              QList<Station*>& stationList)
 {
-  trainName = QString::fromUtf16(tn.utf16());
+  //trainName = QString::fromUtf16(tn.utf16());
+  name = trainName;
   nbrOfSeats = 100;
   positionOnTrack = 0;
   nbrOfPassengers = 0;
@@ -162,7 +163,7 @@ int Train::getIndexTravelPlanByStationID() {return nextIndexTravelPlanByStationI
  *
  * @return name of the train.
  */
-QString Train::getName(){ return trainName; }
+QString Train::getName(){ return name; }
 
 /*!
  * Get the position on the current Track for the train in meters.
@@ -398,7 +399,7 @@ int Train::runningToOpeningState(int n)
  */
 void Train::sendDataChangedSignal(int trainID){//Name, Track/Station , Position, Speed
   QStringList message;
-  message << trainName;
+  message << name;
   if (((UNDEFINED != currentStation) && (UNDEFINED != currentTrack)) ||
       ((UNDEFINED == currentTrack) && (UNDEFINED == currentStation))){
     message<<"ERROR: Invalid position!";
@@ -465,8 +466,8 @@ void Train::setDesiredSpeed(int n) {
  *
  * @param name The new name of the Train object that has information to update.
  */
-void Train::setName(QString const& tn) {
-  trainName = QString::fromUtf16(tn.utf16());
+void Train::setName(QString trainName) {
+  name = trainName;
   sendDataChangedSignal(trainID); //+1?
 }
 
@@ -496,7 +497,7 @@ void Train::setTrackPosition(int n)
  */
 void Train::showInfo()
 {
-  qDebug() << "INFO   : "<< trainName <<" has " << nbrOfSeats << " seats.  "
+  qDebug() << "INFO   : "<< name <<" has " << nbrOfSeats << " seats.  "
            << nbrOfPassengers << " are taken. ";
   if(UNDEFINED != currentTrack)
   {

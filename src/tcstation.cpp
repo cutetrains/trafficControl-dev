@@ -205,6 +205,14 @@ int Station::getNbrOfWaitingPassengers() { return waitingPassengers; }
 float Station::getLatitude() { return thisCoordinate.at(0); }
 
 /*!
+ * The method returns the leavingTrackList of the station
+ *
+ * @return leavingTrackList The list of the leaving tracks from the station
+ */
+QList<int> Station::getLeavingTrackList() { return leavingTrackList;}
+
+
+/*!
  * The method returns the longitude of the station
  *
  * @return latitude The longitude of the station.
