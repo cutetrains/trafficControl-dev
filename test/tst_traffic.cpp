@@ -1,3 +1,4 @@
+﻿// THIS FILE WILL BE REPLACED WITH GOOGLE TEST.
 #include <QtTest>
 #include <QList>
 #include <QString>
@@ -147,7 +148,7 @@ TstTraffic::~TstTraffic() {}
 
 //void TstTraffic::cleanupTestCase() {}
 
-void TstTraffic::station_noPassengersAfterCreated()
+void TstTraffic::station_noPassengersAfterCreated()//ported to Google Test
 {
   QList<Station*> stationList;
   QList<Track*> trackList;

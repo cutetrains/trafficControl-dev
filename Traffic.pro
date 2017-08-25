@@ -4,7 +4,6 @@
 #
 #-------------------------------------------------
 
-#QT += qml network quick positioning location core gui quickwidgets
 QT       += quick
 QT       += core gui
 QT       += qml
@@ -27,9 +26,14 @@ SOURCES += src/main.cpp \
     src/trafficcontrolImportNW.cpp
 
 debug {
-    QT += testlib
+    GOOGLETEST_DIR = $$PWD/../googletest
+    include(gtest_dependency.pri)
+    CONFIG += console c++11
+    CONFIG -= app_bundle
+    CONFIG += thread
     SOURCES -= src/main.cpp
-    SOURCES += test/tst_traffic.cpp
+    SOURCES +=     test/mainTest.cpp
+    HEADERS +=     test/tst_tcUnitTests.h
 }
 
 HEADERS  += inc/trafficcontrol.h \
