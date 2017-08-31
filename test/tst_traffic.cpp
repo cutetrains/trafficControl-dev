@@ -28,7 +28,7 @@ private slots:
                                        if station is created without
                                        coordinates*/
   void staion_validCoordinatesAtCreation(); /* Will station add coordinates and
-                                       set "hasCoordinates=TRUE"*/
+                                       set "hasCoordinates=TRUE" */
   void staion_validNegativeCoordinatesAtCreation(); /* Verify that station will
                                        add negative coordinates and set
                                        "hasCoordinates=TRUE"*/
@@ -45,23 +45,27 @@ private slots:
 /*void station_verifyName();// Verify that the name is copied correctly */
   void station_leavingTrackListEmptyAtCreation(); /* Verify that station has no
                                        defined leaving tracks at creation */
-  // Station - Performance tests
+// Station - Performance tests
 /*void station_timeForAdding100Stations(); // Observe the time needed for
                                        adding 100 stations */
   // Station - Simple operations
   void station_junctionHasNoPassengersAfterAddingTen(); /* Verify that a
                                        Junction cannot accept any waiting
-                                       passengers */
-/*void station_verifyTrainListAfterAddingRemoving(); // Verify that the
+                                       passengers *//*void station_verifyTrainListAfterAddingRemoving(); // Verify that the
                                        trainList is populated and depopulated
                                        properly */
 /*void station_noMoreTrainsThanPlatforms();*/
   void station_tenPassengersAfterAddingTen(); /* Verify that the station can
                                        add passengers properly*/
+  
   void station_noPassengersAfterAddingTenRemovingTwenty(); /* Verify that the
                                        station can add and remove passengers
                                        properly*/
 
+									   
+									   
+									   
+									   
   // Train Tests
   //   Train -  initiating
 /*void train_noCurrentStationAfterCreation();// Verify that the train has no
@@ -148,7 +152,7 @@ TstTraffic::~TstTraffic() {}
 
 //void TstTraffic::cleanupTestCase() {}
 
-void TstTraffic::station_noPassengersAfterCreated()//ported to Google Test
+void TstTraffic::station_noPassengersAfterCreated()// Ported to Google Test
 {
   QList<Station*> stationList;
   QList<Track*> trackList;
@@ -164,7 +168,7 @@ void TstTraffic::station_noPassengersAfterCreated()//ported to Google Test
   delete newStation;
 }
 
-void TstTraffic::station_noTrainsAfterCreated()
+void TstTraffic::station_noTrainsAfterCreated()// Ported to Google Test
 {
   QList<Station*> stationList;
   QList<Track*> trackList;
@@ -180,7 +184,7 @@ void TstTraffic::station_noTrainsAfterCreated()
   delete newStation;
 }
 
-void TstTraffic::station_noCoordinatesAtCreation()
+void TstTraffic::station_noCoordinatesAtCreation()// Ported to Google Test
 {
   QList<Station*> stationList;
   QList<Track*> trackList;
@@ -196,7 +200,7 @@ void TstTraffic::station_noCoordinatesAtCreation()
   delete newStation;
 }
 
-void TstTraffic::staion_validCoordinatesAtCreation()
+void TstTraffic::staion_validCoordinatesAtCreation()// Ported to Google Test
 {
   QList<Station*> stationList;
   QList<Track*> trackList;
@@ -216,7 +220,7 @@ void TstTraffic::staion_validCoordinatesAtCreation()
   delete newStation;
 }
 
-void TstTraffic::staion_validNegativeCoordinatesAtCreation()
+void TstTraffic::staion_validNegativeCoordinatesAtCreation()// Ported to Google Test
 {
   QList<Station*> stationList;
   QList<Track*> trackList;
@@ -236,7 +240,7 @@ void TstTraffic::staion_validNegativeCoordinatesAtCreation()
   delete newStation;
 }
 
-void TstTraffic::station_nonNumericalCoordinatesAtCreation()
+void TstTraffic::station_nonNumericalCoordinatesAtCreation() // Ported to Google Test
 {
   QList<Station*> stationList;
   QList<Track*> trackList;
@@ -254,7 +258,7 @@ void TstTraffic::station_nonNumericalCoordinatesAtCreation()
 }
 
 
-void TstTraffic::station_invalidFloatCoordinatesAtCreation()
+void TstTraffic::station_invalidFloatCoordinatesAtCreation() //Ported to Google Test
 {
   QList<Station*> stationList;
   QList<Track*> trackList;
@@ -271,7 +275,7 @@ void TstTraffic::station_invalidFloatCoordinatesAtCreation()
   delete newStation;
 }
 
-void TstTraffic::station_leavingTrackListEmptyAtCreation()
+void TstTraffic::station_leavingTrackListEmptyAtCreation() //Ported to Google Test
 {
   QList<Station*> stationList;
   QList<Track*> trackList;
@@ -287,7 +291,7 @@ void TstTraffic::station_leavingTrackListEmptyAtCreation()
   delete newStation;
 }
 
-void TstTraffic::station_junctionHasNoPassengersAfterAddingTen()
+void TstTraffic::station_junctionHasNoPassengersAfterAddingTen()//Ported to Google Test
 {
   QList<Station*> stationList;
   QList<Track*> trackList;
@@ -304,7 +308,7 @@ void TstTraffic::station_junctionHasNoPassengersAfterAddingTen()
   delete newStation;
 }
 
-void TstTraffic::station_tenPassengersAfterAddingTen()
+void TstTraffic::station_tenPassengersAfterAddingTen()//Ported to Google Test
 {
   QList<Station*> stationList;
   QList<Track*> trackList;
@@ -321,7 +325,7 @@ void TstTraffic::station_tenPassengersAfterAddingTen()
   QVERIFY(newStation->getNbrOfWaitingPassengers() == 10);
 }
 
-void TstTraffic::station_noPassengersAfterAddingTenRemovingTwenty()
+void TstTraffic::station_noPassengersAfterAddingTenRemovingTwenty()//Ported to Google Test
 {
   QList<Station*> stationList;
   QList<Track*> trackList;
@@ -340,7 +344,7 @@ void TstTraffic::station_noPassengersAfterAddingTenRemovingTwenty()
   QVERIFY(newStation->getNbrOfWaitingPassengers() == 0);
 }
 
-/*void TstTraffic::oneTrainInTrainListModelAfterAddingATrain()
+/*void TstTraffic::oneTrainInTrainListModelAfterAddingATrain() //Ported to Google Test
 {
   TrafficControl tc;
   tc.addTrainToNetwork("Train1");

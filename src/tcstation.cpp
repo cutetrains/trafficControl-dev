@@ -64,21 +64,20 @@ Station::Station(QString stationName,
   waitingPassengers = 0;
   stationIsJunction = isJunction;
   numberOfPlatforms = 2;
-  bool isOk;
-  thisCoordinate << inLatitude.toFloat(&isOk);
+
+  bool isOk; //THIS CODE NEED TO BE REFACTORED!
+  float tempLatitude;
+  float tempLongitude;
+  tempLatitude = inLatitude.toFloat(&isOk);
   if (isOk) {
-    thisCoordinate << inLongitude.toFloat(&isOk);
+    tempLongitude = inLongitude.toFloat(&isOk);
   }
-  else
-  {
-    thisCoordinate<<0;
-  }
-  //Verify that coordinates are not too high
-  if(isOk) {
-    isOk = (qFabs(thisCoordinate.at(0)) < 90 &&
-            qFabs(thisCoordinate.at(0)) < 180);
+  if(isOk) {  //Verify that coordinates are not too out of scope
+    isOk = (qFabs(tempLatitude) < 90 && qFabs(tempLongitude) < 180);
   }
   hasValidCoordinates = isOk;
+  if(isOk){ thisCoordinate<<tempLatitude<<tempLongitude;
+  }
   stationID = totalNbrOfStations;
   totalNbrOfStations++;
   thisTrackList = &trackList;
@@ -202,7 +201,16 @@ int Station::getNbrOfWaitingPassengers() { return waitingPassengers; }
  *
  * @return latitude The latitude of the station.
  */
-float Station::getLatitude() { return thisCoordinate.at(0); }
+float Station::getLatitude() {
+  if(hasValidCoordinates)
+  {
+    return thisCoordinate.at(0);
+  }
+  else
+  {
+    return 0;
+  }
+}
 
 /*!
  * The method returns the leavingTrackList of the station
@@ -217,8 +225,16 @@ QList<int> Station::getLeavingTrackList() { return leavingTrackList;}
  *
  * @return latitude The longitude of the station.
  */
-float Station::getLongitude() { return thisCoordinate.at(1); }
-
+float Station::getLongitude() {
+  if(hasValidCoordinates)
+  {
+    return thisCoordinate.at(1);
+  }
+  else
+  {
+    return 0;
+  }
+}
 /*!
  * The method returns the trainList of the station
  *
