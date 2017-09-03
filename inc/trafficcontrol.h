@@ -32,6 +32,7 @@
 #include "tcstation.h"
 #include "trafficdatamodel.h"
 #include "trafficclock.h"
+#include "tcnetworkcontrol.h"
 
 namespace Ui {
   class TrafficControl;
@@ -73,6 +74,7 @@ public slots:
   void stepTimeForNetwork();
     
 private:
+  NetworkControl *networkControl(int i);
   Ui::TrafficControl *ui;
   QStringList list;
   QObject* handleQMLObject;

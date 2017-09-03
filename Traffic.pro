@@ -23,7 +23,8 @@ SOURCES += src/main.cpp \
     src/tctrack.cpp \
     src/tcstation.cpp \
     src/trafficclock.cpp \
-    src/trafficcontrolImportNW.cpp
+    src/trafficcontrolImportNW.cpp \
+    src/tcnetworkcontrol.cpp
 #UNCOMMENT OUT SECTION BELOW TO TEST
 #debug {
 #    GOOGLETEST_DIR = $$PWD/../googletest
@@ -41,7 +42,8 @@ HEADERS  += inc/trafficcontrol.h \
     inc/tctrack.h \
     inc/tctrain.h \
     inc/trafficclock.h \
-    inc/trafficdatamodel.h
+    inc/trafficdatamodel.h \
+    inc/tcnetworkcontrol.h
 
 FORMS    += trafficcontrol.ui
 
