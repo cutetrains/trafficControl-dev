@@ -232,6 +232,8 @@ TEST(stationTest, noPassengersAfterAddingTenRemovingTwenty)
   EXPECT_THAT(newStation->getNbrOfWaitingPassengers(), Eq(0));
 }
 
+
+
 //TEST(trafficTest,oneTrainInTrainListModelAfterAddingATrain)
 //{ // Verify that trafficControl can add trains properly
 //  //  NOT FUNCTIONING, NEED TO CREATE QAPPLICATION BEFORE CREATING WIDGET

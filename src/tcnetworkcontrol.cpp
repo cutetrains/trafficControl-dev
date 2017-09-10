@@ -15,6 +15,8 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
+// THIS CLASS IS SUPPOSED TO TAKE OVER FUNCTIONALITY FROM traficControl.cpp
+
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
@@ -23,7 +25,7 @@
 #include <QQuickItem> //New
 #include <QQmlComponent> //New
 #include <QQmlEngine> //New
-//#include "../inc/TrafficControl.h"
+#include "../inc/trafficControl.h"
 //#include "ui_TrafficControl.h"
 #include "../inc/tcnetworkcontrol.h"
 #define TRACK 1
@@ -34,9 +36,32 @@
 using namespace std;
 
 /*Constructor*/
-NetworkControl::NetworkControl(int i)
+NetworkControl::NetworkControl(TrafficDataModel &trackListModel,
+                               TrafficDataModel &trainListModel,
+                               TrafficDataModel &stationListModel,
+                               QObject &handleQMLObject)
 {
-  qDebug()<<"NetworkControl initiated.";
+  //ADD CHECK FOR TRAFFICDATAMOODELS HERE!
+  this->trackListModel = &trackListModel;
+
+  if(&handleQMLObject == NULL)
+  {
+    qDebug()<<"NC: trackListModel is a null pointer";
+  } else {
+    qDebug()<<"NC: trackListModel & :"<<&trackListModel;
+  }
+
+  trafficClock.threadSetup(clockThread);// Use the old implementation of clockThread (see Traffic - R1C012_Independent_Thread)
+  trafficClock.moveToThread(&clockThread);
+  clockThread.start();
+  qDebug() << "Before creating track";
+  QStringList tmp;
+  addTrackToNetwork("TrackA_B",
+                    1000,
+                    tmp);
+  qDebug() << "After creating track";
+  //qDebug() << "TrackA_B should have length 1000: "<<trackList.at(0)->getLength();
+
 }
 
 NetworkControl::~NetworkControl()
@@ -50,10 +75,11 @@ NetworkControl::~NetworkControl()
  * @param trackName Name of the track
  * @param trackLength Length of the track [Unit: m]
  */
-/*void TrafficControl::addTrackToNetwork(QString trackName,
+void NetworkControl::addTrackToNetwork(QString trackName,
                                        int trackLength,
                                        QStringList coordinates)
 {
+  qDebug()<<trackList.size();
   Track* newTrack = new Track(trackName,
                             trackLength,
                             coordinates,
@@ -61,12 +87,20 @@ NetworkControl::~NetworkControl()
                             trainList,
                             stationList);
   trackList.append(newTrack);
+  qDebug()<<trackList.size();
+  qDebug() << "In creating track";
+  qDebug() << "trackListModel address:"<< &trackListModel;
+  //if(trackListModel == NULL){
+  //  qDebug()<<"trackListModel is NULL";
+  //}
+  qDebug() << "trackList.size()"<<trackList.size();
   trackListModel->insertRows(trackList.size(), 1 , QModelIndex());
-  connect(newTrack,
-          SIGNAL(dataChangedSignal(int, const QVariant &)),
-          trackListModel,
-          SLOT(onDataChanged(int, const QVariant &)));
-  if(FALSE == coordinates.empty())
+  qDebug() << "Inserted row for trackListModel";
+  //connect(newTrack,
+  //        SIGNAL(dataChangedSignal(int, const QVariant &)),
+  //        trackListModel,
+  //        SLOT(onDataChanged(int, const QVariant &)));
+  /*if(FALSE == coordinates.empty())
   {
     QVariant returnedValue;
     QMetaObject::invokeMethod(handleQMLObject,
@@ -80,9 +114,9 @@ NetworkControl::~NetworkControl()
             SIGNAL(qmlTrackStatusSignal(QVariant ,QVariant ,QVariant)),
             handleQMLObject,
             SLOT(qmlTrackStatusSlot(QVariant, QVariant, QVariant)));
-  }
-  newTrack=NULL;
-}*/
+  }*/
+  //delete newTrack;
+}
 
 /*!
  * The method addTrainToNetwork creates a Train object, connects it to the

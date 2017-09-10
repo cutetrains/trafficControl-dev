@@ -38,16 +38,20 @@ TrafficControl::TrafficControl(QWidget *parent) :
 {
   ui->setupUi(this);
 
-  //ClockThread should move to tcNetworkControl
+  //CAN BE MOVED TO TRAFFICCONTROL. INVESTIGATE SIGNALS/SLOTS
   trafficClock.threadSetup(clockThread);// Use the old implementation of clockThread (see Traffic - R1C012_Independent_Thread)
   trafficClock.moveToThread(&clockThread);
   clockThread.start();
 
   //The slots should be updated when the corresponding functions are moved to tcNetworkControl
   connect(ui->importNetworkButton, SIGNAL(clicked()), this, SLOT(importPredefinedNetwork()));
+
+  //MOVE TO TCNETWORKCONTROL
   connect(ui->timeTickButton, SIGNAL(clicked()), this, SLOT(stepTimeForNetwork()));
   connect(ui->runThreadCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onRunThreadCheckBoxChanged(int)));
   connect(ui->tickIntervalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onTickIntervalChanged(int)));
+
+  //Move to TCNETWORKCONTROL
   connect(&trafficClock, SIGNAL(stepTimeSignal()), this, SLOT(stepTimeForNetwork()));
 
   trackListModel=new TrafficDataModel(TRACK, 0);
@@ -65,7 +69,11 @@ TrafficControl::TrafficControl(QWidget *parent) :
   ui->mapQuickWidget->setSource(source);
   handleQMLObject = ui->mapQuickWidget->rootObject();
 
-  NetworkControl* networkControl = new NetworkControl(1);
+  qDebug()<<"Address to trackListModel: "<<trackListModel;
+  NetworkControl* networkControl = new NetworkControl(*trackListModel,
+                                                      *trainListModel,
+                                                      *stationListModel,
+                                                      *handleQMLObject);
 }
 
 /*!
@@ -314,9 +322,9 @@ void TrafficControl::stepTimeForNetwork()
   foreach(Train* thisTrain, trainList){
     response = thisTrain->move(n);
   }
-  ui->stationListTableView->resizeColumnsToContents();
-  ui->trackListTableView->resizeColumnsToContents();
-  ui->trainListTableView->resizeColumnsToContents();
+  ui->stationListTableView->resizeColumnsToContents();//NOT NECESSARY
+  ui->trackListTableView->resizeColumnsToContents();//NOT NECESSARY
+  ui->trainListTableView->resizeColumnsToContents();//NOT NECESSARY
 }
 
 /*!
@@ -328,11 +336,11 @@ void TrafficControl::stepTimeForNetwork()
  */
 TrafficControl::~TrafficControl()
 {
-  //The destructors should be in tcNetworkControl
+  //TCNETWORKCONTROL
   trafficClock.disconnectThread();
   clockThread.terminate();
   while(!clockThread.isFinished()){}
-  //The destructors should be in tcNetworkControl
+  //TCNETWORKCONTROL
   foreach(Station* thisStation, stationList){ delete thisStation; thisStation=NULL;}
   foreach(Track* thisTrack, trackList){ delete thisTrack; thisTrack=NULL;}
   foreach(Train* thisTrain, trainList){ delete thisTrain; thisTrain=NULL;}

@@ -38,19 +38,24 @@ class NetworkControl : public QObject
   Q_OBJECT
     
 public:
-  NetworkControl(int i);
+  NetworkControl(TrafficDataModel &trackListModel,
+                 TrafficDataModel &trainListModel,
+                 TrafficDataModel &stationListModel,
+                 QObject &handleQMLObject);
   ~NetworkControl();
-//  QThread clockThread;
+
+
 //  QWidget *mapContainer;//Keep in trafficControl
-//  QList<Station*> stationList;
-//  QList<Track*> trackList;
-//  QList<Train*> trainList;
-//  TrafficClock trafficClock;
+  QThread clockThread;
+  QList<Station*> stationList;
+  QList<Track*> trackList;
+  QList<Train*> trainList;
+  TrafficClock trafficClock;
 
 public slots:
-//  void addTrackToNetwork(QString trackName,
-//                         int trackLength,
-//                         QStringList coordinates);
+  void addTrackToNetwork(QString trackName,
+                         int trackLength,
+                         QStringList coordinates);
 //  void addTrainToNetwork(QString trainName);
 //  void addStationToNetwork(QString stationName,
 //                           bool isJunction,
@@ -71,10 +76,10 @@ public slots:
 private:
 //  Ui::TrafficControl *ui;
 //  QStringList list;
-//  QObject* handleQMLObject;
-//  TrafficDataModel *trackListModel;
-//  TrafficDataModel *trainListModel;
-//  TrafficDataModel *stationListModel;
+  QObject* handleQMLObject;
+  TrafficDataModel *trackListModel;
+  TrafficDataModel *trainListModel;
+  TrafficDataModel *stationListModel;
 //  QMutex mutex;
 };
 
