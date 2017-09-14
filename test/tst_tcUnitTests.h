@@ -8,6 +8,11 @@
 #include <QObject>
 
 #include "inc/trafficcontrol.h"
+#include "inc/trafficdatamodel.h"
+#define TRACK 1
+#define TRAIN 2
+#define STATION 3
+#define UNDEFINED -1
 
 using namespace testing;
 
@@ -322,3 +327,4 @@ TEST(stationTest, noPassengersAfterAddingTenRemovingTwenty)
 /**/
 
 //void oneTrainInTrainListModelAfterAddingATrain();
+

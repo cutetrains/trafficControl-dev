@@ -40,8 +40,8 @@ Track::Track(QString trackName,
              QList<Train*>& trainList,
              QList<Station*>& stationList)
 {
-  length=trackLength;
-  name=trackName;
+  length = trackLength;
+  name = trackName;
   startStation = UNDEFINED;
   endStation = UNDEFINED;
   maxAllowedSpeed = 60;

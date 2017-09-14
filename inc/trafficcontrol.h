@@ -45,15 +45,15 @@ class TrafficControl : public QMainWindow
 public:
   explicit TrafficControl(QWidget *parent = 0);
   ~TrafficControl();
-  QThread clockThread;//TCNETWORKCONTROL
+  //QThread clockThread;//TCNETWORKCONTROL
   QWidget *mapContainer;
-  QList<Station*> stationList;//TCNETWORKCONTROL
-  QList<Track*> trackList;//TCNETWORKCONTROL
-  QList<Train*> trainList;//TCNETWORKCONTROL
-  TrafficClock trafficClock; //TCNETWORKCONTROL
+  //QList<Station*> stationList;//TCNETWORKCONTROL
+  //QList<Track*> trackList;//TCNETWORKCONTROL
+  //QList<Train*> trainList;//TCNETWORKCONTROL
+  //TrafficClock trafficClock; //TCNETWORKCONTROL
 
 public slots:
-  void addTrackToNetwork(QString trackName,
+/*  void addTrackToNetwork(QString trackName,
                          int trackLength,
                          QStringList coordinates);
   void addTrainToNetwork(QString trainName);
@@ -71,7 +71,7 @@ public slots:
   void importPredefinedNetwork();
   void onRunThreadCheckBoxChanged(int newState);
   void onTickIntervalChanged(int newInterval);
-  void stepTimeForNetwork();
+  void stepTimeForNetwork();*/
     
 private:
   NetworkControl *networkControl(int i);

@@ -56,22 +56,22 @@ public slots:
   void addTrackToNetwork(QString trackName,
                          int trackLength,
                          QStringList coordinates);
-//  void addTrainToNetwork(QString trainName);
-//  void addStationToNetwork(QString stationName,
-//                           bool isJunction,
-//                           QString lat,
-//                           QString lon);
-//  int connectTrackToStations(QString trackName,
-//                             QString startStationName,
-//                             QString endStationName);
-//  int connectTrackToStations(int trackID,
-//                             int startStationID,
-//                             int endStationID);
-//  int getNumberOfTrains();
-//  void importPredefinedNetwork();
-//  void onRunThreadCheckBoxChanged(int newState);
-//  void onTickIntervalChanged(int newInterval);
-//  void stepTimeForNetwork();
+  void addTrainToNetwork(QString trainName);
+  void addStationToNetwork(QString stationName,
+                           bool isJunction,
+                           QString lat,
+                           QString lon);
+  int connectTrackToStations(QString trackName,
+                             QString startStationName,
+                             QString endStationName);
+  int connectTrackToStations(int trackID,
+                             int startStationID,
+                             int endStationID);
+  int getNumberOfTrains();
+  void importPredefinedNetwork();
+  void onRunThreadCheckBoxChanged(int newState);
+  void onTickIntervalChanged(int newInterval);
+  void stepTimeForNetwork();
     
 private:
 //  Ui::TrafficControl *ui;
@@ -80,7 +80,7 @@ private:
   TrafficDataModel *trackListModel;
   TrafficDataModel *trainListModel;
   TrafficDataModel *stationListModel;
-//  QMutex mutex;
+  QMutex mutex;
 };
 
 #endif // TCNETWORKCONTROL_H
