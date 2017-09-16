@@ -24,20 +24,19 @@ SOURCES += src/main.cpp \
     src/tcstation.cpp \
     src/trafficclock.cpp \
     src/tcnetworkcontrol.cpp \
-    src/trafficcontrolImportNW.cpp \
-    src/tcnetworkcontrolImportNW.cpp
+    src/tcnetworkcontrolcommandparser.cpp
 
 #UNCOMMENT OUT SECTION BELOW TO TEST
-debug {
-    GOOGLETEST_DIR = $$PWD/../googletest
-    include(gtest_dependency.pri)
-    CONFIG += console c++11
-    CONFIG -= app_bundle
-    CONFIG += thread
-    SOURCES -= src/main.cpp
-    SOURCES +=     test/mainTest.cpp
-    HEADERS +=     test/tst_tcUnitTests.h
-}
+#debug {
+#    GOOGLETEST_DIR = $$PWD/../googletest
+#    include(gtest_dependency.pri)
+#    CONFIG += console c++11
+#    CONFIG -= app_bundle
+#    CONFIG += thread
+#    SOURCES -= src/main.cpp
+#    SOURCES +=     test/mainTest.cpp
+#    HEADERS +=     test/tst_tcUnitTests.h
+#}
 
 HEADERS  += inc/trafficcontrol.h \
     inc/tcstation.h \

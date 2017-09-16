@@ -15,10 +15,6 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
-//#include <iostream>
-//#include <sstream>
-//#include <cstring>
-//#include <vector>
 #include <QString>
 #include <QDebug>
 #include <QtCore>

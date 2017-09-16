@@ -18,13 +18,12 @@
 #ifndef TCNETWORKCONTROL_H
 #define TCNETWORKCONTROL_H
 
-#include <QMainWindow>
+//#include <QMainWindow>
 #include <QObject>
 #include <QDebug>
 #include <QThread>
 #include <QMutexLocker>
 #include <QUrl>
-//#include <QQuickView>
 #include <QGeoCoordinate>
 #include <QtQml>
 #include "tctrain.h"
@@ -44,8 +43,6 @@ public:
                  QObject &handleQMLObject);
   ~NetworkControl();
 
-
-//  QWidget *mapContainer;//Keep in trafficControl
   QThread clockThread;
   QList<Station*> stationList;
   QList<Track*> trackList;
@@ -68,19 +65,21 @@ public slots:
                              int startStationID,
                              int endStationID);
   int getNumberOfTrains();
-  void importPredefinedNetwork();
+  bool parseNetworkCommand(QString inputLine);
   void onRunThreadCheckBoxChanged(int newState);
   void onTickIntervalChanged(int newInterval);
   void stepTimeForNetwork();
     
 private:
-//  Ui::TrafficControl *ui;
-//  QStringList list;
   QObject* handleQMLObject;
   TrafficDataModel *trackListModel;
   TrafficDataModel *trainListModel;
   TrafficDataModel *stationListModel;
   QMutex mutex;
+
+  int cmdParserCurrentTrain;
+  int cmdParserCurrentStation;
+  int cmdParserCurrentTrack;
 };
 
 #endif // TCNETWORKCONTROL_H

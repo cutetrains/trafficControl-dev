@@ -21,12 +21,11 @@
 #include <QFile>
 #include <QTextStream>
 #include <QFileDialog>
-#include <QQuickView> //New
-#include <QQuickItem> //New
-#include <QQmlComponent> //New
-#include <QQmlEngine> //New
+#include <QQuickView>
+#include <QQuickItem>
+#include <QQmlComponent>
+#include <QQmlEngine>
 #include "../inc/trafficControl.h"
-//#include "ui_TrafficControl.h"
 #include "../inc/tcnetworkcontrol.h"
 #define TRACK 1
 #define TRAIN 2
@@ -35,13 +34,11 @@
 
 using namespace std;
 
-/*Constructor*/
 NetworkControl::NetworkControl(TrafficDataModel &trackListModel,
                                TrafficDataModel &trainListModel,
                                TrafficDataModel &stationListModel,
                                QObject &handleQMLObject)
 {
-  //ADD CHECK FOR TRAFFICDATAMOODELS HERE!
   this->trackListModel = &trackListModel;
   this->trainListModel = &trainListModel;
   this->stationListModel = &stationListModel;
@@ -54,15 +51,15 @@ NetworkControl::NetworkControl(TrafficDataModel &trackListModel,
   trafficClock.threadSetup(clockThread);// Use the old implementation of clockThread (see Traffic - R1C012_Independent_Thread)
   trafficClock.moveToThread(&clockThread);
   clockThread.start();
+  cmdParserCurrentTrain = UNDEFINED;
+  cmdParserCurrentStation = UNDEFINED;
+  cmdParserCurrentTrack = UNDEFINED;
 
   connect(&trafficClock, SIGNAL(stepTimeSignal()), this, SLOT(stepTimeForNetwork()));
-
-  //importPredefinedNetwork();
-
 }
 
 /*!
- * The method creates a Track Object, connects it to the onDataChanged slot and
+ * The creates a Track Object, connects it to the onDataChanged slot and
  * appends it to the trackList and the trackListModel.
  *
  * @param trackName Name of the track
@@ -73,7 +70,7 @@ void NetworkControl::addTrackToNetwork(QString trackName,
                                        QStringList coordinates)
 {
   Track* newTrack = new Track(trackName,
-                            trackLength,//TrackLength is correct here!
+                            trackLength,
                             coordinates,
                             trackList,
                             trainList,
@@ -84,7 +81,8 @@ void NetworkControl::addTrackToNetwork(QString trackName,
           SIGNAL(dataChangedSignal(int, const QVariant &)),
           trackListModel,
           SLOT(onDataChanged(int, const QVariant &)));
-  if(FALSE == coordinates.empty())
+  if(FALSE == coordinates.empty() &&
+     &handleQMLObject != NULL)
   {
     QVariant returnedValue;
     QMetaObject::invokeMethod(handleQMLObject,
@@ -118,11 +116,8 @@ void NetworkControl::addTrainToNetwork(QString trainName)
   trainList.append(newTrain);
 
   trainListModel->insertRows(trainList.size(), 1 , QModelIndex());
-  trainList[trainList.size()-1]->load(2);//Maybe send datachanged? 2 refers to number
-                                          //of passengers and is hardcoded. Change this later
 
-  //Add train to QML map
-  if( NULL != handleQMLObject){
+  if( NULL != &handleQMLObject){
     QVariant returnedValue;
     QMetaObject::invokeMethod(handleQMLObject,
                               "createQMLTrain",
@@ -161,8 +156,9 @@ void NetworkControl::addStationToNetwork(QString stationName,
   stationList.append(newStation);
   stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
 
-  //ADD CHECK FOR handleQMLObject!!!
-  if( 0 != stationLat.compare("") && 0 != stationLon.compare("")){
+  if( 0 != stationLat.compare("") &&
+      0 != stationLon.compare("") &&
+      NULL != &handleQMLObject){
     QVariant returnedValue;
     QMetaObject::invokeMethod(handleQMLObject,
                               "createQMLStation",
@@ -303,7 +299,7 @@ void NetworkControl::stepTimeForNetwork()
   QMutexLocker locker(&mutex);
   int response = 0;
 
-  /* n needs to be fetched from timebox */
+  /* n needs to be fetched from timebox Signal-Slot?*/
   //int n = ui->stepTimeBox->value();
   int n = 1;
 
@@ -324,17 +320,10 @@ void NetworkControl::stepTimeForNetwork()
  */
 NetworkControl::~NetworkControl()
 {
-  //The destructors should be in tcNetworkControl
   trafficClock.disconnectThread();
   clockThread.terminate();
   while(!clockThread.isFinished()){}
-  //The destructors should be in tcNetworkControl
   foreach(Station* thisStation, stationList){ delete thisStation; thisStation=NULL;}
   foreach(Track* thisTrack, trackList){ delete thisTrack; thisTrack=NULL;}
   foreach(Train* thisTrain, trainList){ delete thisTrain; thisTrain=NULL;}
-  //delete trackListModel;
-  //delete trainListModel;
-  //delete stationListModel;
-  //Insert code to remove objects here
-  //delete ui;
-}
+ }
