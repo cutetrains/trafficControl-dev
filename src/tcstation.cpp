@@ -150,6 +150,11 @@ bool Station::checkIfTrackLeavesStation(int trackID)
   return foundTrack;
 }
 
+void Station::destructorResetTotalNumberOfStations()
+{
+  totalNbrOfStations = 0;
+}
+
 /*!
  * The method finds the track index in leavingTrackList to the adjacent
  * station stationID. If no tracks are found, or the station isn't adjacent,
@@ -235,6 +240,9 @@ float Station::getLongitude() {
     return 0;
   }
 }
+
+int Station::getTotalNbrOfStations(){ return totalNbrOfStations; }
+
 /*!
  * The method returns the trainList of the station
  *

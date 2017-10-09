@@ -147,13 +147,17 @@ bool Track::deleteTrain(int trainID){
   return false;
 }
 
+void Track::destructorResetTotalNumberOfTracks()
+{
+  totalNbrOfTracks = 0;
+}
+
 //TODO: CHECK FOR COORDINATES!
 QList<float> Track::getCoordinatesFromPosition(int position)
 {
   int iii;
   float fractionOfLeg;
   QList<float> thisList;
-
   for (iii=0; iii < coordinateList.length(); iii++){
     if (coordinateCumulatedDistanceList.at(iii) >= position){
       iii--;
@@ -211,6 +215,8 @@ QString Track::getName() {return name;}
  *                      object.
  */
 int Track::getStartStation() { return startStation; }
+
+int Track::getTotalNbrOfTracks(){ return totalNbrOfTracks; }
 
 /*!
  * The method prepares and sends a dataChangedSignal to trafficDataModel to

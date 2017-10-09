@@ -57,6 +57,7 @@ public:
   ~Track();
   bool addTrain(int trainID);
   bool deleteTrain(int trainID);
+  void destructorResetTotalNumberOfTracks();
   QList<float> getCoordinatesFromPosition(int position);
   int getEndStation();
   int getID();
@@ -64,6 +65,7 @@ public:
   int getMaxAllowedSpeed();
   QString getName();
   int getStartStation();
+  int getTotalNbrOfTracks();
   void sendDataChangedSignal(int trackID);
   void setEndStation( int stationID);//To be handled in trafficcontrol
   void setMaxAllowedSpeed(int n);//to implement

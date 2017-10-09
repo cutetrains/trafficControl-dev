@@ -1,3 +1,6 @@
+#if !defined _TST_TCUNITTESTS_H_
+#define _TST_TCUNITTESTS_H_
+
 #include <gtest/gtest.h>
 #include <gmock/gmock-matchers.h>
 #include <QApplication>
@@ -9,6 +12,8 @@
 
 #include "inc/trafficcontrol.h"
 #include "inc/trafficdatamodel.h"
+#include "tst_tcStationTests.h"
+
 #define TRACK 1
 #define TRAIN 2
 #define STATION 3
@@ -16,143 +21,53 @@
 
 using namespace testing;
 
-TEST(stationTest, noPassengersAfterCreated)
-{ /* Verify that the station has no passengers after created */
-  QList<Station*> stationList;
-  QList<Track*> trackList;
-  QList<Train*> trainList;
-  Station* newStation = new Station("testStation",
-                                  false,
-                                  "",
-                                  "",
-                                  trackList,
-                                  trainList,
-                                  stationList);
-  EXPECT_THAT(newStation->getNbrOfWaitingPassengers(), Eq(0));
-  delete newStation;
+class networkTest : public ::testing::Test
+{
+protected:
+  TrafficDataModel *trackListModel;
+  TrafficDataModel *trainListModel;
+  TrafficDataModel *stationListModel;
+  QObject* handleQMLObject;
+  NetworkControl *networkControl;
+  virtual void SetUp()
+  {
+    trackListModel = new TrafficDataModel(TRACK, 0);
+    trainListModel = new TrafficDataModel(TRAIN, 0);
+    stationListModel =new TrafficDataModel(STATION, 0);
+    handleQMLObject = NULL;
+    networkControl = new NetworkControl(*trackListModel,
+                                        *trainListModel,
+                                        *stationListModel,
+                                        *handleQMLObject);
+  }
+
+  virtual void TearDown()
+  {
+    delete trackListModel;
+    delete trainListModel;
+    delete stationListModel;
+    delete handleQMLObject;
+    delete networkControl;
+  }
+};
+
+TEST_F(networkTest, addOneTrainToStation)
+{
+  networkControl->addStationToNetwork("StationA",
+                                      false,
+                                      "",
+                                      "");
+  networkControl->addTrainToNetwork("TrainA");
+  networkControl->trainList.at(0)->setCurrentStation(0);
+
+  EXPECT_THAT(networkControl->stationList.at(0)->getTrainList().length(), Eq(1));
+  int firstTrainAtStationA = networkControl->stationList.at(0)->getTrainList().at(0);
+  EXPECT_THAT(networkControl->trainList.at(firstTrainAtStationA)->getName(), Eq("TrainA"));
 }
 
-TEST(stationTest, noTrainsAfterCreation)
-{ /* Verify that the station has no trains after created */
-  QList<Station*> stationList;
-  QList<Track*> trackList;
-  QList<Train*> trainList;
-  Station* newStation = new Station("testStation",
-                                  false,
-                                  "",
-                                  "",
-                                  trackList,
-                                  trainList,
-                                  stationList);
-  EXPECT_THAT(newStation->getTrainList().length(), Eq(0));
-  delete newStation;
-}
+  //EXPECT_THAT(networkControl->stationList.at(0)->getTrainList().length(), Eq(1));
 
-TEST(stationTest, noCoordinatesAtCreation)
-{ /* Will station report no coordinates if station is created without
-     coordinates*/
-  QList<Station*> stationList;
-  QList<Track*> trackList;
-  QList<Train*> trainList;
-  Station* newStation = new Station("testStation",
-                                  false,
-                                  "",
-                                  "",
-                                  trackList,
-                                  trainList,
-                                  stationList);
-  EXPECT_THAT(newStation->hasCoordinates(), Eq(false));
-  delete newStation;
-}
-
-TEST(stationTest, validCoordinatesAtCreation)
-{ /* Will station add coordinates and set "hasCoordinates=TRUE"*/
-  QList<Station*> stationList;
-  QList<Track*> trackList;
-  QList<Train*> trainList;
-  QString latitude = "55.72729652532263";
-  QString longitude = "13.16723731495294";
-  Station* newStation = new Station("testStation",
-                                  false,
-                                  latitude,
-                                  longitude,
-                                  trackList,
-                                  trainList,
-                                  stationList);
-  EXPECT_THAT(newStation->hasCoordinates(), Eq(true));
-  EXPECT_THAT(newStation->getLatitude(), Eq(latitude.toFloat()));
-  EXPECT_THAT(newStation->getLongitude(), Eq(longitude.toFloat()));
-  delete newStation;
-}
-
-TEST(stationTest, validNegativeCoordinatesAtCreation)
-{ /* Verify that station will add negative coordinates and set
-     "hasCoordinates=TRUE"*/
-  QList<Station*> stationList;
-  QList<Track*> trackList;
-  QList<Train*> trainList;
-  QString latitude = "-55.72729652532263";
-  QString longitude = "-13.16723731495294";
-  Station* newStation = new Station("testStation",
-                                  false,
-                                  latitude,
-                                  longitude,
-                                  trackList,
-                                  trainList,
-                                  stationList);
-  EXPECT_THAT(newStation->hasCoordinates(), Eq(true));
-  EXPECT_THAT(newStation->getLatitude(), Eq(latitude.toFloat()));
-  EXPECT_THAT(newStation->getLongitude(), Eq(longitude.toFloat()));
-  delete newStation;
-}
-
-TEST(stationTest, nonNumericalCoordinatesAtCreation)
-{ /* Verify that station will ignore invalid coordinates at creation*/
-  QList<Station*> stationList;
-  QList<Track*> trackList;
-  QList<Train*> trainList;
-  Station* newStation = new Station("testStation",
-                                  false,
-                                  "55.727hej52532263",
-                                  "13.16723731495294",
-                                  trackList,
-                                  trainList,
-                                  stationList);
-  EXPECT_THAT(newStation->getLatitude(), Eq(0.0));
-  EXPECT_THAT(newStation->getLongitude(), Eq(0.0));
-  EXPECT_THAT(newStation->hasCoordinates(), Eq(false));
-  delete newStation;
-}
-
-TEST(stationTest, invalidFloatCoordinatesAtCreation)
-{ /* Verify that station will ignore invalid coordinates at creation, for
-     example 95 N, 100W*/
-  QList<Station*> stationList;
-  QList<Track*> trackList;
-  QList<Train*> trainList;
-  Station* newStation = new Station("testStation",
-                                  false,
-                                  "105.7272962532263",
-                                  "13.16723731495294",
-                                  trackList,
-                                  trainList,
-                                  stationList);
-  EXPECT_THAT(newStation->getLatitude(), Eq(0.0));
-  EXPECT_THAT(newStation->getLongitude(), Eq(0.0));
-  EXPECT_THAT(newStation->hasCoordinates(), Eq(false));
-  delete newStation;
-  Station* newStation2 = new Station("testStation",
-                                  false,
-                                  "55.7272962532263",
-                                  "213.16723731495294",
-                                  trackList,
-                                  trainList,
-                                  stationList);
-  EXPECT_THAT(newStation2->getLatitude(), Eq(0.0));
-  EXPECT_THAT(newStation2->getLongitude(), Eq(0.0));
-  EXPECT_THAT(newStation2->hasCoordinates(), Eq(false));
-  delete newStation2;
-}
+//  EXPECT_THAT(networkControl->stationList.at(0)->getTrainList().at(0).getName(), Eq("TrainA"));
 
 /*void station_nameAlreadyTaken(); // Verify that the station will rename new
                                       station with a random suffix if the
@@ -177,6 +92,8 @@ TEST(stationTest, leavingTrackListEmptyAtCreation)
   delete newStation;
 }
 
+
+
 /*void station_timeForAdding100Stations(); // Observe the time needed for
                                        adding 100 stations */
 
@@ -199,44 +116,29 @@ TEST(stationTest, junctionHasNoPassengersAfterAddingTen)
 /*void station_verifyTrainListAfterAddingRemoving(); // Verify that the
                                        trainList is populated and depopulated
                                        properly */
+TEST_F(networkTest, trainListAfterAddingTwo)
+{ /*Verify that the trainList is populated and depopulated properly */
+  networkControl->addStationToNetwork("StationA",
+                                      false,
+                                      "",
+                                      "");
+  EXPECT_THAT(networkControl->stationList.at(0)->getTrainList().length(), Eq(0));
+
+  networkControl->addTrainToNetwork("TrainA");
+  EXPECT_THAT(networkControl->trainList.at(0)->getID(), Eq(0));
+
+  networkControl->trainList.at(0)->setCurrentStation(0); //Add train to station
+  EXPECT_THAT(networkControl->stationList.at(0)->getTrainList().at(0), Eq(0));
+  networkControl->addTrainToNetwork("TrainB");
+  networkControl->trainList.at(1)->setCurrentStation(0); //Add train to station
+  EXPECT_THAT(networkControl->stationList.at(0)->getTrainList().at(1), Eq(1));
+  EXPECT_THAT(networkControl->stationList.at(0)->getTrainList().length(), Eq(2));
+}
+
+
 /*void station_noMoreTrainsThanPlatforms();*/
 
 /*TEST(stationTest, noLeavingTracksAfterCreation); //Verify that the station has no leaving tracks after creation */
-
-TEST(stationTest, tenPassengersAfterAddingTen)
-{ /* Verify that the station can add passengers properly*/
-  QList<Station*> stationList;
-  QList<Track*> trackList;
-  QList<Train*> trainList;
-  Station* newStation = new Station("testStation",
-                                  false,
-                                  "",
-                                  "",
-                                  trackList,
-                                  trainList,
-                                  stationList);
-  newStation->changeNbrOfPassengers(10);
-  EXPECT_THAT(newStation->getNbrOfWaitingPassengers(), Eq(10));
-}
-
-TEST(stationTest, noPassengersAfterAddingTenRemovingTwenty)
-{ /* Verify that the station can add and remove passengers properly*/
-  QList<Station*> stationList;
-  QList<Track*> trackList;
-  QList<Train*> trainList;
-  Station* newStation = new Station("testStation",
-                                  false,
-                                  "",
-                                  "",
-                                  trackList,
-                                  trainList,
-                                  stationList);
-
-  newStation->changeNbrOfPassengers(10);
-  newStation->changeNbrOfPassengers(-20);
-  EXPECT_THAT(newStation->getNbrOfWaitingPassengers(), Eq(0));
-}
-
 
 
 //TEST(trafficTest,oneTrainInTrainListModelAfterAddingATrain)
@@ -254,12 +156,43 @@ TEST(stationTest, noPassengersAfterAddingTenRemovingTwenty)
 //  EXPECT_THAT(tc.getNumberOfTrains(), Eq(2));
 //}
 
-/*void train_noCurrentStationAfterCreation();// Verify that the train has no
-                                       current station after creation */
-/*void train_noCurrentTrackAfterCreation();// Verify that the train has no
-                                       current track after creation */
+TEST(trainTest, noCurrentStationAfterCreation)
+{ /* Verify that the train has no current station after creation */
+  QList<Station*> stationList;
+  QList<Track*> trackList;
+  QList<Train*> trainList;
+  Train* newTrain = new Train("testTrain",
+                              trackList,
+                              trainList,
+                              stationList);
+  EXPECT_THAT(newTrain->getCurrentStation(), Eq(UNDEFINED));
+}
+
+TEST(trainTest, noCurrentTrackAfterCreation)
+{ /* Verify that the train has no current track after creation */
+  QList<Station*> stationList;
+  QList<Track*> trackList;
+  QList<Train*> trainList;
+  Train* newTrain = new Train("testTrain",
+                              trackList,
+                              trainList,
+                              stationList);
+  EXPECT_THAT(newTrain->getCurrentTrack(), Eq(UNDEFINED));
+}
+
 /*void train_travelPlanEmptyAfterCreation();// Verify that the travel plan is
                                        empty after creation */
+TEST(trainTest, travelPlanEmptyAfterCreation)
+{ /* Verify that the travel plan iS empty after creation */
+  QList<Station*> stationList;
+  QList<Track*> trackList;
+  QList<Train*> trainList;
+  Train* newTrain = new Train("testTrain",
+                              trackList,
+                              trainList,
+                              stationList);
+  EXPECT_THAT(newTrain->getTravelPlan().length(), Eq(0));
+}
 /*void train_travelPlanIndexZeroAfterCreation(); // Verify that the travel plan
                                        index is zero after creation */
 /*void train_currentSpeedIsZeroAfterCreation(); // Verify that the speed of the
@@ -328,3 +261,4 @@ TEST(stationTest, noPassengersAfterAddingTenRemovingTwenty)
 
 //void oneTrainInTrainListModelAfterAddingATrain();
 
+#endif

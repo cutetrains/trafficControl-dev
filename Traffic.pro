@@ -44,7 +44,8 @@ HEADERS  += inc/trafficcontrol.h \
     inc/tctrain.h \
     inc/trafficclock.h \
     inc/trafficdatamodel.h \
-    inc/tcnetworkcontrol.h
+    inc/tcnetworkcontrol.h \
+    test/tst_tcStationTests.h
 
 FORMS    += trafficcontrol.ui
 

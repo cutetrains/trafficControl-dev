@@ -59,7 +59,6 @@ Train::Train(QString trainName,
   stateTable.insert("CLOSING", 6);  //Doors are closing
   stateTable.insert("STOPPED", 7);  //No more stations to visit or emergency brake
   stateTable.insert("EMERGENCY",8); //Train must stop immediately or at next station if in tunnel, and open doors
-
   trainID = totalNbrOfTrains;/*!<The trainID will be correspond to the order of created Train objects. */
   totalNbrOfTrains++;
   nextIndexTravelPlanByStationID = 0;
@@ -112,6 +111,11 @@ int Train::closingState(int n)
   return n;
 }
 
+void Train::destructorResetTotalNumberOfTrains()
+{
+  totalNbrOfTrains = 0;
+}
+
 /*!
  * Get the actual speed of the Train object.
  *
@@ -160,6 +164,8 @@ int Train::getIndexTravelPlanByStationID() {return nextIndexTravelPlanByStationI
  * @return name of the train.
  */
 QString Train::getName(){ return name; }
+
+int Train::getTotalNbrOfTrains(){ return totalNbrOfTrains; }
 
 /*!
  * Get the position on the current Track for the train in meters.
@@ -338,12 +344,12 @@ int Train::runningState(int n)
   {
     n = runningToOpeningState(n);
   } else {
-    //qDebug()<<"Tr:M: On a track, still some distance to the end of track.";
     desiredSpeed = (int) min((double)maxSpeed,
                              sqrt((thisTrackList->at(currentTrack)->
                                      getLength() - positionOnTrack -
                                      currentSpeed) * 2));
     desiredSpeed = max(desiredSpeed, 1);
+
     if (currentSpeed != desiredSpeed)
     {
       currentSpeed = currentSpeed + (desiredSpeed - currentSpeed) /
@@ -352,7 +358,6 @@ int Train::runningState(int n)
     this->setTrackPosition(positionOnTrack+currentSpeed);
   }
   n--;
-
   return n;
 }
 
@@ -480,7 +485,6 @@ void Train::setTrackPosition(int n)
     positionOnTrack = min(positionOnTrack,
                           thisTrackList->at(currentTrack)->getLength());
     trainCoordinates = thisTrackList->at(currentTrack)->getCoordinatesFromPosition(positionOnTrack);
-    //qDebug()<<this->getName()<<", " << trainCoordinates;
     emit qmlTrainPositionSignal(this->getName(),
                               trainCoordinates.at(0),
                               trainCoordinates.at(1));

@@ -67,6 +67,7 @@ public:
   ~Train();
   int addStationToTravelPlan(int stationID);//To be removed and replaced by addStationToTrainRoute
   int closingState(int n);
+  void destructorResetTotalNumberOfTrains();
   int getCurrentSpeed();
   int getCurrentStation();
   int getCurrentTrack();
@@ -74,6 +75,7 @@ public:
   int getID();
   int getIndexTravelPlanByStationID();
   QString getName();
+  int getTotalNbrOfTrains();
   int getTrackPosition();
   QList<int> getTravelPlan();
   void load(int n);

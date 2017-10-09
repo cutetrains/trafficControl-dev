@@ -15,8 +15,6 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
-// THIS CLASS IS SUPPOSED TO TAKE OVER FUNCTIONALITY FROM traficControl.cpp
-
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
@@ -303,6 +301,25 @@ void NetworkControl::stepTimeForNetwork()
   //int n = ui->stepTimeBox->value();
   int n = 1;
 
+  /* ASSERTS TO VERIFY THAT TRAFFIC ELEMENTS HAS NEVER BEEN DELETED */
+  bool result = false;
+  result = trainList.length() == 0 ? true :
+                     trainList.length() == trainList.last()->getID() + 1;
+  Q_ASSERT_X(result,
+             Q_FUNC_INFO,
+             "Train ID/list mismatch. Train objects mustn't be deleted!");
+
+  result = trackList.length() == 0 ? true :
+                     trackList.length() == trackList.last()->getID() + 1;
+  Q_ASSERT_X(result,
+             Q_FUNC_INFO,
+             "Track ID/list mismatch. Track objects mustn't be deleted!");
+  result = stationList.length() == 0 ? true :
+                       stationList.length() == stationList.last()->getID() + 1;
+  Q_ASSERT_X(result,
+             Q_FUNC_INFO,
+             "Station ID/list mismatch. Station objects mustn't be deleted!");
+
   foreach(Train* thisTrain, trainList){
     response = thisTrain->move(n);
   }
@@ -323,7 +340,17 @@ NetworkControl::~NetworkControl()
   trafficClock.disconnectThread();
   clockThread.terminate();
   while(!clockThread.isFinished()){}
-  foreach(Station* thisStation, stationList){ delete thisStation; thisStation=NULL;}
-  foreach(Track* thisTrack, trackList){ delete thisTrack; thisTrack=NULL;}
-  foreach(Train* thisTrain, trainList){ delete thisTrain; thisTrain=NULL;}
+  foreach(Station* thisStation, stationList){
+    thisStation->destructorResetTotalNumberOfStations();
+    delete thisStation;
+    thisStation=NULL;}
+  foreach(Track* thisTrack, trackList){
+    thisTrack->destructorResetTotalNumberOfTracks();
+    delete thisTrack;
+    thisTrack=NULL;
+  }
+  foreach(Train* thisTrain, trainList){
+   thisTrain->destructorResetTotalNumberOfTrains();
+   delete thisTrain;
+   thisTrain=NULL;}
  }
