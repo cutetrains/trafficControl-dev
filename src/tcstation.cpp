@@ -27,7 +27,6 @@
  * Contact: gustaf_brannberg@hotmail.com
  */
 
-//#include <cstring>
 #include <qDebug>
 #include "../inc/tcstation.h"
 #include "../inc/trafficcontrol.h"
@@ -59,13 +58,12 @@ Station::Station(QString stationName,
                  QList<Train*>& trainList,
                  QList<Station*>& stationList)
 {
-  //name = QString::fromUtf16(stationName.utf16());
   name = stationName;
   waitingPassengers = 0;
   stationIsJunction = isJunction;
   numberOfPlatforms = 2;
 
-  bool isOk; //THIS CODE NEED TO BE REFACTORED!
+  bool isOk;
   float tempLatitude;
   float tempLongitude;
   tempLatitude = inLatitude.toFloat(&isOk);
@@ -105,7 +103,6 @@ void Station::addTrack(int trackID) {
   else
   {
     leavingTrackList << trackID;
-    //leavingTrackVector.push_back(trackID);
   }
   sendDataChangedSignal(stationID);
 }
@@ -150,6 +147,11 @@ bool Station::checkIfTrackLeavesStation(int trackID)
   return foundTrack;
 }
 
+/*!
+ * The method is only used when deleting the networkControl object and will
+ * set the total number ofstations to zero. This is done mainly in the tests
+ * to ensure that the test environment is reset.
+ */
 void Station::destructorResetTotalNumberOfStations()
 {
   totalNbrOfStations = 0;

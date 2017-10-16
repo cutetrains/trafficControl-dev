@@ -32,7 +32,10 @@ int Train::totalNbrOfTrains=0;
  * @param trackList is a pointer to the trackList
  * @param trainList is a pointer to the trackList
  * @param stationList is a pointer to the stationList
+ *
  * @todo Implement a way to limit max passengers to 1.5 times nSeats.
+ *
+ * @todo Implement copy and assign constructor.
  */
 Train::Train(QString trainName,
              QList<Track*>& trackList,
@@ -111,6 +114,11 @@ int Train::closingState(int n)
   return n;
 }
 
+/*!
+ * The method is only used when deleting the networkControl object and will
+ * set the total number of trains to zero. This is done mainly in the tests
+ * to ensure that the test environment is reset.
+ */
 void Train::destructorResetTotalNumberOfTrains()
 {
   totalNbrOfTrains = 0;
@@ -484,10 +492,17 @@ void Train::setTrackPosition(int n)
     positionOnTrack = max(n, 0);
     positionOnTrack = min(positionOnTrack,
                           thisTrackList->at(currentTrack)->getLength());
-    trainCoordinates = thisTrackList->at(currentTrack)->getCoordinatesFromPosition(positionOnTrack);
-    emit qmlTrainPositionSignal(this->getName(),
-                              trainCoordinates.at(0),
-                              trainCoordinates.at(1));
+    if(thisTrackList->at(currentTrack)->hasCoordinates())
+    {
+      trainCoordinates = thisTrackList->at(currentTrack)->getCoordinatesFromPosition(positionOnTrack);
+      emit qmlTrainPositionSignal(this->getName(),
+                                  trainCoordinates.at(0),
+                                  trainCoordinates.at(1));
+    } //else  {
+      //trainCoordinates.clear();
+      //trainCoordinates<<0.0<<0.0;
+    //}
+
   }
   sendDataChangedSignal(trainID);
 }

@@ -64,6 +64,11 @@ TrafficControl::TrafficControl(QWidget *parent) :
   connect(ui->tickIntervalSpinBox, SIGNAL(valueChanged(int)), networkControl, SLOT(onTickIntervalChanged(int)));
 }
 
+/*!
+* Opens a file and parses the commands to networkControl
+*
+* @return result
+*/
 bool TrafficControl::readNetworkDefinitionFromFile()
 {
   QString fileName = QFileDialog::getOpenFileName(this,
@@ -77,12 +82,15 @@ bool TrafficControl::readNetworkDefinitionFromFile()
   }
 
   QTextStream in(&file);
+  QStringList fileStrings;
   while(!in.atEnd())
   {
-    line = in.readLine();
-    networkControl->parseNetworkCommand(line);
+    //line = in.readLine();
+    fileStrings << in.readLine();
+    //networkControl->parseNetworkCommand(line);
   }
   file.close();
+  networkControl->parseMultipleNetworkCommand(fileStrings);
 
   return true;
 }
@@ -99,5 +107,6 @@ TrafficControl::~TrafficControl()
   delete trackListModel;
   delete trainListModel;
   delete stationListModel;
+  delete networkControl;
   delete ui;
 }

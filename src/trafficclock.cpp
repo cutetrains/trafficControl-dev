@@ -29,11 +29,19 @@ TrafficClock::TrafficClock(QObject *parent) :
   tInterval = 500; //No magic numbers
 }
 
+/*!
+* Specifies how often the clock will tick
+*
+* @param n Interval in seconds
+*/
 void TrafficClock::setTickInterval(int n)
 {
   tInterval = n;
 }
 
+/*!
+* Stops thread
+*/
 void TrafficClock::disconnectThread()
 {
   isAlive = false;
@@ -63,16 +71,27 @@ void TrafficClock::threadTick()
   }
 }
 
+/*!
+* Pauses thread
+*/
 void TrafficClock::pauseThread()
 {
   continueTick = false;
 }
 
+/*!
+* Resumes thread
+*/
 void TrafficClock::resumeThread()
 {
   continueTick = true;
 }
 
+/*!
+* Connects thread to slot
+*
+* @param Clock thread to start
+*/
 void TrafficClock::threadSetup(QThread &clockThread)
 {
   connect(&clockThread, SIGNAL(started()), this, SLOT(threadTick()) );

@@ -37,6 +37,7 @@ private:
   QList<float> coordinateList;
   QList<int> coordinateCumulatedDistanceList;
   int endStation;
+  bool hasValidCoordinates;
   int length;
   int maxAllowedSpeed;
   QString name;
@@ -44,6 +45,9 @@ private:
   static int totalNbrOfTracks;
   int trackID;
   QQueue<int> trainsOnTrackQueue;
+  QList<Track*> *thisTrackList;
+  QList<Train*> *thisTrainList;
+  QList<Station*> *thisStationList;
 
 public:
   Track(QString trackName,
@@ -51,10 +55,11 @@ public:
         QStringList coordinates,
         QList<Track*>& trackList,
         QList<Train*>& trainList,
-        QList<Station*>& stationList);//ID and length
+        QList<Station*>& stationList);
   Track(const Track& sTrack);
   Track& operator=(const Track& sTrack);
   ~Track();
+
   bool addTrain(int trainID);
   bool deleteTrain(int trainID);
   void destructorResetTotalNumberOfTracks();
@@ -66,13 +71,11 @@ public:
   QString getName();
   int getStartStation();
   int getTotalNbrOfTracks();
+  bool hasCoordinates();
   void sendDataChangedSignal(int trackID);
-  void setEndStation( int stationID);//To be handled in trafficcontrol
-  void setMaxAllowedSpeed(int n);//to implement
-  void setStartStation( int stationID);//To be handled in trafficcontrol
-  void showInfo();//modify
-  QList<Track*> *thisTrackList;//inserted, REMOVE?
-  QList<Train*> *thisTrainList;//inserted
-  QList<Station*> *thisStationList;//inserted
+  void setEndStation( int stationID);
+  void setMaxAllowedSpeed(int n);
+  void setStartStation( int stationID);
+  void showInfo();
 };
 #endif

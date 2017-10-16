@@ -64,8 +64,8 @@ public slots:
   int connectTrackToStations(int trackID,
                              int startStationID,
                              int endStationID);
-  int getNumberOfTrains();
   bool parseNetworkCommand(QString inputLine);
+  bool parseMultipleNetworkCommand(QStringList inputLines);
   void onRunThreadCheckBoxChanged(int newState);
   void onTickIntervalChanged(int newInterval);
   void stepTimeForNetwork();

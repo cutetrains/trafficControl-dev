@@ -29,7 +29,7 @@ class Station: public QObject
 
 signals:
   void dataChangedSignal(int, const QVariant & );
-  void qmlStationOccupancySignal(QVariant, QVariant, QVariant);//2017-06 MODIFY STATION
+  void qmlStationOccupancySignal(QVariant, QVariant, QVariant);
 
 private:
   bool hasValidCoordinates;
@@ -39,15 +39,14 @@ private:
   int stationID;
   bool stationIsJunction;
   QList<float> thisCoordinate;
-  QList<Track*> *thisTrackList;//inserted, REMOVE?
-  QList<Train*> *thisTrainList;//inserted
-  QList<Station*> *thisStationList;//inserted
+  QList<Track*> *thisTrackList;
+  QList<Train*> *thisTrainList;
+  QList<Station*> *thisStationList;
   static int totalNbrOfStations;
   QList<int> trainsAtStationList;
   int waitingPassengers;
 
-public:// to do later: Add vector with pointers to the trains on each station.
-  /*! The constructor for a Station object.*/
+public:
   Station(QString stationName,
           bool isJunction,
           QString latitude,

@@ -54,12 +54,11 @@ public slots:
 private:
   NetworkControl *networkControl;
   Ui::TrafficControl *ui;
-  QObject* handleQMLObject;//TCNETWORKCONTROL
+  QObject* handleQMLObject;
   TrafficDataModel *trackListModel;
   TrafficDataModel *trainListModel;
   TrafficDataModel *stationListModel;
-  //QMutex mutex;//TCNETWORKCONTROL
   QString line;
 };
 
-#endif // TRAFFICCONTROL_H
+#endif

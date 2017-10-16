@@ -40,6 +40,7 @@ private:
   int currentTrack;//-1 indicates that train is not on a track
   int desiredSpeed;//[m/s]
   int doorOpenProgress;//Doors needs 5 seconds to open and close. 0=closed, 100=open
+  bool hasValidCoordinates; //For trains, this is dependent on the track or station.
   int positionOnTrack;//[m]
   int maxSpeed;
   QMutex mutex;

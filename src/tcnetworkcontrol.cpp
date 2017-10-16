@@ -15,6 +15,18 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
+/*! @file tcnetworkcontrol.cpp
+ * @class NetworkControl
+ *
+ * @brief Implementation of the NetworkControl class
+ *
+ * The class contains the implementation of the Station object
+ *
+ * @author Gustaf Brännberg
+ *
+ * Contact: gustaf_brannberg@hotmail.com
+ */
+
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
@@ -68,11 +80,11 @@ void NetworkControl::addTrackToNetwork(QString trackName,
                                        QStringList coordinates)
 {
   Track* newTrack = new Track(trackName,
-                            trackLength,
-                            coordinates,
-                            trackList,
-                            trainList,
-                            stationList);
+                              trackLength,
+                              coordinates,
+                              trackList,
+                              trainList,
+                              stationList);
   trackList.append(newTrack);
   trackListModel->insertRows(trackList.size(), 1 , QModelIndex());
   connect(newTrack,
@@ -112,7 +124,6 @@ void NetworkControl::addTrainToNetwork(QString trainName)
           trainListModel,
           SLOT(onDataChanged(int , const QVariant &)));
   trainList.append(newTrain);
-
   trainListModel->insertRows(trainList.size(), 1 , QModelIndex());
 
   if( NULL != &handleQMLObject){
@@ -204,6 +215,8 @@ int NetworkControl::connectTrackToStations(int trackID,
  * @param endStationName The name of the end station for the track.
  *
  * @return Status 1 indicates success. 0 indicates failure.
+ *
+ * @todo Add error handling
  */
 int NetworkControl::connectTrackToStations(QString trackName,
                                            QString startStationName,
@@ -244,8 +257,8 @@ int NetworkControl::connectTrackToStations(QString trackName,
       }
     }
   if ((foundStartStationID != UNDEFINED) &&
-        (foundEndStationID != UNDEFINED) &&
-        (foundTrackID != UNDEFINED))
+       (foundEndStationID != UNDEFINED) &&
+       (foundTrackID != UNDEFINED))
   {
     if(trackList.at(foundTrackID)->getStartStation() == UNDEFINED)
     {
@@ -265,12 +278,12 @@ int NetworkControl::connectTrackToStations(QString trackName,
   return 1;
 }
 
-int NetworkControl::getNumberOfTrains()
-{
-  return trainListModel->rowCount();
-}
-
-
+/*!
+ * The method resumes/pauses the trafficClock thread, depending on the new
+ * state of the thread.
+ *
+ * @param newState The new state of the thread.
+ */
 void NetworkControl::onRunThreadCheckBoxChanged(int newState)
 {
   if(newState == 2)//HARDCODED TO 2, THAT MEANS ACTIVE
@@ -283,6 +296,12 @@ void NetworkControl::onRunThreadCheckBoxChanged(int newState)
   }
 }
 
+/*!
+ * The method changes the interval between each tick, depending on the
+ * interval parameter.
+ *
+ * @param newInterval The new interval of the thread.
+ */
 void NetworkControl::onTickIntervalChanged(int newInterval)
 {
   trafficClock.setTickInterval(newInterval);
@@ -350,7 +369,7 @@ NetworkControl::~NetworkControl()
     thisTrack=NULL;
   }
   foreach(Train* thisTrain, trainList){
-   thisTrain->destructorResetTotalNumberOfTrains();
-   delete thisTrain;
-   thisTrain=NULL;}
+    thisTrain->destructorResetTotalNumberOfTrains();
+    delete thisTrain;
+    thisTrain=NULL;}
  }

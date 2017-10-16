@@ -15,6 +15,18 @@
  * along with TrafficControl.  If not, see <http://www.gnu.org/licenses/>.
  ************************************************************************/
 
+/*! @file tctrack.cpp
+ * @class Track
+ *
+ * @brief Implementation of the Track class
+ *
+ * The class contains the implementation of the Track object
+ *
+ * @author Gustaf Brännberg
+ *
+ * Contact: gustaf_brannberg@hotmail.com
+ */
+
 #include <QDebug>
 #include <QtMath>
 #include "../inc/tctrack.h"
@@ -73,6 +85,11 @@ Track::Track(QString trackName,
       }
       coordinateCumulatedDistanceList<<floor(dist*1000);
     }
+    hasValidCoordinates = true;
+  }
+  else
+  {
+    hasValidCoordinates = false;
   }
 }
 
@@ -89,6 +106,7 @@ Track::Track( const Track& sTrack)
   name = sTrack.name;
   startStation = sTrack.startStation;
   endStation = sTrack.endStation;
+  hasValidCoordinates = sTrack.hasValidCoordinates;
   maxAllowedSpeed = sTrack.maxAllowedSpeed;
   trackID = sTrack.trackID;
   coordinateList = sTrack.coordinateList;
@@ -109,6 +127,7 @@ Track& Track::operator=( const Track& sTrack )
   name = sTrack.name;
   startStation = sTrack.startStation;
   endStation = sTrack.endStation;
+  hasValidCoordinates = sTrack.hasValidCoordinates;
   maxAllowedSpeed = sTrack.maxAllowedSpeed;
   trackID = sTrack.trackID;
   coordinateList = sTrack.coordinateList;
@@ -120,16 +139,30 @@ Track& Track::operator=( const Track& sTrack )
 }
 
 /*!
- * Adds train tothe train network. The location of the train will be set in
+ * Adds train to the track.
  *
- * @param sTrack The Track object that acts as the original for this object.
+ * @param trainID The id of the train to add.
+ *
+ * @return bool telling whether it was possible to add the train.
+ *
+ * @todo Check for errors
  */
 bool Track::addTrain(int trainID){
   trainsOnTrackQueue.enqueue(trainID);
   emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "AVAILABLE");
-  return false;
+  return true;
 }
 
+/*!
+ * Delete train from the list of trains on the track.
+ *
+ * @param trainID The id of the train to remove
+ *
+ * @return bool telling whether it was possible to add the train.
+ *
+ * @todo Add Assert
+ * @todo Analyse whether this is called or not
+ */
 bool Track::deleteTrain(int trainID){
   if(trainsOnTrackQueue.isEmpty()){
     qDebug()<<"ERROR  : Trying to remove rom an empty queue";
@@ -147,17 +180,35 @@ bool Track::deleteTrain(int trainID){
   return false;
 }
 
+/*!
+ * The method is only used when deleting the networkControl object and will
+ * set the total number ofstations to zero. This is done mainly in the tests
+ * to ensure that the test environment is reset.
+ */
 void Track::destructorResetTotalNumberOfTracks()
 {
   totalNbrOfTracks = 0;
 }
 
-//TODO: CHECK FOR COORDINATES!
+/*!
+ * The method calculates the coordinates for a position on the track.
+ *
+ * @param position Position along the track in meters.
+ *
+ * @return The coordinates for the position.
+ */
 QList<float> Track::getCoordinatesFromPosition(int position)
 {
   int iii;
   float fractionOfLeg;
   QList<float> thisList;
+  if(!this->hasValidCoordinates)
+  {
+    qDebug()<<"ERROR   : Trying to get coordinates from "<< this->getName();
+    qDebug()<<"that has no coordinates";
+    thisList<<0.0<<0.0;
+    return thisList;
+  }
   for (iii=0; iii < coordinateList.length(); iii++){
     if (coordinateCumulatedDistanceList.at(iii) >= position){
       iii--;
@@ -214,9 +265,11 @@ QString Track::getName() {return name;}
  * @return startStation The station ID for the startStation for this Track
  *                      object.
  */
-int Track::getStartStation() { return startStation; }
+int Track::getStartStation(){ return startStation;}
 
-int Track::getTotalNbrOfTracks(){ return totalNbrOfTracks; }
+int Track::getTotalNbrOfTracks(){ return totalNbrOfTracks;}
+
+bool Track::hasCoordinates(){ return hasValidCoordinates;}
 
 /*!
  * The method prepares and sends a dataChangedSignal to trafficDataModel to

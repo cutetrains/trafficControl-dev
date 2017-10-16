@@ -28,7 +28,31 @@
 using namespace std;
 
 /*!
- * This method imports a network from a file to the program.
+ * This method imports a list of network commands from a file to the program.
+ *
+ * @param inputLine One network commands as a QStringList.
+ *
+ * @return Success of Failure
+ */
+bool NetworkControl::parseMultipleNetworkCommand(QStringList inputLines)
+{
+  bool result = true;
+
+  foreach(QString thisString, inputLines)
+  {
+    qDebug()<<thisString;
+    result = result && parseNetworkCommand(thisString);
+  }
+  return result;
+}
+
+/*!
+ * This method imports a network command from a file to the program.
+ *
+ * @param inputLine One network command.
+ *
+ * @return Success of Failure
+ *
  * @todo: If this part becomes too extensive, place this code in a separate source file.
  * @todo: Introduce consistensy checks for files.
  */
@@ -245,11 +269,11 @@ bool NetworkControl::parseNetworkCommand(QString inputLine)
           }
       }
   }
-
   if (!approvedCommand){
       qDebug()<<"ERROR  : TC:IPN Command not recognised: "<<inputLine;
   }
   return approvedCommand;
+
   //ui->trainListTableView->resizeColumnsToContents();
   //ui->trackListTableView->resizeColumnsToContents();
   //ui->stationListTableView->resizeColumnsToContents();
