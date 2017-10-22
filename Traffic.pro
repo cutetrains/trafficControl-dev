@@ -26,7 +26,7 @@ SOURCES += src/main.cpp \
     src/tcnetworkcontrol.cpp \
     src/tcnetworkcontrolcommandparser.cpp
 
-UNCOMMENT OUT SECTION BELOW TO TEST
+#UNCOMMENT OUT SECTION BELOW TO TEST
 debug {
     GOOGLETEST_DIR = $$PWD/../googletest
     include(gtest_dependency.pri)
@@ -35,7 +35,9 @@ debug {
     CONFIG += thread
     SOURCES -= src/main.cpp
     SOURCES +=     test/mainTest.cpp
-    HEADERS +=     test/tst_tcUnitTests.h
+    HEADERS +=     test/tst_tcStationTests.h \
+    test/tst_tcNetworkTests.h \
+    test/tst_tcTrainTests.h
 }
 
 HEADERS  += inc/trafficcontrol.h \
@@ -44,8 +46,7 @@ HEADERS  += inc/trafficcontrol.h \
     inc/tctrain.h \
     inc/trafficclock.h \
     inc/trafficdatamodel.h \
-    inc/tcnetworkcontrol.h \
-    test/tst_tcStationTests.h
+    inc/tcnetworkcontrol.h
 
 FORMS    += trafficcontrol.ui
 

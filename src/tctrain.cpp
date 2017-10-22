@@ -44,7 +44,7 @@ Train::Train(QString trainName,
 {
   //trainName = QString::fromUtf16(tn.utf16());
   name = trainName;
-  nbrOfSeats = 100;
+  passengerCapacity = 100;
   positionOnTrack = 0;
   nbrOfPassengers = 0;
   desiredSpeed = 0;
@@ -160,7 +160,8 @@ int Train::getDesiredSpeed() { return desiredSpeed; }
 int Train::getID() { return trainID;}
 
 /*!
- * Get the current location on the Train's trip plan. The method getTrainRouteVector will give the entire trip plan.
+ * Get the current location on the Train's trip plan. The method
+ * getTrainRouteVector will give the entire trip plan.
  *
  * @return trainRouteIndex The position of the Train's trip plan.
  */
@@ -173,6 +174,25 @@ int Train::getIndexTravelPlanByStationID() {return nextIndexTravelPlanByStationI
  */
 QString Train::getName(){ return name; }
 
+/*!
+ * Get the number of passengers on the train.
+ *
+ * @return number of passengers on the train
+ */
+int Train::getNbrOfPassengers(){ return nbrOfPassengers;}
+
+/*!
+ * Get the number of seats of the train.
+ *
+ * @return number of seats.
+ */
+int Train::getPassengerCapacity(){ return passengerCapacity;}
+
+/*!
+ * Get the total number of trains.
+ *
+ * @return total number of trains in the network.
+ */
 int Train::getTotalNbrOfTrains(){ return totalNbrOfTrains; }
 
 /*!
@@ -195,9 +215,18 @@ QList<int> Train::getTravelPlan() {return travelPlanByStationID;}
  * Load some passengers to the train.
  *
  * @todo The load function is faulty. Also send a signal.
- * @param n The numer of passengers to load to the train.
+ * @param nbrOfPassengersToLoad The numer of passengers to load to the train.
+ *                              This number can be negative for unloading.
  */
-void Train::load( int n) {n++;}
+int Train::load(int nbrOfPassengersToLoad) {
+  int newNbrOfPassengers = min(passengerCapacity,
+                               max(0,
+                                   nbrOfPassengers + nbrOfPassengersToLoad));
+  int deniedPassengers =  (nbrOfPassengersToLoad -
+                           (newNbrOfPassengers - nbrOfPassengers));
+  nbrOfPassengers = newNbrOfPassengers;
+  return deniedPassengers;
+}
 
 /*!
  * This state reflects when the train is at a station and loading passengers.
@@ -498,11 +527,7 @@ void Train::setTrackPosition(int n)
       emit qmlTrainPositionSignal(this->getName(),
                                   trainCoordinates.at(0),
                                   trainCoordinates.at(1));
-    } //else  {
-      //trainCoordinates.clear();
-      //trainCoordinates<<0.0<<0.0;
-    //}
-
+    }
   }
   sendDataChangedSignal(trainID);
 }
@@ -512,7 +537,7 @@ void Train::setTrackPosition(int n)
  */
 void Train::showInfo()
 {
-  qDebug() << "INFO   : "<< name <<" has " << nbrOfSeats << " seats.  "
+  qDebug() << "INFO   : "<< name <<" has " << passengerCapacity << " seats.  "
            << nbrOfPassengers << " are taken. ";
   if(UNDEFINED != currentTrack)
   {

@@ -1,4 +1,6 @@
-#include "tst_tcUnitTests.h"
+#include "tst_tcNetworkTests.h"
+#include "tst_tcStationTests.h"
+#include "tst_tcTrainTests.h"
 #include <gtest/gtest.h>
 
 int main(int argc, char *argv[])

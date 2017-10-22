@@ -47,7 +47,7 @@ private:
   int nextIndexTravelPlanByStationID;
   int nextTrack;
   int nbrOfPassengers;
-  int nbrOfSeats;
+  int passengerCapacity;
   bool passing;
   int state;
   QHash<QString, int> stateTable;
@@ -76,10 +76,12 @@ public:
   int getID();
   int getIndexTravelPlanByStationID();
   QString getName();
+  int getNbrOfPassengers();
+  int getPassengerCapacity();
   int getTotalNbrOfTrains();
   int getTrackPosition();
   QList<int> getTravelPlan();
-  void load(int n);
+  int load(int nbrOfPassengersToLoad);
   int loadingState(int n);
   int move(int n);//if train shall wait for other elements, return int>0.
   int openingState(int n);
