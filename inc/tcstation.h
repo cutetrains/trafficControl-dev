@@ -65,6 +65,7 @@ public:
   float getLongitude();
   QString getName();
   QList<int> getLeavingTrackList();
+  int getNbrOfPlatforms();
   int getTotalNbrOfStations();
   QList<int> getTrainList();
   int getNbrOfWaitingPassengers();
@@ -72,9 +73,10 @@ public:
   bool isJunction();
   void destructorResetTotalNumberOfStations();
   void sendDataChangedSignal(int stationID);
+  bool setNbrOfPlatforms(int nbrOfPlatforms);
   void showInfo();
-  void trainArrival(int trainID);
-  void trainDeparture(int trainID);
+  bool trainArrival(int trainID);
+  bool trainDeparture(int trainID);
 };
 
 #endif

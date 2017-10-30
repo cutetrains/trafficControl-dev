@@ -173,13 +173,12 @@ bool NetworkControl::parseNetworkCommand(QString inputLine)
     exit(1);
   }
 
-  /* ADD TRAIN NAME <train name> */
+  /* ADD TRAIN <train name> */
   if ((0 == argumentList.indexOf("ADD")) &&
       (1 == argumentList.indexOf("TRAIN")) &&
-      (2 == argumentList.indexOf("NAME")) &&
-      (4 == argumentList.count())){
+      (3 == argumentList.count())){
     //qDebug()<<"INFO   : ADD TRAIN recognised";
-    addTrainToNetwork(QString(argumentList.at(3)));
+    addTrainToNetwork(QString(argumentList.at(2)));
     cmdParserCurrentTrain=trainList.length()-1;
     approvedCommand=true;
   }

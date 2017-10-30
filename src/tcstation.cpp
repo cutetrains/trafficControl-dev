@@ -243,6 +243,18 @@ float Station::getLongitude() {
   }
 }
 
+/*!
+ * The method returns the number of platforms.
+ *
+ * @return nbrOfPlatforms The number of platfoms/tracks on the station.
+ */
+int Station::getNbrOfPlatforms(){ return numberOfPlatforms;}
+
+/*!
+ * The method returns the number of platforms.
+ *
+ * @return nbrOfPlatforms The number of platfoms/tracks on the station.
+ */
 int Station::getTotalNbrOfStations(){ return totalNbrOfStations; }
 
 /*!
@@ -281,6 +293,23 @@ void Station::sendDataChangedSignal(int stationID){
 }
 
 /*!
+ * The method specifies the number of platforms. The default number of
+ * platforms is 2.
+ *
+ * @param nbrOfPlatforms The new number of platfoms/tracks on the station.
+ */
+bool Station::setNbrOfPlatforms(int nbrOfPlatforms){
+  if(numberOfPlatforms > 0){
+    numberOfPlatforms = nbrOfPlatforms;
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+
+/*!
  * The method shows information about the Station object (Name, number of
  * waiting passengers, number of leaving tracks) to the console.
  * @todo Check if a foreach statement can simplify the code.
@@ -301,17 +330,26 @@ void Station::showInfo() {
  *
  * @param trainID The ID of the train.
  */
-void Station::trainArrival(int trainID)
+bool Station::trainArrival(int trainID)
 {
   if(trainsAtStationList.length() >= numberOfPlatforms)
   {
     qDebug()<<"ERROR  : TOO MANY TRAINS!" <<thisTrainList->at(trainID)->getName()<<
               " arrived to the full station" << this->getName();
+    return false;
   }
   else
   {
+    if(trainsAtStationList.contains(trainID))
+    {
+      bool result = false;
+      Q_ASSERT_X(result,
+                 Q_FUNC_INFO,
+                 "Station::Arrival, the train is already at the station!");
+    }
     trainsAtStationList<<trainID;
     emit qmlStationOccupancySignal(this->getName(), trainsAtStationList.length(), numberOfPlatforms);
+    return true;
   }
 }
 
@@ -320,8 +358,10 @@ void Station::trainArrival(int trainID)
  * emits a signal to QML.
  *
  * @param trainID The ID of the train.
+ *
+ * @return true/false depending on whether the removal was successful
  */
-void Station::trainDeparture(int trainID)
+bool Station::trainDeparture(int trainID)
 {
   bool removalSuccess = trainsAtStationList.removeOne(trainID);
   if(removalSuccess)
@@ -332,6 +372,7 @@ void Station::trainDeparture(int trainID)
   {
     qDebug()<<"ERROR  : Train departure failed";
   }
+  return removalSuccess;
 }
 
 Station::~Station()

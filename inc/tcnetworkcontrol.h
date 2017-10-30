@@ -18,7 +18,6 @@
 #ifndef TCNETWORKCONTROL_H
 #define TCNETWORKCONTROL_H
 
-//#include <QMainWindow>
 #include <QObject>
 #include <QDebug>
 #include <QThread>
@@ -58,10 +57,11 @@ public slots:
                            bool isJunction,
                            QString lat,
                            QString lon);
-  int connectTrackToStations(QString trackName,
+  bool connectTrackToStations(QString trackName,
                              QString startStationName,
                              QString endStationName);
-  int connectTrackToStations(int trackID,
+  /* Two functions that are doing the same thing. Simplify */
+  bool connectTrackToStations(int trackID,
                              int startStationID,
                              int endStationID);
   bool parseNetworkCommand(QString inputLine);

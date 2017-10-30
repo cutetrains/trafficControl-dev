@@ -197,18 +197,34 @@ void NetworkControl::addStationToNetwork(QString stationName,
  *
  * @TODO Add error detection
  */
-int NetworkControl::connectTrackToStations(int trackID,
+bool NetworkControl::connectTrackToStations(int trackID,
                                            int startStationID,
                                            int endStationID)
 {
-  trackList[trackID]->setStartStation(startStationID);
-  trackList[trackID]->setEndStation(endStationID);
-  stationList[startStationID]->addTrack(trackID);
-  return 1;
+
+  if(trackID != UNDEFINED && trackID < trackList.length() &&
+     startStationID != UNDEFINED && startStationID < stationList.length() &&
+     endStationID != UNDEFINED && endStationID < stationList.length() &&
+     startStationID != endStationID){
+    if(trackList.at(trackID)->getStartStation() == UNDEFINED)
+    {
+      trackList.at(trackID)->setStartStation(startStationID);
+    }
+    if(trackList.at(trackID)->getEndStation() == UNDEFINED)
+    {
+      trackList.at(trackID)->setEndStation(endStationID);
+    }
+    stationList[startStationID]->addTrack(trackID);
+    return true;
+  } else {
+    qDebug()<<"ERROR  : TC:cTTS: Either track or station name is not found.";
+    return false;
+  }
 }
 
 /*!
- * The method connects at Track object to a Start Station and an End Station.
+ * The method finds the IDs for the track and station and invokes the connect
+ * method that is based on IDs.
  *
  * @param trackName The name of the track.
  * @param startStationName The name of the start station for the track.
@@ -218,64 +234,37 @@ int NetworkControl::connectTrackToStations(int trackID,
  *
  * @todo Add error handling
  */
-int NetworkControl::connectTrackToStations(QString trackName,
+bool NetworkControl::connectTrackToStations(QString trackName,
                                            QString startStationName,
                                            QString endStationName)
 {
   int foundStartStationID = UNDEFINED;
   int foundEndStationID = UNDEFINED;
   int foundTrackID = UNDEFINED;
-  if(QString::compare(startStationName, endStationName) == 0)
+  foreach(Station* thisStation, stationList)
   {
-    qDebug()<<"TC:cTTS: Station names are equal";
-    return 0;
-  }
-  else
-  {
-    foreach(Station* thisStation, stationList)
-    {
       if (QString::compare(startStationName, thisStation->getName()) == 0)
       {
-        foundStartStationID=thisStation->getID();
+          foundStartStationID=thisStation->getID();
       }
       if (QString::compare(endStationName, thisStation->getName()) == 0)
       {
-        foundEndStationID=thisStation->getID();
+          foundEndStationID=thisStation->getID();
       }
       if ((foundStartStationID != UNDEFINED) &&
-          (foundEndStationID != UNDEFINED))
-        {
+              (foundEndStationID != UNDEFINED))
+      {
           break;
-        }
       }
-    }
-    foreach(Track* thisTrack, trackList){
+  }
+  foreach(Track* thisTrack, trackList){
       if(QString::compare(trackName, thisTrack->getName()) == 0)
       {
-        foundTrackID=thisTrack->getID();
-        break;
+          foundTrackID=thisTrack->getID();
+          break;
       }
-    }
-  if ((foundStartStationID != UNDEFINED) &&
-       (foundEndStationID != UNDEFINED) &&
-       (foundTrackID != UNDEFINED))
-  {
-    if(trackList.at(foundTrackID)->getStartStation() == UNDEFINED)
-    {
-      trackList.at(foundTrackID)->setStartStation(foundStartStationID);
-    }
-    if(trackList.at(foundTrackID)->getEndStation() == UNDEFINED)
-    {
-      trackList.at(foundTrackID)->setEndStation(foundEndStationID);
-    }
-    stationList.at(foundStartStationID)->addTrack(foundTrackID);//
   }
-  else
-  {
-    qDebug()<<"ERROR  : TC:cTTS: Either track or station name is not found.";
-    return 0;
-  }
-  return 1;
+  return this->connectTrackToStations(foundTrackID, foundStartStationID, foundEndStationID);
 }
 
 /*!
