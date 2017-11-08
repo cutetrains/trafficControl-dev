@@ -147,7 +147,7 @@ Track& Track::operator=( const Track& sTrack )
  *
  * @todo Check for errors
  */
-bool Track::addTrain(int trainID){
+bool Track::addTrainToTrack(int trainID){
   trainsOnTrackQueue.enqueue(trainID);
   emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "AVAILABLE");
   return true;
@@ -163,7 +163,7 @@ bool Track::addTrain(int trainID){
  * @todo Add Assert
  * @todo Analyse whether this is called or not
  */
-bool Track::deleteTrain(int trainID){
+bool Track::deleteTrainFromTrack(int trainID){
   if(trainsOnTrackQueue.isEmpty()){
     qDebug()<<"ERROR  : Trying to remove rom an empty queue";
     return false;

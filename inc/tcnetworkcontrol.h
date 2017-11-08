@@ -49,7 +49,7 @@ public:
   TrafficClock trafficClock;
 
 public slots:
-  void addTrackToNetwork(QString trackName,
+  bool addTrackToNetwork(QString trackName,
                          int trackLength,
                          QStringList coordinates);
   void addTrainToNetwork(QString trainName);
@@ -64,7 +64,7 @@ public slots:
   bool connectTrackToStations(int trackID,
                              int startStationID,
                              int endStationID);
-  bool parseNetworkCommand(QString inputLine);
+  bool parseCmd(QString inputLine);
   bool parseMultipleNetworkCommand(QStringList inputLines);
   void onRunThreadCheckBoxChanged(int newState);
   void onTickIntervalChanged(int newInterval);

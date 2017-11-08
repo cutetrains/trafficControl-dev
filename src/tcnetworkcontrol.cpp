@@ -75,10 +75,12 @@ NetworkControl::NetworkControl(TrafficDataModel &trackListModel,
  * @param trackName Name of the track
  * @param trackLength Length of the track [Unit: m]
  */
-void NetworkControl::addTrackToNetwork(QString trackName,
+bool NetworkControl::addTrackToNetwork(QString trackName,
                                        int trackLength,
                                        QStringList coordinates)
 {
+  if(trackLength <= 0) { return false; }
+
   Track* newTrack = new Track(trackName,
                               trackLength,
                               coordinates,
@@ -107,6 +109,7 @@ void NetworkControl::addTrackToNetwork(QString trackName,
             SLOT(qmlTrackStatusSlot(QVariant, QVariant, QVariant)));
   }
   newTrack = NULL;
+  return true;
 }
 
 /*!

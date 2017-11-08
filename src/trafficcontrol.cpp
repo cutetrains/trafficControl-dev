@@ -87,7 +87,7 @@ bool TrafficControl::readNetworkDefinitionFromFile()
   {
     //line = in.readLine();
     fileStrings << in.readLine();
-    //networkControl->parseNetworkCommand(line);
+    //networkControl->parseCmd(line);
   }
   file.close();
   networkControl->parseMultipleNetworkCommand(fileStrings);

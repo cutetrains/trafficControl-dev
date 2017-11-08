@@ -41,7 +41,7 @@ bool NetworkControl::parseMultipleNetworkCommand(QStringList inputLines)
   foreach(QString thisString, inputLines)
   {
     qDebug()<<thisString;
-    result = result && parseNetworkCommand(thisString);
+    result = result && parseCmd(thisString);
   }
   return result;
 }
@@ -56,7 +56,7 @@ bool NetworkControl::parseMultipleNetworkCommand(QStringList inputLines)
  * @todo: If this part becomes too extensive, place this code in a separate source file.
  * @todo: Introduce consistensy checks for files.
  */
-bool NetworkControl::parseNetworkCommand(QString inputLine)
+bool NetworkControl::parseCmd(QString inputLine)
 {
   QStringList argumentList=inputLine.split(" ");
   bool approvedCommand = false;
@@ -81,16 +81,17 @@ bool NetworkControl::parseNetworkCommand(QString inputLine)
       if ( 4 == argumentList.count() )
       {
         QStringList emptyCoordinates;
-        addTrackToNetwork(argumentList.at(2), iLength, emptyCoordinates);
-        approvedCommand = true;
+        approvedCommand = addTrackToNetwork(argumentList.at(2), iLength, emptyCoordinates);
+      }
+      else if (4 == argumentList.indexOf("COORDINATES")  &&
+             ( argumentList.count()%2 == 1 ) ){
+        approvedCommand = addTrackToNetwork(argumentList.at(2), iLength, argumentList.mid(5,-1));
+
+      }
+      if(approvedCommand) {
         cmdParserCurrentTrack = trackList.length()-1;
       }
-     else if (4 == argumentList.indexOf("COORDINATES")  &&
-             ( argumentList.count()%2 == 1 ) ){
-        addTrackToNetwork(argumentList.at(2), iLength, argumentList.mid(5,-1));
-        approvedCommand = true;
-        cmdParserCurrentTrack = trackList.length()-1;
-  } } }
+  } }
 
   /* TRACK SELECT <track name> */
   if ((0 == argumentList.indexOf("TRACK")) &&

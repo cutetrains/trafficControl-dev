@@ -56,8 +56,8 @@ public:
           QList<Station*>& stationList);
   ~Station();
 
-  void addTrack(int trackID); //To be handled in trafficcontrol
-  void changeNbrOfPassengers(int n);
+  bool addTrack(int trackID); //To be handled in trafficcontrol
+  bool changeNbrOfPassengers(int n);
   bool checkIfTrackLeavesStation(int trackID);
   int findLeavingTrackIndexToStation(int targetStationID);
   int getID();

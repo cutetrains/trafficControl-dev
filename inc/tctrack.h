@@ -60,8 +60,8 @@ public:
   Track& operator=(const Track& sTrack);
   ~Track();
 
-  bool addTrain(int trainID);
-  bool deleteTrain(int trainID);
+  bool addTrainToTrack(int trainID);
+  bool deleteTrainFromTrack(int trainID);
   void destructorResetTotalNumberOfTracks();
   QList<float> getCoordinatesFromPosition(int position);
   int getEndStation();

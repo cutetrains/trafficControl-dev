@@ -95,16 +95,20 @@ Station::Station(QString stationName,
  *       stations.
  * @todo Check if track is already connected to the station
  */
-void Station::addTrack(int trackID) {
-  if (trackID<= -1 ){
+bool Station::addTrack(int trackID) {
+  if (trackID<= -1 ||
+      trackID > thisTrackList->length() - 1 ||
+      this->leavingTrackList.contains(trackID)){
     qDebug()<<"ERROR  : Station::addTrack" << name
-            <<" Error: negative number specified: "<<trackID;
+            <<" Error: bad number specified: "<<trackID;
+    return false;
   }
   else
   {
     leavingTrackList << trackID;
+    sendDataChangedSignal(stationID);
+    return true;
   }
-  sendDataChangedSignal(stationID);
 }
 
 /*!
@@ -113,16 +117,21 @@ void Station::addTrack(int trackID) {
  *
  * @param nbrPassengersToAdd The number of passengers that shall be added to
  *        the station. A negative number means that some passengers are leaving the station.
+ *
+ * @return result
  */
-void Station::changeNbrOfPassengers(int nbrPassengersToAdd) {
+bool Station::changeNbrOfPassengers(int nbrPassengersToAdd) {
   if(this->isJunction())
   {
     qDebug()<<"ERROR  : Tried to change number of passengers for Junction: "<< this->getName();
+    return false;
   }
   else
   {
+    bool result = nbrPassengersToAdd + waitingPassengers<0 ? false: true;
     waitingPassengers = max((waitingPassengers + nbrPassengersToAdd), 0);
     sendDataChangedSignal(stationID);
+    return result;
   }
 }
 
@@ -299,7 +308,7 @@ void Station::sendDataChangedSignal(int stationID){
  * @param nbrOfPlatforms The new number of platfoms/tracks on the station.
  */
 bool Station::setNbrOfPlatforms(int nbrOfPlatforms){
-  if(numberOfPlatforms > 0){
+  if(nbrOfPlatforms > 0){
     numberOfPlatforms = nbrOfPlatforms;
     return true;
   }
@@ -346,6 +355,13 @@ bool Station::trainArrival(int trainID)
       Q_ASSERT_X(result,
                  Q_FUNC_INFO,
                  "Station::Arrival, the train is already at the station!");
+      return false;
+    } else {
+      if(trainID < 0 ||
+         trainID > thisTrainList->length() - 1 )
+      {
+        return false;
+      }
     }
     trainsAtStationList<<trainID;
     emit qmlStationOccupancySignal(this->getName(), trainsAtStationList.length(), numberOfPlatforms);
