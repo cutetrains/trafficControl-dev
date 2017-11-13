@@ -57,7 +57,7 @@ public slots:
                            bool isJunction,
                            QString lat,
                            QString lon);
-  bool connectTrackToStations(QString trackName,
+  bool connectTrackToStationsByName(QString trackName,
                              QString startStationName,
                              QString endStationName);
   /* Two functions that are doing the same thing. Simplify */

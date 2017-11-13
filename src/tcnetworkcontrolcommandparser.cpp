@@ -85,8 +85,33 @@ bool NetworkControl::parseCmd(QString inputLine)
       }
       else if (4 == argumentList.indexOf("COORDINATES")  &&
              ( argumentList.count()%2 == 1 ) ){
-        approvedCommand = addTrackToNetwork(argumentList.at(2), iLength, argumentList.mid(5,-1));
-
+        bool ok;
+        float coordinate;
+        for(int iii=5; iii<argumentList.length();iii++)
+        {
+          coordinate = argumentList.at(iii).toFloat(&ok);
+          if(!ok){break;}
+          if(iii%2 == 0)
+          {
+            if(abs(coordinate) > 180)
+            {
+              ok = false;
+              break;
+            }
+          } else {
+            if(abs(coordinate)>90)
+            {
+              ok = false;
+              break;
+            }
+          }
+        }
+        if(ok){
+          approvedCommand = addTrackToNetwork(argumentList.at(2), iLength, argumentList.mid(5,-1));
+          return true;
+        } else {
+          return false;
+        }
       }
       if(approvedCommand) {
         cmdParserCurrentTrack = trackList.length()-1;
@@ -140,32 +165,27 @@ bool NetworkControl::parseCmd(QString inputLine)
       (1 == argumentList.indexOf("TRACK")) &&
       (3 == argumentList.indexOf("FROM")) &&
       (5 == argumentList.indexOf("TO")) &&
-      (7 == argumentList.count()) ){
+      (7 == argumentList.count()) ) {
       //Check that the second argument reflects an existing track, and that the stations exist.
     int foundTrack = UNDEFINED;
-    //qDebug()<<"INFO   : CONNECT TRACK name FROM station TO station recognised";
-    foreach(Track* t, trackList){
-      if (t->getName()==argumentList.at(2)) {foundTrack=t->getID();
+    foreach(Track* t, trackList) {
+      if (t->getName()==argumentList.at(2)) { foundTrack=t->getID(); }
     }
     int foundStartStation = UNDEFINED;
     int foundEndStation = UNDEFINED;
-    foreach(Station* s, stationList){
-      if(s->getName()==argumentList.at(4)){
-        foundStartStation=s->getID();
-      }
-      if(s->getName()==argumentList.at(6)){
-        foundEndStation=s->getID();
-      }
+    foreach(Station* s, stationList) {
+      if(s->getName()==argumentList.at(4)) { foundStartStation=s->getID(); }
+      if(s->getName()==argumentList.at(6)) { foundEndStation=s->getID(); }
     }
     if ((foundStartStation != UNDEFINED) &&
         (foundEndStation != UNDEFINED) &&
         (foundStartStation != foundEndStation) &&
-        (foundTrack != UNDEFINED)){
-      connectTrackToStations(argumentList.at(2),
-                             argumentList.at(4),
-                             argumentList.at(6));
+        (foundTrack != UNDEFINED)) {
+      connectTrackToStationsByName(argumentList.at(2),
+                                   argumentList.at(4),
+                                   argumentList.at(6));
       approvedCommand=true;
-  } } }
+  } }
 
   //Code for analysing train commands
   if ((0 == argumentList.indexOf("TRAIN")) &&

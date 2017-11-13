@@ -37,12 +37,9 @@ TEST_F(stationTest, addTrackToStation)
   nc->parseCmd("ADD TRACK trackB 2345");
   EXPECT_THAT(nc->stationList.at(0)->addTrack(0), Eq(true));
   EXPECT_THAT(nc->stationList.at(0)->addTrack(1), Eq(true));
-  EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().at(0),
-              Eq(0));
-  EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().at(1),
-              Eq(1));
-  EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().length(),
-              Eq(2));
+  EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().at(0), Eq(0));
+  EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().at(1), Eq(1));
+  EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().length(), Eq(2));
 }
 
 TEST_F(stationTest, addInvalidTrackToStation)
@@ -80,7 +77,7 @@ TEST_F(stationTest, connectNonExistingTrackToStations)
   nc->parseCmd("ADD STATION stationB");
   EXPECT_THAT(nc->connectTrackToStations(0, 0, 1), Eq(false));
   EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().length(),Eq(0));
-  EXPECT_THAT(nc->connectTrackToStations("nonExistingTrack", "stationA", "stationB"), Eq(false));
+  EXPECT_THAT(nc->connectTrackToStationsByName("nonExistingTrack", "stationA", "stationB"), Eq(false));
 }
 
 TEST_F(stationTest, connectTrackToStations)
@@ -88,7 +85,7 @@ TEST_F(stationTest, connectTrackToStations)
   nc->parseCmd("ADD STATION stationA");
   nc->parseCmd("ADD STATION stationB");
   nc->parseCmd("ADD TRACK trackA 1234");
-  EXPECT_THAT(nc->connectTrackToStations("trackA",
+  EXPECT_THAT(nc->connectTrackToStationsByName("trackA",
                                                      "stationA",
                                                      "stationB"),
                                                          Eq(true));
@@ -107,34 +104,31 @@ TEST_F(stationTest, connectTrackToStations)
 }
 
 TEST_F(stationTest, connectBidirectionalTrackToStations)
-{/* Verify the track's start/end stations are not overwritten when a bithat the network can't connect a non-existing track to a station */
+{/* Verify the track's start/end stations are not overwritten when the track
+  * is connected in the opposite direction between two stations
+  */
   nc->parseCmd("ADD STATION stationA");
   nc->parseCmd("ADD STATION stationB");
   nc->parseCmd("ADD TRACK trackA 1234");
-  EXPECT_THAT(nc->connectTrackToStations("trackA",
-                                                     "stationA",
-                                                     "stationB"),
-                                                         Eq(true));
-  EXPECT_THAT(nc->connectTrackToStations("trackA",
-                                                     "stationB",
-                                                     "stationA"),
-                                                         Eq(true));
+  EXPECT_THAT(nc->parseCmd("CONNECT TRACK trackA FROM stationA TO stationB"),
+                           Eq(true));
+  EXPECT_THAT(nc->parseCmd("CONNECT TRACK trackA FROM stationB TO stationA"),
+                           Eq(true));
   EXPECT_THAT(nc->trackList.at(0)->getStartStation(), Eq(0));
   EXPECT_THAT(nc->trackList.at(0)->getEndStation(), Eq(1));
-  EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().at(0),
-              Eq(0));
+  EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().at(0), Eq(0));
 }
 
 TEST_F(stationTest, constructor_invalidFloatCoordinatesAtCreation)
 { /* Verify that station will ignore invalid coordinates at creation, for
      example 95 N, 100W*/
-  nc->parseCmd(
-    "ADD STATION station COORDINATES 105.7272962532263 13.16723731495294");
+  nc->parseCmd("ADD STATION station COORDINATES "
+               "105.7272962532263 13.16723731495294");
   EXPECT_THAT(nc->stationList.at(0)->getLatitude(), Eq(0.0));
   EXPECT_THAT(nc->stationList.at(0)->getLongitude(), Eq(0.0));
   EXPECT_THAT(nc->stationList.at(0)->hasCoordinates(), Eq(false));
-  nc->parseCmd(
-    "ADD STATION station COORDINATES 55.7272962532263 213.16723731495294");
+  nc->parseCmd("ADD STATION station COORDINATES "
+               "55.7272962532263 213.16723731495294");
   EXPECT_THAT(nc->stationList.at(1)->getLatitude(), Eq(0.0));
   EXPECT_THAT(nc->stationList.at(1)->getLongitude(), Eq(0.0));
   EXPECT_THAT(nc->stationList.at(1)->hasCoordinates(), Eq(false));
@@ -150,12 +144,9 @@ TEST_F(stationTest, constructor_junctionHasNoPassengersAfterAddingTen)
 
 TEST_F(stationTest, constructor_leavingTrackListEmptyAtCreation)
 { /* Verify that station has no defined leaving tracks at creation */
-  nc->addStationToNetwork("station",
-                                      false,
-                                     "55.7272962532263",
-                                     "13.16723731495294");
-  EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().length(),
-              Eq(0));
+  nc->parseCmd("ADD STATION station COORDINATES "
+               "55.7272962532263 13.16723731495294");
+  EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().length(), Eq(0));
 }
 
 TEST_F(stationTest, constructor_noCoordinatesAtCreation)
@@ -168,16 +159,13 @@ TEST_F(stationTest, constructor_noCoordinatesAtCreation)
 TEST_F(stationTest, constructor_noLeavingTracksAfterCreation)
 { /*Verify that the station has no leaving tracks after creation */
   nc->parseCmd("ADD STATION station");
-  EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().length(),
-              Eq(0));
+  EXPECT_THAT(nc->stationList.at(0)->getLeavingTrackList().length(), Eq(0));
 }
 
 TEST_F(stationTest, constructor_nonNumericalCoordinatesAtCreation)
 { /* Verify that station will ignore invalid coordinates at creation*/
-  nc->addStationToNetwork("station",
-                                      false,
-                                      "55.727hej52532263",
-                                      "13.16723731495294");
+  nc->parseCmd("ADD STATION station COORDINATES "
+               "55.727hej2962532263 13.16723731495294");
   EXPECT_THAT(nc->stationList.at(0)->getLatitude(), Eq(0.0));
   EXPECT_THAT(nc->stationList.at(0)->getLongitude(), Eq(0.0));
   EXPECT_THAT(nc->stationList.at(0)->hasCoordinates(), Eq(false));
@@ -186,30 +174,23 @@ TEST_F(stationTest, constructor_nonNumericalCoordinatesAtCreation)
 TEST_F(stationTest, constructor_noPassengersAfterCreated)
 { /* Verify that the station has no passengers after created */
   nc->parseCmd("ADD STATION station");
-  EXPECT_THAT(nc->stationList.at(0)->getNbrOfWaitingPassengers(),
-              Eq(0));
+  EXPECT_THAT(nc->stationList.at(0)->getNbrOfWaitingPassengers(), Eq(0));
 }
 
 TEST_F(stationTest, constructor_noTrainsAfterCreation)
 { /* Verify that the station has no trains after created */
   nc->parseCmd("ADD STATION station");
-  EXPECT_THAT(nc->stationList.at(0)->getTrainList().length(),
-              Eq(0));
+  EXPECT_THAT(nc->stationList.at(0)->getTrainList().length(), Eq(0));
 }
 
 TEST_F(stationTest, constructor_validCoordinatesAtCreation)
 { /* Will station add coordinates and set "hasCoordinates=TRUE"*/
   QString latitude = "55.72729652532263";
   QString longitude = "13.16723731495294";
-  nc->addStationToNetwork("station",
-                                      false,
-                                      latitude,
-                                      longitude);
+  nc->addStationToNetwork("station", false, latitude, longitude);
   EXPECT_THAT(nc->stationList.at(0)->hasCoordinates(), Eq(true));
-  EXPECT_THAT(nc->stationList.at(0)->getLatitude(),
-              Eq(latitude.toFloat()));
-  EXPECT_THAT(nc->stationList.at(0)->getLongitude(),
-              Eq(longitude.toFloat()));
+  EXPECT_THAT(nc->stationList.at(0)->getLatitude(), Eq(latitude.toFloat()));
+  EXPECT_THAT(nc->stationList.at(0)->getLongitude(), Eq(longitude.toFloat()));
 }
 
 TEST_F(stationTest, constructor_validNegativeCoordinatesAtCreation)
@@ -217,10 +198,7 @@ TEST_F(stationTest, constructor_validNegativeCoordinatesAtCreation)
      "hasCoordinates=TRUE"*/
   QString latitude = "-55.72729652532263";
   QString longitude = "-13.16723731495294";
-  nc->addStationToNetwork("station",
-                                      false,
-                                      latitude,
-                                      longitude);
+  nc->addStationToNetwork("station", false, latitude, longitude);
   EXPECT_THAT(nc->stationList.at(0)->hasCoordinates(), Eq(true));
   EXPECT_THAT(nc->stationList.at(0)->getLatitude(),
               Eq(latitude.toFloat()));
@@ -351,14 +329,12 @@ TEST_F(stationTest, trainListAfterAddingTwo)
 { /*Verify that the trainList is populated and depopulated properly */
   nc->parseCmd("ADD STATION station");
   EXPECT_THAT(nc->stationList.at(0)->getTrainList().length(), Eq(0));
-
-  nc->addTrainToNetwork("TrainA");
+  nc->parseCmd("ADD TRAIN trainA");
   EXPECT_THAT(nc->trainList.at(0)->getID(), Eq(0));
-
-  nc->trainList.at(0)->setCurrentStation(0); //Add train to station
+  nc->parseCmd("TRAIN SET CURRENT STATION station");
   EXPECT_THAT(nc->stationList.at(0)->getTrainList().at(0), Eq(0));
-  nc->addTrainToNetwork("TrainB");
-  nc->trainList.at(1)->setCurrentStation(0); //Add train to station
+  nc->parseCmd("ADD TRAIN trainB");
+  nc->parseCmd("TRAIN SET CURRENT STATION station");
   EXPECT_THAT(nc->stationList.at(0)->getTrainList().at(1), Eq(1));
   EXPECT_THAT(nc->stationList.at(0)->getTrainList().length(), Eq(2));
 }
@@ -367,7 +343,6 @@ TEST_F(stationTest, trainListNonExistingTrain)
 { /* Add a train to trainList and remove a non-existing train */
   nc->parseCmd("ADD STATION stationA");
   EXPECT_THAT(nc->stationList.at(0)->trainDeparture(3), Eq(false));
-  // Create two trains
   nc->parseCmd("ADD TRAIN trainA");
   nc->parseCmd("ADD TRAIN trainB");
   EXPECT_THAT(nc->stationList.at(0)->trainArrival(1), Eq(true));
@@ -377,7 +352,6 @@ TEST_F(stationTest, trainListNonExistingTrain)
   EXPECT_THAT(nc->stationList.at(0)->trainArrival(2), Eq(false));
   EXPECT_THAT(nc->stationList.at(0)->trainArrival(-1), Eq(false));
   EXPECT_THAT(nc->stationList.at(0)->getTrainList().length(), Eq(1));
-  EXPECT_THAT(0,Eq(0));
 }
 
 

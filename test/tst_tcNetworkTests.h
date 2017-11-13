@@ -56,12 +56,11 @@ protected:
 TEST_F(networkTest, addOneTrainToStation)
 {
   nc->parseCmd("ADD STATION stationA");
-  nc->addTrainToNetwork("TrainA");
-  nc->trainList.at(0)->setCurrentStation(0);
-
+  nc->parseCmd("ADD TRAIN trainA");
+  EXPECT_THAT(nc->parseCmd("TRAIN SET CURRENT STATION stationA"), Eq(true));
   EXPECT_THAT(nc->stationList.at(0)->getTrainList().length(), Eq(1));
   int firstTrainAtStationA = nc->stationList.at(0)->getTrainList().at(0);
-  EXPECT_THAT(nc->trainList.at(firstTrainAtStationA)->getName(), Eq("TrainA"));
+  EXPECT_THAT(nc->trainList.at(firstTrainAtStationA)->getName(), Eq("trainA"));
 }
 
 TEST_F(networkTest, connectThreeTracksToTwoStations)

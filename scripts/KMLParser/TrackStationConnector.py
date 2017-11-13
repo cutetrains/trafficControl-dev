@@ -15,7 +15,7 @@ def haversine(lon1, lat1, lon2, lat2):  #From rosettacode.org
  
   return R * c
 
-inputfile = "NetworkCoordinates_EnglishCharacters.kml"
+inputfile = "ActiveNetworkCoordinates.kml"
 
 trackList=[] # The track list contains name, line in file, start coordinates, start station name, end coordinates, 
              # end station name, length

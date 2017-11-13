@@ -204,7 +204,6 @@ bool NetworkControl::connectTrackToStations(int trackID,
                                            int startStationID,
                                            int endStationID)
 {
-
   if(trackID != UNDEFINED && trackID < trackList.length() &&
      startStationID != UNDEFINED && startStationID < stationList.length() &&
      endStationID != UNDEFINED && endStationID < stationList.length() &&
@@ -237,7 +236,7 @@ bool NetworkControl::connectTrackToStations(int trackID,
  *
  * @todo Add error handling
  */
-bool NetworkControl::connectTrackToStations(QString trackName,
+bool NetworkControl::connectTrackToStationsByName(QString trackName,
                                            QString startStationName,
                                            QString endStationName)
 {

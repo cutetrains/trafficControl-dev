@@ -96,11 +96,12 @@ Station::Station(QString stationName,
  * @todo Check if track is already connected to the station
  */
 bool Station::addTrack(int trackID) {
+    qDebug()<<"       : Station::addTrack "<<trackID<<" LT" << leavingTrackList;
   if (trackID<= -1 ||
       trackID > thisTrackList->length() - 1 ||
       this->leavingTrackList.contains(trackID)){
     qDebug()<<"ERROR  : Station::addTrack" << name
-            <<" Error: bad number specified: "<<trackID;
+            <<" Error: bad number specified: "<<trackID<<"LT: "<<leavingTrackList;
     return false;
   }
   else
