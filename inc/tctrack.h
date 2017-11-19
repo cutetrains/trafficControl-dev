@@ -41,6 +41,7 @@ private:
   int length;
   int maxAllowedSpeed;
   QString name;
+  bool reversedTraffic;
   int startStation;
   static int totalNbrOfTracks;
   int trackID;
@@ -72,9 +73,11 @@ public:
   int getStartStation();
   int getTotalNbrOfTracks();
   bool hasCoordinates();
+  bool isReversedTraffic();
   void sendDataChangedSignal(int trackID);
   void setEndStation( int stationID);
   void setMaxAllowedSpeed(int n);
+  void setReversedTraffic(bool rt);
   void setStartStation( int stationID);
   void showInfo();
 };

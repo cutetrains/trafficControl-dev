@@ -96,7 +96,6 @@ Station::Station(QString stationName,
  * @todo Check if track is already connected to the station
  */
 bool Station::addTrack(int trackID) {
-    qDebug()<<"       : Station::addTrack "<<trackID<<" LT" << leavingTrackList;
   if (trackID<= -1 ||
       trackID > thisTrackList->length() - 1 ||
       this->leavingTrackList.contains(trackID)){
@@ -169,8 +168,11 @@ void Station::destructorResetTotalNumberOfStations()
 
 /*!
  * The method finds the track index in leavingTrackList to the adjacent
- * station stationID. If no tracks are found, or the station isn't adjacent,
- * the method will return -1.
+ * station stationID.
+ *
+ * If no tracks in preferred direction are found, the method shall search for
+ * tracks in reversed direction. If no tracks are found, or the station isn't
+ * adjacent, the method will return -1.
  *
  * @param stationID The ID of the station to rearch.
  *
@@ -179,11 +181,21 @@ void Station::destructorResetTotalNumberOfStations()
  */
 int Station::findLeavingTrackIndexToStation(int targetStationID)
 {
-  foreach(int i, leavingTrackList)
+  if(this->getID() != targetStationID)
   {
-    if((thisTrackList->at(i)->getEndStation()) == targetStationID)
+    foreach(int i, leavingTrackList)
     {
-      return i;
+      if((thisTrackList->at(i)->getEndStation()) == targetStationID)
+      {
+        return i;
+      }
+    }
+    foreach(int i, leavingTrackList)
+    {
+      if((thisTrackList->at(i)->getStartStation()) == targetStationID)
+      {
+        return i;
+      }
     }
   }
   return UNDEFINED;

@@ -312,14 +312,14 @@ int Train::readyState(int n)
   {
     if ( (nextIndexTravelPlanByStationID ==  (int) travelPlanByStationID.size() - 1  ) &&
          (travelPlanByStationID.at(nextIndexTravelPlanByStationID) == currentStation) )
-    {
+    { // Train at end of travel plan
       state = stateTable.value("STOPPED");
       return 0;
     }
     else
     {
       if (UNDEFINED == nextTrack)
-      {
+      { //Find next station to travel towards
         nextTrack = thisStationList->at(currentStation)
                       ->findLeavingTrackIndexToStation(//What track to next station?
                         travelPlanByStationID.at(nextIndexTravelPlanByStationID));
@@ -350,13 +350,38 @@ int Train::readyState(int n)
  */
 int Train::readyToRunningState(int n)
 {
+  /* Add mutex
+   * Identify whether train willl travel in reversed direction or not
+   * Depart from station
+   * Add train to track
+   * set current track to next track
+   *
+   * Remove mutex
+   */
+
   bool transactionSuccess = false;
+  bool reversedDirectionOnTrack = false;
+  if(thisTrackList->at(nextTrack)->getEndStation() == currentStation)
+  {
+    reversedDirectionOnTrack = true;
+  }
   thisStationList->at(currentStation)->trainDeparture(this->getID());
   currentTrack = nextTrack;
   transactionSuccess = thisTrackList->at(currentTrack)->addTrainToTrack(trainID);
   currentStation = UNDEFINED;//Remove this train from station.
   nextTrack = UNDEFINED;
-  positionOnTrack = 0;//TODO: Check what happens when train is traveling in opposite deirection!
+  if(reversedDirectionOnTrack)
+  {
+    qDebug()<<"reversed track" <<thisTrackList->at(currentTrack)->getLength();
+    positionOnTrack = thisTrackList->at(currentTrack)->getLength();
+    thisTrackList->at(currentTrack)->setReversedTraffic(true);
+  }
+  else
+  {
+    qDebug()<<"Non-reversed track";
+    positionOnTrack = 0;//TODO: Check what happens when train is traveling in opposite deirection!
+    thisTrackList->at(currentTrack)->setReversedTraffic(false);
+  }
   state = stateTable.value("RUNNING");
   if (nextIndexTravelPlanByStationID < ((int) travelPlanByStationID.size() - 1))
   {
@@ -377,22 +402,29 @@ int Train::readyToRunningState(int n)
  */
 int Train::runningState(int n)
 {
-  if(positionOnTrack == thisTrackList->at(currentTrack)->getLength())
+  bool reversed = thisTrackList->at(currentTrack)->isReversedTraffic();
+  int virtualPositionOnTrack = reversed ? thisTrackList->at(currentTrack)->
+                                             getLength()-positionOnTrack :
+                                          positionOnTrack;
+  if(virtualPositionOnTrack == thisTrackList->at(currentTrack)->getLength())
   {
     n = runningToOpeningState(n);
   } else {
     desiredSpeed = (int) min((double)maxSpeed,
                              sqrt((thisTrackList->at(currentTrack)->
-                                     getLength() - positionOnTrack -
+                                     getLength() - virtualPositionOnTrack -
                                      currentSpeed) * 2));
     desiredSpeed = max(desiredSpeed, 1);
-
     if (currentSpeed != desiredSpeed)
     {
       currentSpeed = currentSpeed + (desiredSpeed - currentSpeed) /
                      abs(desiredSpeed-currentSpeed);
     }
-    this->setTrackPosition(positionOnTrack+currentSpeed);
+    virtualPositionOnTrack = virtualPositionOnTrack + currentSpeed;
+    positionOnTrack = reversed ? thisTrackList->at(currentTrack)->getLength() -
+                                        virtualPositionOnTrack :
+                                 virtualPositionOnTrack;
+    this->setTrackPosition(positionOnTrack);
   }
   n--;
   return n;
@@ -409,7 +441,9 @@ int Train::runningToOpeningState(int n)
 {
   //TODO: Consider trains moving in the opposite direction
   bool transactionSuccess = false;
-  currentStation = thisTrackList->at(currentTrack)->getEndStation();
+  currentStation = thisTrackList->at(currentTrack)->isReversedTraffic()?
+                     thisTrackList->at(currentTrack)->getStartStation():
+                     thisTrackList->at(currentTrack)->getEndStation();
   thisStationList->at(currentStation)->trainArrival(this->getID());
   currentSpeed = 0;
   transactionSuccess = thisTrackList->at(currentTrack)->deleteTrainFromTrack(trainID);

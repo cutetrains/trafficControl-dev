@@ -1,6 +1,6 @@
-#define TRACK 1
-#define TRAIN 2
-#define STATION 3
+#ifndef _TST_TCSTATIONTESTS_H_
+#define _TST_TCSTATIONTESTS_H_
+
 #define UNDEFINED -1
 
 using namespace testing;
@@ -367,3 +367,5 @@ TEST_F(stationTest, tenPassengersAfterAddingTen)
 /*void station_invalidName(); // Verify that the station names will contain onl
                                  [a-ö,A-Ö,0-9,-,_] */
 /*void station_verifyName();// Verify that the name is copied correctly */
+
+#endif //_TST_TCSTATIONTESTS_H_

@@ -38,7 +38,8 @@ SOURCES += src/main.cpp \
 #    HEADERS +=     test/tst_tcStationTests.h \
 #    test/tst_tcNetworkTests.h \
 #    test/tst_tcTrainTests.h \
-#    test/tst_tcTrackTests.h
+#    test/tst_tcTrackTests.h \
+#    test/tst_tcTrafficTests.h
 #}
 
 HEADERS  += inc/trafficcontrol.h \

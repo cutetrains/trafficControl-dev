@@ -1,5 +1,5 @@
-#if !defined _TST_TCUNITTESTS_H_
-#define _TST_TCUNITTESTS_H_
+#ifndef _TST_TCNETWORKTESTS_H_
+#define _TST_TCNETWORKTESTS_H_
 
 #include <gtest/gtest.h>
 #include <gmock/gmock-matchers.h>
@@ -65,9 +65,9 @@ TEST_F(networkTest, addOneTrainToStation)
 
 TEST_F(networkTest, connectThreeTracksToTwoStations)
 { /* Verify that station can add leaving Tracks
-   * testStation0 <=  track0 <=  testStation1
-   * testStation0  => track1  => testStation1
-   * testStation0  => track1  => testStation1
+   * testStation0 <-  track0 <-  testStation1
+   * testStation0  -> track1  -> testStation1
+   * testStation0  -> track1  -> testStation1
    */
 
   nc->parseCmd("ADD STATION station0");
@@ -89,6 +89,22 @@ TEST_F(networkTest, connectThreeTracksToTwoStations)
   EXPECT_THAT(nc->trackList.at(1)->getEndStation(), Eq(1));
   EXPECT_THAT(nc->trackList.at(2)->getStartStation(), Eq(1));
   EXPECT_THAT(nc->trackList.at(2)->getEndStation(), Eq(0));
+}
+
+
+TEST_F(networkTest, findReversedTrack)
+{ /* Verify that station can find a reversed track
+   * Gaersnaes <=> Sim_Gar_W <=> testStation1
+   */
+  EXPECT_THAT(nc->parseCmd("ADD TRACK Sim_Gar_W 11357 COORDINATES "
+                           "55.55427467440431 14.35344709206785 "
+                           "55.54651317914202 14.18147578739106"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("ADD STATION Simrishamn COORDINATES 55.55402301071182 14.35252057730063"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("ADD STATION Gaersnaes COORDINATES 55.54654125122775 14.18141868329311") ,Eq(true));
+  EXPECT_THAT(nc->parseCmd("CONNECT TRACK Sim_Gar_W FROM Simrishamn TO Gaersnaes"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("CONNECT TRACK Sim_Gar_W FROM Gaersnaes TO Simrishamn"), Eq(true));
+  EXPECT_THAT(nc->stationList.at(0)->findLeavingTrackIndexToStation(1), Eq(0));
+  EXPECT_THAT(nc->stationList.at(1)->findLeavingTrackIndexToStation(0), Eq(0));
 }
 
 /*void station_nameAlreadyTaken(); // Verify that the station will rename new
@@ -189,4 +205,4 @@ TEST_F(networkTest, connectThreeTracksToTwoStations)
 
 //void oneTrainInTrainListModelAfterAddingATrain();
 
-#endif
+#endif //_TST_TCNETWORKTESTS_H_

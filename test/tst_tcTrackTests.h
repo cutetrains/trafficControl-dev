@@ -1,9 +1,6 @@
-#ifndef TST_TCTRACKTESTS_H
-#define TST_TCTRACKTESTS_H
+#ifndef _TST_TCTRACKTESTS_H_
+#define _TST_TCTRACKTESTS_H_
 
-#define TRACK 1
-#define TRAIN 2
-#define STATION 3
 #define UNDEFINED -1
 
 using namespace testing;
@@ -70,4 +67,4 @@ TEST_F(trackTest, constructor_startEndStation)
 //   * /
 //}
 
-#endif // TST_TCTRACKTESTS_H
+#endif // _TST_TCTRACKTESTS_H_

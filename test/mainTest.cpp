@@ -1,4 +1,5 @@
 #include "tst_tcNetworkTests.h"
+#include "tst_tcTrafficTests.h"
 #include "tst_tcStationTests.h"
 #include "tst_tcTrainTests.h"
 #include "tst_tcTrackTests.h"

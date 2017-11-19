@@ -1,9 +1,6 @@
-#ifndef TST_TCTRAINTESTS_H
-#define TST_TCTRAINTESTS_H
+#ifndef _TST_TCTRAINTESTS_H_
+#define _TST_TCTRAINTESTS_H_
 
-#define TRACK 1
-#define TRAIN 2
-#define STATION 3
 #define UNDEFINED -1
 
 using namespace testing;
@@ -51,4 +48,4 @@ TEST_F(trainTest, travelPlanEmptyAfterCreation)
   EXPECT_THAT(nc->trainList.at(0)->getTravelPlan().length(), Eq(0));
 }
 
-#endif // TST_TCTRAINTESTS_H
+#endif // _TST_TCTRAINTESTS_H_

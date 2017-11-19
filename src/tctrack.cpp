@@ -57,6 +57,7 @@ Track::Track(QString trackName,
   startStation = UNDEFINED;
   endStation = UNDEFINED;
   maxAllowedSpeed = 60;
+  reversedTraffic = false;
   trackID = totalNbrOfTracks;/*!<The trackID will correspond to the order of created Track objects. */
   totalNbrOfTracks++;
   thisTrackList = &trackList;
@@ -209,6 +210,10 @@ QList<float> Track::getCoordinatesFromPosition(int position)
     thisList<<0.0<<0.0;
     return thisList;
   }
+  if(0 == position){
+    thisList<<coordinateList.at(0)<<coordinateList.at(1);
+    return thisList;
+  }
   for (iii=0; iii < coordinateList.length(); iii++){
     if (coordinateCumulatedDistanceList.at(iii) >= position){
       iii--;
@@ -272,6 +277,13 @@ int Track::getTotalNbrOfTracks(){ return totalNbrOfTracks;}
 bool Track::hasCoordinates(){ return hasValidCoordinates;}
 
 /*!
+ * The method returns whether the track operates in reversed directon (from end to start).
+ *
+ * return rt true if the traffic is in reversed direction.
+ */
+bool Track::isReversedTraffic() { return reversedTraffic; }
+
+/*!
  * The method prepares and sends a dataChangedSignal to trafficDataModel to
  * update it.
  *
@@ -326,6 +338,13 @@ void Track::setEndStation(int stationID) {
  * @param n The maximum allowed speed [m/s].
  */
 void Track::setMaxAllowedSpeed(int n) { maxAllowedSpeed = n; }
+
+/*!
+ * The method sets whether the track operates in reversed directon (from end to start).
+ *
+ * param rt true if the traffic is in reversed direction.
+ */
+void Track::setReversedTraffic(bool rt) { reversedTraffic = rt; }
 
 /*!
  * The method prints information about the track to the console.
