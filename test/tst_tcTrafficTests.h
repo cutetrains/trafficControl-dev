@@ -25,12 +25,12 @@ TEST_F(trafficTest, regularTrackTest)
   nc->parseCmd("ADD TRAIN trainAB");
   EXPECT_THAT(nc->parseCmd("TRAIN SET CURRENT STATION stationA"), Eq(true));
   EXPECT_THAT(nc->parseCmd("TRAIN TRAVELPLAN ADD STATION stationB"), Eq(true));
-  for(int iii=0;iii<8;iii++){ nc->stepTimeForNetwork(); }
+  nc->stepTimeForNetwork(8);
   EXPECT_THAT(nc->trainList.at(0)->getCurrentTrack(), Eq(0));
   EXPECT_THAT(nc->trainList.at(0)->getTrackPosition(), Eq(0));
   EXPECT_THAT(nc->trainList.at(0)->getCurrentStation(), Eq(-1));
   EXPECT_THAT(nc->trackList.at(0)->isReversedTraffic(), Eq(false));
-  nc->stepTimeForNetwork();
+  nc->stepTimeForNetwork(1);
   EXPECT_THAT(nc->trainList.at(0)->getTrackPosition(), Eq(1));
 }
 
@@ -48,7 +48,7 @@ TEST_F(trafficTest, reversedTrackTest)
   nc->parseCmd("ADD TRAIN trainCB");
   EXPECT_THAT(nc->parseCmd("TRAIN SET CURRENT STATION stationC"), Eq(true));
   nc->parseCmd("TRAIN TRAVELPLAN ADD STATION stationB");
-  for(int iii=0;iii<8;iii++){ nc->stepTimeForNetwork(); }
+  nc->stepTimeForNetwork(8);
   EXPECT_THAT(nc->trainList.at(0)->getCurrentTrack(), Eq(0));
   EXPECT_THAT(nc->trainList.at(0)->getTrackPosition(),
               Eq(nc->trackList.at(0)->getLength()));
@@ -56,7 +56,7 @@ TEST_F(trafficTest, reversedTrackTest)
   EXPECT_THAT(nc->trainList.at(0)->getCurrentStation(), Eq(-1));
 
   EXPECT_THAT(nc->trackList.at(0)->isReversedTraffic(), Eq(true));
-  nc->stepTimeForNetwork();
+  nc->stepTimeForNetwork(1);
 
   EXPECT_THAT(nc->trainList.at(0)->getTrackPosition(),
               Eq(nc->trackList.at(0)->getLength() - 1));

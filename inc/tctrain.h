@@ -72,6 +72,7 @@ public:
   int getCurrentSpeed();
   int getCurrentStation();
   int getCurrentTrack();
+  int getState();
   int getDesiredSpeed();
   int getID();
   int getIndexTravelPlanByStationID();

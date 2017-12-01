@@ -189,6 +189,13 @@ int Train::getNbrOfPassengers(){ return nbrOfPassengers;}
 int Train::getPassengerCapacity(){ return passengerCapacity;}
 
 /*!
+ * Get the state of the train.
+ *
+ * @return state of the train.
+ */
+int Train::getState() {return state;}
+
+/*!
  * Get the total number of trains.
  *
  * @return total number of trains in the network.
@@ -326,8 +333,8 @@ int Train::readyState(int n)
         if (UNDEFINED == nextTrack)
         {
           qDebug() << "ERROR  : "<< this->getName()<<" No leaving track";
-          state = stateTable.value("STOPPED");
-          return 0;
+          n--;
+          return n;
         }
         else
         {
@@ -350,42 +357,21 @@ int Train::readyState(int n)
  */
 int Train::readyToRunningState(int n)
 {
-  /* Add mutex
-   * Identify whether train willl travel in reversed direction or not
-   * Depart from station
-   * Add train to track
-   * set current track to next track
-   *
-   * Remove mutex
-   */
-
   bool transactionSuccess = false;
-  bool reversedDirectionOnTrack = false;
-  if(thisTrackList->at(nextTrack)->getEndStation() == currentStation)
-  {
-    reversedDirectionOnTrack = true;
-  }
-  thisStationList->at(currentStation)->trainDeparture(this->getID());
   currentTrack = nextTrack;
   transactionSuccess = thisTrackList->at(currentTrack)->addTrainToTrack(trainID);
-  currentStation = UNDEFINED;//Remove this train from station.
-  nextTrack = UNDEFINED;
-  if(reversedDirectionOnTrack)
+  if(transactionSuccess)
   {
-    qDebug()<<"reversed track" <<thisTrackList->at(currentTrack)->getLength();
-    positionOnTrack = thisTrackList->at(currentTrack)->getLength();
-    thisTrackList->at(currentTrack)->setReversedTraffic(true);
-  }
-  else
-  {
-    qDebug()<<"Non-reversed track";
-    positionOnTrack = 0;//TODO: Check what happens when train is traveling in opposite deirection!
-    thisTrackList->at(currentTrack)->setReversedTraffic(false);
-  }
-  state = stateTable.value("RUNNING");
-  if (nextIndexTravelPlanByStationID < ((int) travelPlanByStationID.size() - 1))
-  {
-    nextIndexTravelPlanByStationID++;
+    thisStationList->at(currentStation)->trainDeparture(this->getID());
+    currentStation = UNDEFINED;
+    nextTrack = UNDEFINED;
+
+    state = stateTable.value("RUNNING");
+
+    if (nextIndexTravelPlanByStationID < ((int) travelPlanByStationID.size() - 1))
+    {
+      nextIndexTravelPlanByStationID++;
+    }
   }
   n--;
   return n;
@@ -439,7 +425,6 @@ int Train::runningState(int n)
  */
 int Train::runningToOpeningState(int n)
 {
-  //TODO: Consider trains moving in the opposite direction
   bool transactionSuccess = false;
   currentStation = thisTrackList->at(currentTrack)->isReversedTraffic()?
                      thisTrackList->at(currentTrack)->getStartStation():

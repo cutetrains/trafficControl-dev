@@ -56,6 +56,8 @@ Track::Track(QString trackName,
   name = trackName;
   startStation = UNDEFINED;
   endStation = UNDEFINED;
+  lockedDownStream = false;
+  lockedUpStream = false;
   maxAllowedSpeed = 60;
   reversedTraffic = false;
   trackID = totalNbrOfTracks;/*!<The trackID will correspond to the order of created Track objects. */
@@ -107,6 +109,8 @@ Track::Track( const Track& sTrack)
   name = sTrack.name;
   startStation = sTrack.startStation;
   endStation = sTrack.endStation;
+  lockedDownStream = sTrack.lockedDownStream;
+  lockedUpStream = sTrack.lockedUpStream;
   hasValidCoordinates = sTrack.hasValidCoordinates;
   maxAllowedSpeed = sTrack.maxAllowedSpeed;
   trackID = sTrack.trackID;
@@ -128,6 +132,8 @@ Track& Track::operator=( const Track& sTrack )
   name = sTrack.name;
   startStation = sTrack.startStation;
   endStation = sTrack.endStation;
+  lockedDownStream = sTrack.lockedDownStream;
+  lockedUpStream = sTrack.lockedUpStream;
   hasValidCoordinates = sTrack.hasValidCoordinates;
   maxAllowedSpeed = sTrack.maxAllowedSpeed;
   trackID = sTrack.trackID;
@@ -149,7 +155,20 @@ Track& Track::operator=( const Track& sTrack )
  * @todo Check for errors
  */
 bool Track::addTrainToTrack(int trainID){
-  trainsOnTrackQueue.enqueue(trainID);
+  reversedTraffic = (endStation == thisTrainList->at(trainID)->getCurrentStation() );
+
+  if(reversedTraffic)
+  {
+    thisTrainList->at(trainID)->setTrackPosition(length);
+    lockedDownStream = true;
+  }
+  else
+  {
+    thisTrainList->at(trainID)->setTrackPosition(0);
+    lockedUpStream = true;
+  }
+
+  trainsOnTrackQueue.append(trainID);
   emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "AVAILABLE");
   return true;
 }
@@ -166,18 +185,26 @@ bool Track::addTrainToTrack(int trainID){
  */
 bool Track::deleteTrainFromTrack(int trainID){
   if(trainsOnTrackQueue.isEmpty()){
-    qDebug()<<"ERROR  : Trying to remove rom an empty queue";
     return false;
-  } else {
-    if(trainsOnTrackQueue.head() == trainID){
-      trainsOnTrackQueue.dequeue();
+  }
+  else
+  {
+    if(trainsOnTrackQueue.first() == trainID){
+      trainsOnTrackQueue.removeFirst();
       emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "AVAILABLE");
+      if(trainsOnTrackQueue.isEmpty())
+      {
+        reversedTraffic = false;
+        lockedDownStream = false;
+        lockedUpStream = false;
+      }
       return true;
-    } else {
+    }
+    else
+    {
       qDebug()<<"CRASH!!! : Queue violation!";
     }
   }
-  qDebug()<<"INFO   : DELETE LAST TRAIN "<<trainID<<" FROM TRACK: "<<trackID;
   return false;
 }
 
@@ -274,7 +301,16 @@ int Track::getStartStation(){ return startStation;}
 
 int Track::getTotalNbrOfTracks(){ return totalNbrOfTracks;}
 
+QList<int> Track::getTrainList()
+{
+  return trainsOnTrackQueue;
+}
+
 bool Track::hasCoordinates(){ return hasValidCoordinates;}
+
+bool Track::isLockedDownStream(){ return lockedDownStream; }
+
+bool Track::isLockedUpStream(){ return lockedUpStream; }
 
 /*!
  * The method returns whether the track operates in reversed directon (from end to start).
@@ -327,6 +363,16 @@ void Track::setStartStation(int stationID) {
 void Track::setEndStation(int stationID) {	
   endStation=stationID;
   sendDataChangedSignal(trackID);
+}
+
+void Track::setLockDownStream(bool lockDS) {
+  qDebug()<<"Locking "<<this->getName()<<" in downstream";
+  lockedDownStream = lockDS;
+}
+
+void Track::setLockUpStream(bool lockUS) {
+  qDebug()<<"Locking "<<this->getName()<<" in upsream";
+  lockedUpStream = lockUS;
 }
 
 /*!

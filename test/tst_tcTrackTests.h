@@ -55,13 +55,60 @@ TEST_F(trackTest, constructor_startEndStation)
   EXPECT_THAT(nc->trackList.at(0)->getStartStation(), Eq(UNDEFINED));
 }
 
-//TEST_F(trackTest, trainListAddRmUpstream)
+TEST_F(trackTest, trainListAddRmUpstream)
+{ /* Verify that it is possible to add and remove trains on trainList (FIFO)
+   * FIFO manner.
+   * stationA  -> trackAB  -> stationB
+   * trainA ->
+   * trainB ->
+   * trainB starts when trainA is more than 3000 m into the trackAB
+   */
+  EXPECT_THAT(nc->parseCmd("ADD STATION stationA"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("ADD STATION stationB"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("ADD TRACK trackAB 12345"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("CONNECT TRACK trackAB FROM stationA TO stationB"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("CONNECT TRACK trackAB FROM stationB TO stationA"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("ADD TRAIN trainA"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("TRAIN SET CURRENT STATION stationA"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("TRAIN TRAVELPLAN ADD STATION stationB"), Eq(true));
+  //Check that there is one track on queue
+  nc->stepTimeForNetwork(8);
+  do{
+    nc->stepTimeForNetwork(1);
+  }
+  while (nc->trainList.at(0)->getTrackPosition()<3000);
+  EXPECT_THAT(nc->trackList.at(0)->isLockedDownStream(), Eq(false));
+  EXPECT_THAT(nc->trackList.at(0)->isLockedUpStream(), Eq(true));
+  EXPECT_THAT(nc->parseCmd("ADD TRAIN trainB"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("TRAIN SET CURRENT STATION stationA"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("TRAIN TRAVELPLAN ADD STATION stationB"), Eq(true));
+  nc->stepTimeForNetwork(8);
+  EXPECT_THAT(nc->trackList.at(0)->getTrainList().at(0),Eq(0));
+  EXPECT_THAT(nc->trackList.at(0)->getTrainList().at(1),Eq(1));
+  EXPECT_THAT(nc->trackList.at(0)->getTrainList().length(),Eq(2));
+  do{
+    nc->stepTimeForNetwork(1);
+  }
+  while (nc->trainList.at(0)->getTrackPosition()<12344);
+  EXPECT_THAT(nc->trackList.at(0)->getTrainList().length(),Eq(2));
+  nc->stepTimeForNetwork(10);
+  EXPECT_THAT(nc->trackList.at(0)->getTrainList().length(),Eq(1));
+  EXPECT_THAT(nc->trackList.at(0)->getTrainList().at(0),Eq(1));
+  do{
+    nc->stepTimeForNetwork(1);
+  }
+  while (nc->trainList.at(1)->getTrackPosition()<12344);
+  nc->stepTimeForNetwork(10);
+  EXPECT_THAT(nc->trackList.at(0)->getTrainList().length(),Eq(0));
+}
+
+//TEST_F(trackTest, trainListAddRmDownstream)
 //{ /* Verify that it is possible to add and remove trains on trainList in a
-//   * FIFO manner.
+//   * FIFO manner, rejecting Upstream trains if Downstream is used.
 //   * /
 //}
 
-//TEST_F(trackTest, trainListAddRmDownstream)
+//TEST_F(trackTest, trainListAddRmUpAndDownstream)
 //{ /* Verify that it is possible to add and remove trains on trainList in a
 //   * FIFO manner, rejecting Upstream trains if Downstream is used.
 //   * /

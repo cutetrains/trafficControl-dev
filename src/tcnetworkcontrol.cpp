@@ -302,14 +302,10 @@ void NetworkControl::onTickIntervalChanged(int newInterval)
  * This method commands all trains to move the amount of time defined in the stepTimeBox item in the UI.
  * @TODO: make method update all traffic elements
  */
-void NetworkControl::stepTimeForNetwork()
+void NetworkControl::stepTimeForNetwork(int n)
 {
   QMutexLocker locker(&mutex);
   int response = 0;
-
-  /* n needs to be fetched from timebox Signal-Slot?*/
-  //int n = ui->stepTimeBox->value();
-  int n = 1;
 
   /* ASSERTS TO VERIFY THAT TRAFFIC ELEMENTS HAS NEVER BEEN DELETED */
   bool result = false;
@@ -329,14 +325,18 @@ void NetworkControl::stepTimeForNetwork()
   Q_ASSERT_X(result,
              Q_FUNC_INFO,
              "Station ID/list mismatch. Station objects mustn't be deleted!");
-
-  foreach(Train* thisTrain, trainList){
-    response = thisTrain->move(n);
+  for(int iii=0;iii<n;iii++)
+  {
+    foreach(Train* thisTrain, trainList){
+      response = thisTrain->move(1);
+    }
   }
   //ui->stationListTableView->resizeColumnsToContents();
   //ui->trackListTableView->resizeColumnsToContents();
   //ui->trainListTableView->resizeColumnsToContents();
 }
+
+void NetworkControl::stepTimeForNetwork(){ stepTimeForNetwork(1);}
 
 /*!
  * The destructor method

@@ -174,10 +174,10 @@ void Station::destructorResetTotalNumberOfStations()
  * tracks in reversed direction. If no tracks are found, or the station isn't
  * adjacent, the method will return -1.
  *
- * @param stationID The ID of the station to rearch.
+ * @param stationID The ID of the station to reach.
  *
  * @return trackID The ID number the station.
- * @TODO: Search for tracks in opposite direction.
+ * @TODO consider whether track is locked or not
  */
 int Station::findLeavingTrackIndexToStation(int targetStationID)
 {
@@ -187,14 +187,20 @@ int Station::findLeavingTrackIndexToStation(int targetStationID)
     {
       if((thisTrackList->at(i)->getEndStation()) == targetStationID)
       {
-        return i;
+        if( !thisTrackList->at(i)->isLockedDownStream() )
+        {
+          return i;
+        }
       }
     }
     foreach(int i, leavingTrackList)
     {
       if((thisTrackList->at(i)->getStartStation()) == targetStationID)
       {
-        return i;
+        if( !thisTrackList->at(i)->isLockedUpStream() )
+        {
+          return i;
+        }
       }
     }
   }

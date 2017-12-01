@@ -69,6 +69,7 @@ public slots:
   void onRunThreadCheckBoxChanged(int newState);
   void onTickIntervalChanged(int newInterval);
   void stepTimeForNetwork();
+  void stepTimeForNetwork(int n);
     
 private:
   QObject* handleQMLObject;
