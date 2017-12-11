@@ -156,7 +156,6 @@ Track& Track::operator=( const Track& sTrack )
  */
 bool Track::addTrainToTrack(int trainID){
   reversedTraffic = (endStation == thisTrainList->at(trainID)->getCurrentStation() );
-
   if(reversedTraffic)
   {
     thisTrainList->at(trainID)->setTrackPosition(length);

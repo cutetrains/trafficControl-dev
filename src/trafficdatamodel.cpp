@@ -149,13 +149,13 @@ QVariant TrafficDataModel::headerData(int section, Qt::Orientation orientation, 
         switch (section)
         {
           case 0:
-            return QString("Name");
+            return QString("Track name");
           case 1:
             return QString("Length");
           case 2:
-            return QString("Start");
+            return QString("Start station");
           case 3:
-            return QString("End");
+            return QString("End station");
         }
       }
     }
@@ -166,7 +166,7 @@ QVariant TrafficDataModel::headerData(int section, Qt::Orientation orientation, 
         switch (section)
         {
           case 0:
-            return QString("Name");
+            return QString("Station Name");
           case 1:
             return QString("Waiting");
         }
@@ -179,11 +179,11 @@ QVariant TrafficDataModel::headerData(int section, Qt::Orientation orientation, 
         switch (section)
         {
           case 0:
-            return QString("Name");
+            return QString("Train Name");
           case 1:
             return QString("Location");
           case 2:
-            return QString("Pos:");
+            return QString("Position");
           case 3:
             return QString("Speed");
           case 4:

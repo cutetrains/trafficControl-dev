@@ -102,16 +102,43 @@ TEST_F(trackTest, trainListAddRmUpstream)
   EXPECT_THAT(nc->trackList.at(0)->getTrainList().length(),Eq(0));
 }
 
-//TEST_F(trackTest, trainListAddRmDownstream)
-//{ /* Verify that it is possible to add and remove trains on trainList in a
-//   * FIFO manner, rejecting Upstream trains if Downstream is used.
-//   * /
-//}
+TEST_F(trackTest, trainListAddDownstream)
+{ /* Verify that it is possible to add and remove trains on trainList in FIFO manner, rejecting
+   * Upstream trains if Downstream is used.
+   * stationA  -> trackAB  -> stationB
+   *                         <- trainA
+   * trainB ->
+   * trainB starts when trainA is more than 10 m into the trackAB
+   */
+  EXPECT_THAT(nc->parseCmd("ADD STATION stationA"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("ADD STATION stationB"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("ADD TRACK trackAB 12345"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("CONNECT TRACK trackAB FROM stationA TO stationB"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("CONNECT TRACK trackAB FROM stationB TO stationA"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("ADD TRAIN trainA"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("TRAIN SET CURRENT STATION stationB"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("TRAIN TRAVELPLAN ADD STATION stationA"), Eq(true));
+  nc->stepTimeForNetwork(8);
+  EXPECT_THAT(nc->trackList.at(0)->getTrainList().at(0),Eq(0));
+  EXPECT_THAT(nc->trackList.at(0)->getTrainList().length(),Eq(1));
+  EXPECT_THAT(nc->parseCmd("ADD TRAIN trainB"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("TRAIN SET CURRENT STATION stationA"), Eq(true));
+  EXPECT_THAT(nc->parseCmd("TRAIN TRAVELPLAN ADD STATION stationB"), Eq(true));
+  //CHECK THAT THERE IS ONLY ONE TRAIN ON TRACK
+  nc->stepTimeForNetwork(8);
+  EXPECT_THAT(nc->trackList.at(0)->getTrainList().at(0),Eq(0));
+  EXPECT_THAT(nc->trackList.at(0)->getTrainList().length(),Eq(1));
+  EXPECT_THAT(nc->trackList.at(0)->isReversedTraffic(), Eq(true));
+  EXPECT_THAT(nc->trainList.at(1)->getState(), Eq(1));//READY
+  do{
+    nc->stepTimeForNetwork(1);
+  }
+  while (nc->trainList.at(0)->getState() == 2); //RUNNING
+  nc->stepTimeForNetwork(3);
+  EXPECT_THAT(nc->trainList.at(1)->getState(), Eq(2));//RUNNING
+}
 
-//TEST_F(trackTest, trainListAddRmUpAndDownstream)
-//{ /* Verify that it is possible to add and remove trains on trainList in a
-//   * FIFO manner, rejecting Upstream trains if Downstream is used.
-//   * /
-//}
+//TEST_F(trackTest, trackLock)
+
 
 #endif // _TST_TCTRACKTESTS_H_

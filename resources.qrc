@@ -3,4 +3,8 @@
         <file>map.qml</file>
         <file>QmlLogic.js</file>
     </qresource>
+    <qresource prefix="/">
+        <file>resources/walton_with_leicester___peterborough_east_train_geograph_2791492_by_ben_brooksbank_lsD_icon.ico</file>
+        <file>resources/trafficControl.rc</file>
+    </qresource>
 </RCC>

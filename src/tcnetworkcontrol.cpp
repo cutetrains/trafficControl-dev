@@ -331,9 +331,6 @@ void NetworkControl::stepTimeForNetwork(int n)
       response = thisTrain->move(1);
     }
   }
-  //ui->stationListTableView->resizeColumnsToContents();
-  //ui->trackListTableView->resizeColumnsToContents();
-  //ui->trainListTableView->resizeColumnsToContents();
 }
 
 void NetworkControl::stepTimeForNetwork(){ stepTimeForNetwork(1);}

@@ -11,6 +11,8 @@ QT       += quickwidgets
 QT       += positioning
 QT       += location
 
+RC_FILE = resources/trafficControl.rc
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TEMPLATE = app
 
@@ -27,20 +29,20 @@ SOURCES += src/main.cpp \
     src/tcnetworkcontrolcommandparser.cpp
 
 #UNCOMMENT SECTION BELOW TO TEST
-debug {
-    GOOGLETEST_DIR = $$PWD/../googletest
-    include(gtest_dependency.pri)
-    CONFIG += console c++11
-    CONFIG -= app_bundle
-    CONFIG += thread
-    SOURCES -= src/main.cpp
-    SOURCES +=     test/mainTest.cpp
-    HEADERS +=     test/tst_tcStationTests.h \
-    test/tst_tcNetworkTests.h \
-    test/tst_tcTrainTests.h \
-    test/tst_tcTrackTests.h \
-    test/tst_tcTrafficTests.h
-}
+#debug {
+#    GOOGLETEST_DIR = $$PWD/../googletest
+#    include(gtest_dependency.pri)
+#    CONFIG += console c++11
+#    CONFIG -= app_bundle
+#    CONFIG += thread
+#    SOURCES -= src/main.cpp
+#    SOURCES +=     test/mainTest.cpp
+#    HEADERS +=     test/tst_tcStationTests.h \
+#    test/tst_tcNetworkTests.h \
+#    test/tst_tcTrainTests.h \
+#    test/tst_tcTrackTests.h \
+#    test/tst_tcTrafficTests.h
+#}
 
 HEADERS  += inc/trafficcontrol.h \
     inc/tcstation.h \

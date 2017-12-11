@@ -72,13 +72,13 @@ public:
   int getCurrentSpeed();
   int getCurrentStation();
   int getCurrentTrack();
-  int getState();
   int getDesiredSpeed();
   int getID();
   int getIndexTravelPlanByStationID();
   QString getName();
   int getNbrOfPassengers();
   int getPassengerCapacity();
+  int getState();
   int getTotalNbrOfTrains();
   int getTrackPosition();
   QList<int> getTravelPlan();

@@ -181,24 +181,17 @@ void Station::destructorResetTotalNumberOfStations()
  */
 int Station::findLeavingTrackIndexToStation(int targetStationID)
 {
-  if(this->getID() != targetStationID)
-  {
-    foreach(int i, leavingTrackList)
-    {
-      if((thisTrackList->at(i)->getEndStation()) == targetStationID)
-      {
-        if( !thisTrackList->at(i)->isLockedDownStream() )
-        {
+  if(this->getID() != targetStationID) {
+    foreach(int i, leavingTrackList) {
+      if((thisTrackList->at(i)->getEndStation()) == targetStationID) {
+        if( !thisTrackList->at(i)->isLockedDownStream() ) {
           return i;
         }
       }
     }
-    foreach(int i, leavingTrackList)
-    {
-      if((thisTrackList->at(i)->getStartStation()) == targetStationID)
-      {
-        if( !thisTrackList->at(i)->isLockedUpStream() )
-        {
+    foreach(int i, leavingTrackList) {
+      if((thisTrackList->at(i)->getStartStation()) == targetStationID) {
+        if( !thisTrackList->at(i)->isLockedUpStream() ) {
           return i;
         }
       }

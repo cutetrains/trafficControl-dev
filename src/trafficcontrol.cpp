@@ -37,6 +37,8 @@ TrafficControl::TrafficControl(QWidget *parent) :
   ui(new Ui::TrafficControl)
 {
   ui->setupUi(this);
+  //ui->mapDockWidget->setGeometry(0,0,1000,700);
+  //ui->dockWidget_16->setVisible(false);
 
   trackListModel=new TrafficDataModel(TRACK, 0);
   trainListModel=new TrafficDataModel(TRAIN, 0);
@@ -62,6 +64,14 @@ TrafficControl::TrafficControl(QWidget *parent) :
   connect(ui->timeTickButton, SIGNAL(clicked()), networkControl, SLOT(stepTimeForNetwork()));
   connect(ui->runThreadCheckBox, SIGNAL(stateChanged(int)), networkControl, SLOT(onRunThreadCheckBoxChanged(int)));
   connect(ui->tickIntervalSpinBox, SIGNAL(valueChanged(int)), networkControl, SLOT(onTickIntervalChanged(int)));
+
+  //ui->mapQuickWidget->setGeometry(800,500,1,1);
+  //ui->mapQuickWidget->setMinimumWidth(100);
+  //ui->mapDockWidget->setMinimumWidth(130);
+
+  ui->stationListTableView->resizeColumnsToContents();
+  ui->trackListTableView->resizeColumnsToContents();
+  ui->trainListTableView->resizeColumnsToContents();
 }
 
 /*!
