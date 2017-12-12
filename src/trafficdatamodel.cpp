@@ -49,9 +49,9 @@ TrafficDataModel::TrafficDataModel(int type, QObject *parent)
   nbrOfRows=0;
   switch (type)
   {
-    case TRACK: nbrOfColumns=4; break;//Name, length, start, end,
-    case TRAIN: nbrOfColumns=5; break;//Name, Track, Position, Speed, State
-    case STATION: nbrOfColumns=2; break;//Name, NbrOfPassengers
+    case TRACK: nbrOfColumns = 5; break;//Name, length, lock status, start, end,
+    case TRAIN: nbrOfColumns = 5; break;//Name, Track, Position, Speed, State
+    case STATION: nbrOfColumns = 2; break;//Name, NbrOfPassengers
   }
 }
 
@@ -153,8 +153,10 @@ QVariant TrafficDataModel::headerData(int section, Qt::Orientation orientation, 
           case 1:
             return QString("Length");
           case 2:
-            return QString("Start station");
+            return QString("Lock");
           case 3:
+            return QString("Start station");
+          case 4:
             return QString("End station");
         }
       }
