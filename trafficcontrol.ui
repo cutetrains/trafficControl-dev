@@ -175,6 +175,9 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="mapDockWidget_2">
+   <property name="windowTitle">
+    <string>Map</string>
+   </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
@@ -193,8 +196,8 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>600</width>
-         <height>400</height>
+         <width>800</width>
+         <height>200</height>
         </size>
        </property>
        <property name="sizeIncrement">

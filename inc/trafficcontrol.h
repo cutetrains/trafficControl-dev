@@ -21,11 +21,7 @@
 #include <QMainWindow>
 #include <QObject>
 #include <QDebug>
-//#include <QThread>
-//#include <QMutexLocker>
 #include <QUrl>
-//#include <QQuickView>
-//#include <QGeoCoordinate>
 #include <QtQml>
 #include "tctrain.h"
 #include "tctrack.h"

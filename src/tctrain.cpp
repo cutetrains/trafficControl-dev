@@ -332,13 +332,19 @@ int Train::readyState(int n)
                         travelPlanByStationID.at(nextIndexTravelPlanByStationID));
         if (UNDEFINED == nextTrack)
         {
-          qDebug() << "ERROR  : "<< this->getName()<<" No leaving track";
+          //qDebug() << "ERROR  : "<< this->getName()<<" No leaving track";
+          waitingTimer=3;
           n--;
           return n;
         }
         else
-        {
-          n = this->readyToRunningState(n);
+        { //Wait if an available track has been found and the waiting timer is bigger than 0.
+          if (waitingTimer>0){
+            waitingTimer--;
+            nextTrack = UNDEFINED;
+          } else {
+            n = this->readyToRunningState(n);
+          }
           return n;
         }
       }
@@ -463,8 +469,7 @@ void Train::sendDataChangedSignal(int trainID){//Name, Track/Station , Position,
   }
   if (UNDEFINED != currentStation)
   {
-    message << "S[" + QString::number(currentStation) + "] " +
-               thisStationList->at(currentStation)->getName();
+    message << thisStationList->at(currentStation)->getName();
   }
   else if (UNDEFINED != currentTrack)
   {
@@ -591,6 +596,7 @@ void Train::showInfo()
  */
 int Train::waitingState(int n)
 {
+  waitingTimer = 1;//TODO: SET THIS TO A RANDOM NUMBER
   state = stateTable.value("READY");
   return n;
 }

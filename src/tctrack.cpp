@@ -156,6 +156,7 @@ Track& Track::operator=( const Track& sTrack )
  */
 bool Track::addTrainToTrack(int trainID){
   reversedTraffic = (endStation == thisTrainList->at(trainID)->getCurrentStation() );
+  trainsOnTrackQueue.append(trainID);
   if(reversedTraffic)
   {
     thisTrainList->at(trainID)->setTrackPosition(length);
@@ -167,8 +168,6 @@ bool Track::addTrainToTrack(int trainID){
     setLockUpStream(true);
   }
 
-  trainsOnTrackQueue.append(trainID);
-  emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "AVAILABLE");
   return true;
 }
 
@@ -190,13 +189,14 @@ bool Track::deleteTrainFromTrack(int trainID){
   {
     if(trainsOnTrackQueue.first() == trainID){
       trainsOnTrackQueue.removeFirst();
-      emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "AVAILABLE");
       if(trainsOnTrackQueue.isEmpty())
       {
         reversedTraffic = false;
         setLockDownStream(false);
         setLockUpStream(false);
+        emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "FREE");
       }
+
       return true;
     }
     else
@@ -331,30 +331,27 @@ void Track::sendDataChangedSignal(int trackID){
   //TODO: Check that stationID is within upper range too
   if(isLockedDownStream()){
     if(isLockedUpStream()){
-      message << "DS+US lock";
+      message << "Locked";
     } else {
-      message << "DS lock";
+      message << "Start";
     }
   } else {
     if(isLockedUpStream()){
-      message << "US lock";
+      message << "End";
     } else {
       message << "Free";
     }
   }
   if (startStation != UNDEFINED)
   {
-    message << "S[" + QString::number(startStation) + "]" +
-            thisStationList->at(startStation)->getName();
+    message << thisStationList->at(startStation)->getName();
   }
-  else { message << "S[-1] N/A";}
+  else { message << "N/A";}
   if (endStation != UNDEFINED) {
-    message << "S[" + QString::number(endStation) + "] " +
-            thisStationList->at(endStation)->getName(); }
-  else { message<<"S[-1] N/A";}
+    message << thisStationList->at(endStation)->getName(); }
+  else { message<<"N/A";}
   emit dataChangedSignal(trackID,
                          QVariant(message));
-
 }
 
 /*!
@@ -378,15 +375,19 @@ void Track::setEndStation(int stationID) {
 }
 
 void Track::setLockDownStream(bool lockDS) {
-  qDebug()<<"Lock Toggle DS";
   lockedDownStream = lockDS;
   sendDataChangedSignal(this->getID());
+  if(lockDS == true){
+    emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "LOCKED_START");
+  }
 }
 
 void Track::setLockUpStream(bool lockUS) {
-  qDebug()<<"Lock Toggle DS";
   lockedUpStream = lockUS;
   sendDataChangedSignal(this->getID());
+  if(lockUS == true){
+    emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "LOCKED_END");
+  }
 }
 
 /*!

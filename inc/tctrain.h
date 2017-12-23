@@ -59,6 +59,7 @@ private:
   QList<Track*> *thisTrackList;
   QList<Train*> *thisTrainList;
   QList<Station*> *thisStationList;
+  int waitingTimer;
 
 public:
   Train(QString trainName,

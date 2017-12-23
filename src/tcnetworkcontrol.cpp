@@ -104,7 +104,7 @@ bool NetworkControl::addTrackToNetwork(QString trackName,
                               Q_ARG(QVariant, trackLength),
                               Q_ARG(QVariant, coordinates));
     connect(newTrack,
-            SIGNAL(qmlTrackStatusSignal(QVariant ,QVariant ,QVariant)),
+            SIGNAL(qmlTrackStatusSignal(QVariant, QVariant ,QVariant)),
             handleQMLObject,
             SLOT(qmlTrackStatusSlot(QVariant, QVariant, QVariant)));
   }
