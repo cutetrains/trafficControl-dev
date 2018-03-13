@@ -67,7 +67,7 @@ public slots:
   bool parseCmd(QString inputLine);
   bool parseMultipleNetworkCommand(QStringList inputLines);
   void onRunThreadCheckBoxChanged(int newState);
-  void onTickIntervalChanged(int newInterval);
+  void onFastForwardSpeedChanged(double newFastForwardSpeed);
   void stepTimeForNetwork();
   void stepTimeForNetwork(int n);
     

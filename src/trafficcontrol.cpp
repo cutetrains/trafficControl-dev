@@ -61,7 +61,7 @@ TrafficControl::TrafficControl(QWidget *parent) :
 
   connect(ui->timeTickButton, SIGNAL(clicked()), networkControl, SLOT(stepTimeForNetwork()));
   connect(ui->runThreadCheckBox, SIGNAL(stateChanged(int)), networkControl, SLOT(onRunThreadCheckBoxChanged(int)));
-  connect(ui->tickIntervalSpinBox, SIGNAL(valueChanged(int)), networkControl, SLOT(onTickIntervalChanged(int)));
+  connect(ui->fastForwardSpinBox, SIGNAL(valueChanged(double)), networkControl, SLOT(onFastForwardSpeedChanged(double)));
 
   ui->stationListTableView->resizeColumnsToContents();
   ui->trackListTableView->resizeColumnsToContents();

@@ -22,11 +22,11 @@ using namespace std;
 TrafficClock::TrafficClock(QObject *parent) :
     QObject(parent)
 {
-  continueTick = false;//hardcoded, let the trafficControl emit a signal that updates this parameter later
+  simulationIsRunning = false;//hardcoded, let the trafficControl emit a signal that updates this parameter later
   isAlive = true;
   systemTime = QTime::currentTime();//may be deleted
   timer.start();
-  tInterval = 500; //No magic numbers
+  tInterval = 1000; //No magic numbers
 }
 
 /*!
@@ -58,16 +58,18 @@ void TrafficClock::threadTick()
   while(isAlive)
   {
     targetTime = targetTime.addMSecs(tInterval);
-    tWait = max(QTime::currentTime().msecsTo(targetTime) , tInterval/2);
-    if (tWait < 0)
-    {
-      qDebug()<<"***ERROR*** Target time missed!";
-    }
-    if (true == continueTick)
+
+    if (true == simulationIsRunning)
     {
       emit stepTimeSignal();
     }
-    QThread::msleep(max(tWait, tInterval/2));
+    tWait = QTime::currentTime().msecsTo(targetTime);
+    if(tWait<0){
+        qDebug()<<"tWait negative. Replacing with tInterval and resetting targetTime";
+        tWait = tInterval;
+        targetTime = QTime::currentTime().addMSecs(tInterval);
+    }
+    QThread::msleep(tWait);
   }
 }
 
@@ -76,7 +78,7 @@ void TrafficClock::threadTick()
 */
 void TrafficClock::pauseThread()
 {
-  continueTick = false;
+  simulationIsRunning = false;
 }
 
 /*!
@@ -84,7 +86,7 @@ void TrafficClock::pauseThread()
 */
 void TrafficClock::resumeThread()
 {
-  continueTick = true;
+  simulationIsRunning = true;
 }
 
 /*!

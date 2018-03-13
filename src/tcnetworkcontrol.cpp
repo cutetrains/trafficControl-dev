@@ -58,7 +58,7 @@ NetworkControl::NetworkControl(TrafficDataModel &trackListModel,
     qDebug()<<"NC: trackListModel is a null pointer";
   }
 
-  trafficClock.threadSetup(clockThread);// Use the old implementation of clockThread (see Traffic - R1C012_Independent_Thread)
+  trafficClock.threadSetup(clockThread);
   trafficClock.moveToThread(&clockThread);
   clockThread.start();
   cmdParserCurrentTrain = UNDEFINED;
@@ -293,14 +293,16 @@ void NetworkControl::onRunThreadCheckBoxChanged(int newState)
  *
  * @param newInterval The new interval of the thread.
  */
-void NetworkControl::onTickIntervalChanged(int newInterval)
+void NetworkControl::onFastForwardSpeedChanged(double newFastForwardSpeed)
 {
+  int newInterval = newFastForwardSpeed=0? 1000: (int) 1000/newFastForwardSpeed;
   trafficClock.setTickInterval(newInterval);
+
 }
 
 /*!
  * This method commands all trains to move the amount of time defined in the stepTimeBox item in the UI.
- * @TODO: make method update all traffic elements
+ * @TODO: make method update all traffic elements, such as TRACK and STATION
  */
 void NetworkControl::stepTimeForNetwork(int n)
 {

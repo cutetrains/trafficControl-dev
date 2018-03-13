@@ -100,22 +100,22 @@
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_17">
-    <layout class="QGridLayout" name="gridLayout_7">
-     <item row="0" column="0" colspan="2">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
       <widget class="QPushButton" name="importNetworkButton">
        <property name="text">
         <string>Import Network</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="2" colspan="2">
+     <item row="0" column="1">
       <widget class="QCheckBox" name="runThreadCheckBox">
        <property name="text">
         <string>Continue with ticks</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="4">
+     <item row="0" column="2">
       <widget class="QPushButton" name="timeTickButton">
        <property name="text">
         <string>Step time</string>
@@ -123,51 +123,24 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="threadStatusButton_2">
-       <property name="text">
-        <string>Every</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1" colspan="2">
-      <widget class="QSpinBox" name="tickIntervalSpinBox">
+      <widget class="QDoubleSpinBox" name="fastForwardSpinBox">
        <property name="suffix">
-        <string> ms</string>
+        <string>x</string>
+       </property>
+       <property name="decimals">
+        <number>1</number>
        </property>
        <property name="minimum">
-        <number>100</number>
+        <double>0.500000000000000</double>
        </property>
        <property name="maximum">
-        <number>1000</number>
+        <double>50.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.500000000000000</double>
        </property>
        <property name="value">
-        <number>500</number>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QLabel" name="threadStatusButton_3">
-       <property name="text">
-        <string>the network time steps</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="4">
-      <widget class="QSpinBox" name="stepTimeBox">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="suffix">
-        <string> s</string>
-       </property>
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <number>1</number>
-       </property>
-       <property name="value">
-        <number>1</number>
+        <double>1.000000000000000</double>
        </property>
       </widget>
      </item>

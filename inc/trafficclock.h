@@ -43,7 +43,7 @@ public slots:
   void threadTick();
 
 private:
-  bool continueTick; //This shall be toggled to tell whether to continue or not
+  bool simulationIsRunning; //This shall be toggled to tell whether to continue or not
   bool isAlive; //This shall be enabled until the thread shall be killed.
   bool threadMutexLocked;
   QTime systemTime;
