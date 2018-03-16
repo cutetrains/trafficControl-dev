@@ -47,6 +47,14 @@ void TrafficClock::disconnectThread()
   isAlive = false;
 }
 
+/*!
+ * Increments system time by 1 second
+ */
+void TrafficClock::incrementSimulatedTime(int iSeconds)
+{
+  systemTime = systemTime.addSecs(iSeconds);
+  emit updateSimulatedTimeSignal(systemTime.toString());
+}
 
 /*!
 * The is the is called by the thread. This is called everythime the counter is activated by the user.
@@ -54,6 +62,7 @@ void TrafficClock::disconnectThread()
 */
 void TrafficClock::threadTick()
 {
+
   targetTime = QTime::currentTime();
   while(isAlive)
   {

@@ -62,7 +62,8 @@ TrafficControl::TrafficControl(QWidget *parent) :
   connect(ui->timeTickButton, SIGNAL(clicked()), networkControl, SLOT(stepTimeForNetwork()));
   connect(ui->runThreadCheckBox, SIGNAL(stateChanged(int)), networkControl, SLOT(onRunThreadCheckBoxChanged(int)));
   connect(ui->fastForwardSpinBox, SIGNAL(valueChanged(double)), networkControl, SLOT(onFastForwardSpeedChanged(double)));
-
+  //connect(networkControl, SIGNAL(updateSimulatedTimeSignalLabel(QString)), this, SLOT(updateSimulatedTimeLabel(QString)));
+  connect(networkControl, SIGNAL(updateSimulatedTimeSignalLabel(QString)), this, SLOT(updateSimulatedTimeLabel(QString)));
   ui->stationListTableView->resizeColumnsToContents();
   ui->trackListTableView->resizeColumnsToContents();
   ui->trainListTableView->resizeColumnsToContents();
@@ -97,6 +98,11 @@ bool TrafficControl::readNetworkDefinitionFromFile()
   networkControl->parseMultipleNetworkCommand(fileStrings);
 
   return true;
+}
+
+void TrafficControl::updateSimulatedTimeLabel(QString sTime)
+{
+  ui->simulatedTimeLabel->setText(sTime);
 }
 
 /*!

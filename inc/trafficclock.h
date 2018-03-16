@@ -30,10 +30,12 @@ class TrafficClock : public QObject
 public:
   explicit TrafficClock(QObject *parent = 0);
   void threadSetup(QThread &clockThread);
+  void incrementSimulatedTime(int iSeconds);
   ~TrafficClock();
 
 signals:
   void stepTimeSignal();
+  void updateSimulatedTimeSignal(QString sMessage);
 
 public slots:
   void disconnectThread();

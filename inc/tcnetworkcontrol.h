@@ -48,6 +48,9 @@ public:
   QList<Train*> trainList;
   TrafficClock trafficClock;
 
+signals:
+  void updateSimulatedTimeSignalLabel(QString sMessage);
+
 public slots:
   bool addTrackToNetwork(QString trackName,
                          int trackLength,
@@ -68,6 +71,7 @@ public slots:
   bool parseMultipleNetworkCommand(QStringList inputLines);
   void onRunThreadCheckBoxChanged(int newState);
   void onFastForwardSpeedChanged(double newFastForwardSpeed);
+  void onUpdatedSimulatedTimeSignal(QString msg);
   void stepTimeForNetwork();
   void stepTimeForNetwork(int n);
     

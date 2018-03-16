@@ -61,11 +61,13 @@ NetworkControl::NetworkControl(TrafficDataModel &trackListModel,
   trafficClock.threadSetup(clockThread);
   trafficClock.moveToThread(&clockThread);
   clockThread.start();
+
   cmdParserCurrentTrain = UNDEFINED;
   cmdParserCurrentStation = UNDEFINED;
   cmdParserCurrentTrack = UNDEFINED;
-
   connect(&trafficClock, SIGNAL(stepTimeSignal()), this, SLOT(stepTimeForNetwork()));
+  //This is an intermediate step, relaying a signal from trafficClock via networkControl to UI
+  connect(&trafficClock, SIGNAL(updateSimulatedTimeSignal(QString)), this, SLOT(onUpdatedSimulatedTimeSignal(QString)));
 }
 
 /*!
@@ -295,11 +297,14 @@ void NetworkControl::onRunThreadCheckBoxChanged(int newState)
  */
 void NetworkControl::onFastForwardSpeedChanged(double newFastForwardSpeed)
 {
-  int newInterval = newFastForwardSpeed=0? 1000: (int) 1000/newFastForwardSpeed;
+  int newInterval = newFastForwardSpeed=0 ? 1000 : (int) 1000/newFastForwardSpeed;
   trafficClock.setTickInterval(newInterval);
-
 }
 
+void NetworkControl::onUpdatedSimulatedTimeSignal(QString msg)
+{
+  emit updateSimulatedTimeSignalLabel(msg);
+}
 /*!
  * This method commands all trains to move the amount of time defined in the stepTimeBox item in the UI.
  * @TODO: make method update all traffic elements, such as TRACK and STATION
@@ -307,8 +312,9 @@ void NetworkControl::onFastForwardSpeedChanged(double newFastForwardSpeed)
 void NetworkControl::stepTimeForNetwork(int n)
 {
   QMutexLocker locker(&mutex);
-  int response = 0;
 
+  int response = 0;
+  trafficClock.incrementSimulatedTime(n);
   /* ASSERTS TO VERIFY THAT TRAFFIC ELEMENTS HAS NEVER BEEN DELETED */
   bool result = false;
   result = trainList.length() == 0 ? true :
