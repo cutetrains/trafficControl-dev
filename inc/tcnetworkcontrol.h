@@ -50,6 +50,7 @@ public:
 
 signals:
   void updateSimulatedTimeSignalLabel(QString sMessage);
+  void updateCalculationLoad(int calculationTimeMs);
 
 public slots:
   bool addTrackToNetwork(QString trackName,
@@ -81,6 +82,9 @@ private:
   TrafficDataModel *trainListModel;
   TrafficDataModel *stationListModel;
   QMutex mutex;
+
+  QTime startTime;
+  QTime endTime;
 
   int cmdParserCurrentTrain;
   int cmdParserCurrentStation;

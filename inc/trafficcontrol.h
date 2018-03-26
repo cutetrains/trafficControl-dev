@@ -47,6 +47,7 @@ public:
 public slots:
   bool readNetworkDefinitionFromFile();
   void updateSimulatedTimeLabel(QString message);
+  void updateCalculationTime(int calculationTimeMs);
 
 private:
   NetworkControl *networkControl;

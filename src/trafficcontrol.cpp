@@ -62,7 +62,7 @@ TrafficControl::TrafficControl(QWidget *parent) :
   connect(ui->timeTickButton, SIGNAL(clicked()), networkControl, SLOT(stepTimeForNetwork()));
   connect(ui->runThreadCheckBox, SIGNAL(stateChanged(int)), networkControl, SLOT(onRunThreadCheckBoxChanged(int)));
   connect(ui->fastForwardSpinBox, SIGNAL(valueChanged(double)), networkControl, SLOT(onFastForwardSpeedChanged(double)));
-  //connect(networkControl, SIGNAL(updateSimulatedTimeSignalLabel(QString)), this, SLOT(updateSimulatedTimeLabel(QString)));
+  connect(networkControl, SIGNAL(updateCalculationLoad(int)), this, SLOT(updateCalculationTime(int)));
   connect(networkControl, SIGNAL(updateSimulatedTimeSignalLabel(QString)), this, SLOT(updateSimulatedTimeLabel(QString)));
   ui->stationListTableView->resizeColumnsToContents();
   ui->trackListTableView->resizeColumnsToContents();
@@ -90,9 +90,7 @@ bool TrafficControl::readNetworkDefinitionFromFile()
   QStringList fileStrings;
   while(!in.atEnd())
   {
-    //line = in.readLine();
     fileStrings << in.readLine();
-    //networkControl->parseCmd(line);
   }
   file.close();
   networkControl->parseMultipleNetworkCommand(fileStrings);
@@ -103,6 +101,13 @@ bool TrafficControl::readNetworkDefinitionFromFile()
 void TrafficControl::updateSimulatedTimeLabel(QString sTime)
 {
   ui->simulatedTimeLabel->setText(sTime);
+}
+
+void TrafficControl::updateCalculationTime(int calculationTimeMs){//This can be merged with updateSimulatedTimeLabel
+  // 100*calculationTimeMs/1000*speedFactor
+  // Example: 20 ms / 500 ms: 100*20/1000*2 = 4000/1000 = 4%
+  int systemLoad = (int) calculationTimeMs/10*ui->fastForwardSpinBox->value();
+  ui->calculationTimeLabel->setText(QString::number(calculationTimeMs)+ " ms ( "+QString::number(systemLoad)+" % )");
 }
 
 /*!

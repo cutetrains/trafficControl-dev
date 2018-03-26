@@ -311,8 +311,9 @@ void NetworkControl::onUpdatedSimulatedTimeSignal(QString msg)
  */
 void NetworkControl::stepTimeForNetwork(int n)
 {
+  int calculationTime;
   QMutexLocker locker(&mutex);
-
+  startTime = QTime::currentTime();
   int response = 0;
   trafficClock.incrementSimulatedTime(n);
   /* ASSERTS TO VERIFY THAT TRAFFIC ELEMENTS HAS NEVER BEEN DELETED */
@@ -339,6 +340,9 @@ void NetworkControl::stepTimeForNetwork(int n)
       response = thisTrain->move(1);
     }
   }
+  calculationTime = startTime.msecsTo(QTime::currentTime());
+  //qDebug()<<"Calculation time: "<<calculationTime;
+  emit updateCalculationLoad((int) calculationTime/n);
 }
 
 void NetworkControl::stepTimeForNetwork(){ stepTimeForNetwork(1);}

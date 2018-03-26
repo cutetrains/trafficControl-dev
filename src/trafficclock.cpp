@@ -24,8 +24,7 @@ TrafficClock::TrafficClock(QObject *parent) :
 {
   simulationIsRunning = false;//hardcoded, let the trafficControl emit a signal that updates this parameter later
   isAlive = true;
-  systemTime = QTime::currentTime();//may be deleted
-  timer.start();
+  simulatedTime = QTime::currentTime();
   tInterval = 1000; //No magic numbers
 }
 
@@ -52,8 +51,8 @@ void TrafficClock::disconnectThread()
  */
 void TrafficClock::incrementSimulatedTime(int iSeconds)
 {
-  systemTime = systemTime.addSecs(iSeconds);
-  emit updateSimulatedTimeSignal(systemTime.toString());
+  simulatedTime = simulatedTime.addSecs(iSeconds);
+  emit updateSimulatedTimeSignal(simulatedTime.toString());
 }
 
 /*!
@@ -62,23 +61,28 @@ void TrafficClock::incrementSimulatedTime(int iSeconds)
 */
 void TrafficClock::threadTick()
 {
-
   targetTime = QTime::currentTime();
+  int nrOfAdditionsThisTick;
   while(isAlive)
   {
-    targetTime = targetTime.addMSecs(tInterval);
+    //qDebug()<<QTime::currentTime()<<"Thread resumed"; //@HIDE IF RELEASE
 
     if (true == simulationIsRunning)
     {
       emit stepTimeSignal();
     }
-    tWait = QTime::currentTime().msecsTo(targetTime);
-    if(tWait<0){
-        qDebug()<<"tWait negative. Replacing with tInterval and resetting targetTime";
-        tWait = tInterval;
-        targetTime = QTime::currentTime().addMSecs(tInterval);
-    }
-    QThread::msleep(tWait);
+    /*First, find a target time in the future*/
+    nrOfAdditionsThisTick = 0;
+    do{
+      nrOfAdditionsThisTick++;
+      targetTime = targetTime.addMSecs(tInterval);
+      //qDebug()<<"Added "<<tInterval<<" to target. New Target: "<<targetTime;
+    } while (targetTime < QTime::currentTime());
+
+    if(nrOfAdditionsThisTick > 1){qDebug()<<"Target time missed ";}
+    //qDebug()<<QTime::currentTime()<<"Thread sleep";  //@HIDE IF RELEASE
+
+    QThread::msleep(QTime::currentTime().msecsTo(targetTime));
   }
 }
 
