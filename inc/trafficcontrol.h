@@ -48,6 +48,7 @@ public slots:
   bool readNetworkDefinitionFromFile();
   void updateSimulatedTimeLabel(QString message);
   void updateCalculationTime(int calculationTimeMs);
+  void onPlayStopButtonClicked(bool isChecked);
 
 private:
   NetworkControl *networkControl;

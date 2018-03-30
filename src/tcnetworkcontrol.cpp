@@ -275,18 +275,11 @@ bool NetworkControl::connectTrackToStationsByName(QString trackName,
  * The method resumes/pauses the trafficClock thread, depending on the new
  * state of the thread.
  *
- * @param newState The new state of the thread.
+ * @param simulationIsPaused Bool to tell if the simulation shall be paused.
  */
-void NetworkControl::onRunThreadCheckBoxChanged(int newState)
+void NetworkControl::setSimulationPaused(bool isPaused)
 {
-  if(newState == 2)//HARDCODED TO 2, THAT MEANS ACTIVE
-  {
-    trafficClock.resumeThread();
-  }
-  else
-  {
-    trafficClock.pauseThread();
-  }
+  isPaused ? trafficClock.pauseThread() : trafficClock.resumeThread();
 }
 
 /*!

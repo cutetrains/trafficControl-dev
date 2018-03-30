@@ -60,8 +60,13 @@ TrafficControl::TrafficControl(QWidget *parent) :
   connect(ui->importNetworkButton, SIGNAL(clicked()), this, SLOT(readNetworkDefinitionFromFile()));
 
   connect(ui->timeTickButton, SIGNAL(clicked()), networkControl, SLOT(stepTimeForNetwork()));
-  connect(ui->runThreadCheckBox, SIGNAL(stateChanged(int)), networkControl, SLOT(onRunThreadCheckBoxChanged(int)));
+  ui->playStopButton->setCheckable(true);
+  ui->playStopButton->setChecked(true);
+  connect(ui->playStopButton, SIGNAL(toggled(bool)), this, SLOT(onPlayStopButtonClicked(bool)));
+  ui->playStopButton->setToolTip("Play / pause the simulation");
   connect(ui->fastForwardSpinBox, SIGNAL(valueChanged(double)), networkControl, SLOT(onFastForwardSpeedChanged(double)));
+  ui->importNetworkButton->setToolTip("Import a train network from a file.");
+  ui->timeTickButton->setToolTip("Simulate one second.");
   connect(networkControl, SIGNAL(updateCalculationLoad(int)), this, SLOT(updateCalculationTime(int)));
   connect(networkControl, SIGNAL(updateSimulatedTimeSignalLabel(QString)), this, SLOT(updateSimulatedTimeLabel(QString)));
   ui->stationListTableView->resizeColumnsToContents();
@@ -108,6 +113,18 @@ void TrafficControl::updateCalculationTime(int calculationTimeMs){//This can be 
   // Example: 20 ms / 500 ms: 100*20/1000*2 = 4000/1000 = 4%
   int systemLoad = (int) calculationTimeMs/10*ui->fastForwardSpinBox->value();
   ui->calculationTimeLabel->setText(QString::number(calculationTimeMs)+ " ms ( "+QString::number(systemLoad)+" % )");
+}
+/*
+ * isChecked is TRUE if the simulation is paused
+ */
+void TrafficControl::onPlayStopButtonClicked(bool isPaused){
+  qDebug()<<"Clicked play/stop button: "<<isPaused;
+  if(true == isPaused) {
+    ui->playStopButton->setIcon(QIcon(":/resources/Media-Controls-Play-icon.png"));
+  } else {
+    ui->playStopButton->setIcon(QIcon(":/resources/Media-Controls-Pause-icon.png"));
+  }
+  networkControl->setSimulationPaused(isPaused);
 }
 
 /*!

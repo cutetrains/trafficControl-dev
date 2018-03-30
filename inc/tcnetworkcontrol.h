@@ -70,7 +70,7 @@ public slots:
                              int endStationID);
   bool parseCmd(QString inputLine);
   bool parseMultipleNetworkCommand(QStringList inputLines);
-  void onRunThreadCheckBoxChanged(int newState);
+  void setSimulationPaused(bool isPaused);
   void onFastForwardSpeedChanged(double newFastForwardSpeed);
   void onUpdatedSimulatedTimeSignal(QString msg);
   void stepTimeForNetwork();

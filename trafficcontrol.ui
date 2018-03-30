@@ -111,48 +111,67 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>83</width>
-       <height>23</height>
+       <width>32</width>
+       <height>32</height>
       </rect>
      </property>
      <property name="text">
-      <string>Import Network</string>
+      <string/>
      </property>
-    </widget>
-    <widget class="QCheckBox" name="runThreadCheckBox">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>71</width>
-       <height>17</height>
-      </rect>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/resources/if_map_107206.png</normaloff>:/resources/if_map_107206.png</iconset>
      </property>
-     <property name="text">
-      <string>Continous</string>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
      </property>
     </widget>
     <widget class="QPushButton" name="timeTickButton">
      <property name="geometry">
       <rect>
-       <x>170</x>
+       <x>90</x>
        <y>10</y>
-       <width>75</width>
-       <height>23</height>
+       <width>32</width>
+       <height>32</height>
       </rect>
      </property>
+     <property name="whatsThis">
+      <string/>
+     </property>
      <property name="text">
-      <string>Step time</string>
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/resources/Media-Controls-End-icon.png</normaloff>:/resources/Media-Controls-End-icon.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="fastForwardSpinBox">
      <property name="geometry">
       <rect>
-       <x>100</x>
+       <x>130</x>
        <y>10</y>
        <width>53</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="toolTipDuration">
+      <number>3</number>
+     </property>
+     <property name="whatsThis">
+      <string/>
      </property>
      <property name="suffix">
       <string>x</string>
@@ -179,8 +198,8 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>98</x>
-       <y>41</y>
+       <x>190</x>
+       <y>10</y>
        <width>60</width>
        <height>16</height>
       </rect>
@@ -210,8 +229,8 @@
     <widget class="QLabel" name="calculationTimeLabel">
      <property name="geometry">
       <rect>
-       <x>170</x>
-       <y>40</y>
+       <x>190</x>
+       <y>30</y>
        <width>71</width>
        <height>20</height>
       </rect>
@@ -230,6 +249,38 @@
      </property>
      <property name="text">
       <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="playStopButton">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>10</y>
+       <width>32</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="whatsThis">
+      <string/>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="resources.qrc">
+       <normaloff>:/resources/Media-Controls-Play-icon.png</normaloff>:/resources/Media-Controls-Play-icon.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>32</width>
+       <height>32</height>
+      </size>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
      </property>
     </widget>
    </widget>
@@ -289,6 +340,8 @@
    <header>QtQuickWidgets/QQuickWidget</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
