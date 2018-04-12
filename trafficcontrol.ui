@@ -92,199 +92,6 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidget_15">
-   <property name="minimumSize">
-    <size>
-     <width>89</width>
-     <height>90</height>
-    </size>
-   </property>
-   <property name="windowTitle">
-    <string> Controls</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_17">
-    <widget class="QPushButton" name="importNetworkButton">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>32</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="resources.qrc">
-       <normaloff>:/resources/if_map_107206.png</normaloff>:/resources/if_map_107206.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>32</width>
-       <height>32</height>
-      </size>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="timeTickButton">
-     <property name="geometry">
-      <rect>
-       <x>90</x>
-       <y>10</y>
-       <width>32</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="whatsThis">
-      <string/>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="resources.qrc">
-       <normaloff>:/resources/Media-Controls-End-icon.png</normaloff>:/resources/Media-Controls-End-icon.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>32</width>
-       <height>32</height>
-      </size>
-     </property>
-    </widget>
-    <widget class="QDoubleSpinBox" name="fastForwardSpinBox">
-     <property name="geometry">
-      <rect>
-       <x>130</x>
-       <y>10</y>
-       <width>53</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string/>
-     </property>
-     <property name="toolTipDuration">
-      <number>3</number>
-     </property>
-     <property name="whatsThis">
-      <string/>
-     </property>
-     <property name="suffix">
-      <string>x</string>
-     </property>
-     <property name="decimals">
-      <number>1</number>
-     </property>
-     <property name="minimum">
-      <double>0.500000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>50.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.500000000000000</double>
-     </property>
-     <property name="value">
-      <double>1.000000000000000</double>
-     </property>
-    </widget>
-    <widget class="QLabel" name="simulatedTimeLabel">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>10</y>
-       <width>60</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>60</width>
-       <height>10</height>
-      </size>
-     </property>
-     <property name="baseSize">
-      <size>
-       <width>6</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QLabel" name="calculationTimeLabel">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>30</y>
-       <width>71</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>50</width>
-       <height>10</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="playStopButton">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>10</y>
-       <width>32</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="whatsThis">
-      <string/>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="resources.qrc">
-       <normaloff>:/resources/Media-Controls-Play-icon.png</normaloff>:/resources/Media-Controls-Play-icon.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>32</width>
-       <height>32</height>
-      </size>
-     </property>
-     <property name="default">
-      <bool>false</bool>
-     </property>
-     <property name="flat">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </widget>
-  </widget>
   <widget class="QDockWidget" name="mapDockWidget_2">
    <property name="windowTitle">
     <string>Map</string>
@@ -331,6 +138,94 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1360</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionImport_Network_File"/>
+   </widget>
+   <widget class="QMenu" name="menuWindow">
+    <property name="title">
+     <string>Window</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuSimulation">
+    <property name="title">
+     <string>Simulation</string>
+    </property>
+    <addaction name="actionToggle_Simulation"/>
+    <addaction name="actionStep_Simulation"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuSimulation"/>
+   <addaction name="menuWindow"/>
+  </widget>
+  <widget class="QDockWidget" name="nwFileDockWidget">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionImport_Network_File"/>
+   <addaction name="actionToggle_Simulation"/>
+   <addaction name="actionStep_Simulation"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionImport_Network_File">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/icons8-waypoint-map-50.png</normaloff>:/resources/icons8-waypoint-map-50.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import Network File...</string>
+   </property>
+  </action>
+  <action name="actionToggle_Simulation">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/Media-Controls-Play-icon.png</normaloff>:/resources/Media-Controls-Play-icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Simulation</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Simulation</string>
+   </property>
+  </action>
+  <action name="actionStep_Simulation">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/Media-Controls-End-icon.png</normaloff>:/resources/Media-Controls-End-icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Step Simulation</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

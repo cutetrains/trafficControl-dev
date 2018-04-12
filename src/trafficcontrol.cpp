@@ -37,6 +37,25 @@ TrafficControl::TrafficControl(QWidget *parent) :
   ui(new Ui::TrafficControl)
 {
   ui->setupUi(this);
+  ui->nwFileDockWidget->hide();//Investigate
+
+  fastForwardSpinBox = new QDoubleSpinBox(this);
+
+  ui->toolBar->addWidget(fastForwardSpinBox); //fastForwfastForwardSpinBoxardSpinBox
+  fastForwardSpinBox->setMaximum(50);
+  fastForwardSpinBox->setMinimum(0.5);
+  fastForwardSpinBox->setSingleStep(0.5);
+  fastForwardSpinBox->setValue(1);
+  fastForwardSpinBox->setDecimals(1);
+  fastForwardSpinBox->setSuffix("x");
+  fastForwardSpinBox->setToolTip("Set the fast forward speed.");
+
+  simulatedTimeLabel  = new QLabel(this);
+  simulatedTimeLabel->setText("tt:mm:ss");
+  ui->statusBar->addWidget(simulatedTimeLabel);
+  calculationTimeLabel = new QLabel(this);//calculationTimeLabel and simulatedTimeLabel
+  calculationTimeLabel->setText("aaa ms ( bbb % )");
+  ui->statusBar->addWidget(calculationTimeLabel);
 
   trackListModel=new TrafficDataModel(TRACK, 0);
   trainListModel=new TrafficDataModel(TRAIN, 0);
@@ -57,16 +76,15 @@ TrafficControl::TrafficControl(QWidget *parent) :
                                       *stationListModel,
                                       *handleQMLObject);
 
-  connect(ui->importNetworkButton, SIGNAL(clicked()), this, SLOT(readNetworkDefinitionFromFile()));
+  connect(ui->actionImport_Network_File, SIGNAL(triggered(bool)), this, SLOT(readNetworkDefinitionFromFile()));
 
-  connect(ui->timeTickButton, SIGNAL(clicked()), networkControl, SLOT(stepTimeForNetwork()));
-  ui->playStopButton->setCheckable(true);
-  ui->playStopButton->setChecked(true);
-  connect(ui->playStopButton, SIGNAL(toggled(bool)), this, SLOT(onPlayStopButtonClicked(bool)));
-  ui->playStopButton->setToolTip("Play / pause the simulation");
-  connect(ui->fastForwardSpinBox, SIGNAL(valueChanged(double)), networkControl, SLOT(onFastForwardSpeedChanged(double)));
-  ui->importNetworkButton->setToolTip("Import a train network from a file.");
-  ui->timeTickButton->setToolTip("Simulate one second.");
+  connect(ui->actionStep_Simulation, SIGNAL(triggered(bool)), networkControl, SLOT(stepTimeForNetwork()));
+
+  ui->actionToggle_Simulation->setChecked(true);
+  connect(ui->actionToggle_Simulation, SIGNAL(toggled(bool)), this, SLOT(onPlayStopButtonClicked(bool)));
+
+  connect(fastForwardSpinBox, SIGNAL(valueChanged(double)), networkControl, SLOT(onFastForwardSpeedChanged(double)));
+
   connect(networkControl, SIGNAL(updateCalculationLoad(int)), this, SLOT(updateCalculationTime(int)));
   connect(networkControl, SIGNAL(updateSimulatedTimeSignalLabel(QString)), this, SLOT(updateSimulatedTimeLabel(QString)));
   ui->stationListTableView->resizeColumnsToContents();
@@ -105,24 +123,26 @@ bool TrafficControl::readNetworkDefinitionFromFile()
 
 void TrafficControl::updateSimulatedTimeLabel(QString sTime)
 {
-  ui->simulatedTimeLabel->setText(sTime);
+  simulatedTimeLabel->setText(sTime);
 }
 
 void TrafficControl::updateCalculationTime(int calculationTimeMs){//This can be merged with updateSimulatedTimeLabel
   // 100*calculationTimeMs/1000*speedFactor
   // Example: 20 ms / 500 ms: 100*20/1000*2 = 4000/1000 = 4%
-  int systemLoad = (int) calculationTimeMs/10*ui->fastForwardSpinBox->value();
-  ui->calculationTimeLabel->setText(QString::number(calculationTimeMs)+ " ms ( "+QString::number(systemLoad)+" % )");
+  int systemLoad = (int) calculationTimeMs / 10 * fastForwardSpinBox->value();
+  calculationTimeLabel->setText(QString::number(calculationTimeMs)+ " ms ( "+QString::number(systemLoad)+" % )");
 }
+
 /*
- * isChecked is TRUE if the simulation is paused
+ * isChecked is TRUE if the simulation is paused.
+ * Icon credit:
+ * http://icons8.com/
  */
 void TrafficControl::onPlayStopButtonClicked(bool isPaused){
-  qDebug()<<"Clicked play/stop button: "<<isPaused;
   if(true == isPaused) {
-    ui->playStopButton->setIcon(QIcon(":/resources/Media-Controls-Play-icon.png"));
+    ui->actionToggle_Simulation->setIcon(QIcon(":/resources/Media-Controls-Play-icon.png"));
   } else {
-    ui->playStopButton->setIcon(QIcon(":/resources/Media-Controls-Pause-icon.png"));
+    ui->actionToggle_Simulation->setIcon(QIcon(":/resources/Media-Controls-Pause-icon.png"));
   }
   networkControl->setSimulationPaused(isPaused);
 }

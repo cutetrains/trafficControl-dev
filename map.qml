@@ -45,6 +45,7 @@ Item {
     var foundTrackId = -1;
     var foundStartSignalId = -1;
     var foundEndSignalId = -1;
+    var j;
     for (var i = 0; i < mainMap.children.length; ++i)
     {
       if(mainMap.children[i].objectName === "track_"+trackName) {foundTrackId = i;}
@@ -54,12 +55,12 @@ Item {
     mainMap.children[foundTrackId].line.width = nbrOfTrains+1;
     if ("FREE" == trackStatus){
       mainMap.children[foundTrackId].line.color = "green";
-      for (var j = 0; j < mainMap.children.length; ++j) {
+      for (j = 0; j < mainMap.children.length; ++j) {
         if(mainMap.children[j].objectName === "track_"+trackName+"_START") {
           mainMap.children[j].destroy();
         }
       }
-      for (var j = 0; j < mainMap.children.length; ++j) {
+      for (j = 0; j < mainMap.children.length; ++j) {
         if(mainMap.children[j].objectName === "track_"+trackName+"_END") {
           mainMap.children[j].destroy();
         }

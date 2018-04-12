@@ -23,6 +23,8 @@
 #include <QDebug>
 #include <QUrl>
 #include <QtQml>
+#include <QLabel>
+#include <QDoubleSpinBox>
 #include "tctrain.h"
 #include "tctrack.h"
 #include "tcstation.h"
@@ -58,6 +60,9 @@ private:
   TrafficDataModel *trainListModel;
   TrafficDataModel *stationListModel;
   QString line;
+  QLabel *simulatedTimeLabel;
+  QLabel *calculationTimeLabel;
+  QDoubleSpinBox *fastForwardSpinBox;
 };
 
 #endif

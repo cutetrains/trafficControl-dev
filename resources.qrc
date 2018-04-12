@@ -9,6 +9,6 @@
         <file>resources/Media-Controls-Play-icon.png</file>
         <file>resources/Media-Controls-Pause-icon.png</file>
         <file>resources/Media-Controls-End-icon.png</file>
-        <file>resources/if_map_107206.png</file>
+        <file>resources/icons8-waypoint-map-50.png</file>
     </qresource>
 </RCC>
