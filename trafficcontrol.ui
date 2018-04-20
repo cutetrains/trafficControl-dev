@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+   <sizepolicy hsizetype="Ignored" vsizetype="Maximum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -92,7 +92,13 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="mapDockWidget_2">
+  <widget class="QDockWidget" name="mapDockWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <property name="windowTitle">
     <string>Map</string>
    </property>
@@ -107,14 +113,14 @@
         <bool>true</bool>
        </property>
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="minimumSize">
         <size>
-         <width>800</width>
+         <width>200</width>
          <height>200</height>
         </size>
        </property>
@@ -168,15 +174,6 @@
    <addaction name="menuFile"/>
    <addaction name="menuSimulation"/>
    <addaction name="menuWindow"/>
-  </widget>
-  <widget class="QDockWidget" name="nwFileDockWidget">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">

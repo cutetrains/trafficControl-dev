@@ -37,7 +37,7 @@ TrafficControl::TrafficControl(QWidget *parent) :
   ui(new Ui::TrafficControl)
 {
   ui->setupUi(this);
-  ui->nwFileDockWidget->hide();//Investigate
+
 
   fastForwardSpinBox = new QDoubleSpinBox(this);
 
@@ -71,6 +71,13 @@ TrafficControl::TrafficControl(QWidget *parent) :
   ui->mapQuickWidget->setSource(source);
   handleQMLObject = ui->mapQuickWidget->rootObject();
 
+  ui->mapDockWidget->sizePolicy().setHorizontalPolicy(QSizePolicy::MinimumExpanding);
+
+  ui->mapDockWidget->setFloating(true);
+  ui->mapDockWidget->move(100,100);
+  ui->mapDockWidget->resize(1000,700);
+  ui->mapDockWidget->updateGeometry();
+
   networkControl = new NetworkControl(*trackListModel,
                                       *trainListModel,
                                       *stationListModel,
@@ -90,6 +97,7 @@ TrafficControl::TrafficControl(QWidget *parent) :
   ui->stationListTableView->resizeColumnsToContents();
   ui->trackListTableView->resizeColumnsToContents();
   ui->trainListTableView->resizeColumnsToContents();
+
 }
 
 /*!
@@ -139,10 +147,14 @@ void TrafficControl::updateCalculationTime(int calculationTimeMs){//This can be 
  * http://icons8.com/
  */
 void TrafficControl::onPlayStopButtonClicked(bool isPaused){
-  if(true == isPaused) {
-    ui->actionToggle_Simulation->setIcon(QIcon(":/resources/Media-Controls-Play-icon.png"));
+  // If the simulation isn't paused (isPaused=FALSE), the step button should be disabled (setEnabled = FALSE)
+  ui->actionStep_Simulation->setEnabled(isPaused);
+  if(true ==  isPaused) {
+    ui->actionToggle_Simulation->setText("Resume Simulation");
+    ui->actionToggle_Simulation->setToolTip("Resume Simulation");
   } else {
-    ui->actionToggle_Simulation->setIcon(QIcon(":/resources/Media-Controls-Pause-icon.png"));
+    ui->actionToggle_Simulation->setText("Pause Simulation");
+    ui->actionToggle_Simulation->setToolTip("Pause Simulation");
   }
   networkControl->setSimulationPaused(isPaused);
 }
