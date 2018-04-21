@@ -23,7 +23,7 @@
    <string>trafficControl</string>
   </property>
   <widget class="QWidget" name="centralWidget"/>
-  <widget class="QDockWidget" name="dockWidget_11">
+  <widget class="QDockWidget" name="trackDockWidget">
    <property name="windowTitle">
     <string>Track List</string>
    </property>
@@ -44,7 +44,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidget_13">
+  <widget class="QDockWidget" name="stationDockWidget">
    <property name="windowTitle">
     <string>Station List</string>
    </property>
@@ -65,7 +65,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="dockWidget_14">
+  <widget class="QDockWidget" name="trainDockWidget">
    <property name="windowTitle">
     <string>Train List</string>
    </property>
@@ -163,6 +163,10 @@
     <property name="title">
      <string>Window</string>
     </property>
+    <addaction name="actionMapToggle"/>
+    <addaction name="actionTrainToggle"/>
+    <addaction name="actionStationToggle"/>
+    <addaction name="actionTrackToggle"/>
    </widget>
    <widget class="QMenu" name="menuSimulation">
     <property name="title">
@@ -176,6 +180,9 @@
    <addaction name="menuWindow"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -190,6 +197,24 @@
    <addaction name="actionStep_Simulation"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QToolBar" name="windowToolBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="windowTitle">
+    <string>toolBar_2</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionMapToggle"/>
+   <addaction name="actionTrainToggle"/>
+   <addaction name="actionStationToggle"/>
+   <addaction name="actionTrackToggle"/>
+  </widget>
   <action name="actionImport_Network_File">
    <property name="icon">
     <iconset resource="resources.qrc">
@@ -201,6 +226,9 @@
   </action>
   <action name="actionToggle_Simulation">
    <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
     <bool>true</bool>
    </property>
    <property name="icon">
@@ -221,6 +249,66 @@
    </property>
    <property name="text">
     <string>Step Simulation</string>
+   </property>
+  </action>
+  <action name="actionMapToggle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/icons8-world-map-64.png</normaloff>:/resources/icons8-world-map-64.png</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Map</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Map</string>
+   </property>
+  </action>
+  <action name="actionTrainToggle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/icons8-train-50.png</normaloff>:/resources/icons8-train-50.png</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Train List</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Train List</string>
+   </property>
+  </action>
+  <action name="actionStationToggle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/icons8-railway-station-50.png</normaloff>:/resources/icons8-railway-station-50.png</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Station List</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Station List</string>
+   </property>
+  </action>
+  <action name="actionTrackToggle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/icons8-tracks-50.png</normaloff>:/resources/icons8-tracks-50.png</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Track List</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Track List</string>
    </property>
   </action>
  </widget>

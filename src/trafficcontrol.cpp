@@ -74,7 +74,7 @@ TrafficControl::TrafficControl(QWidget *parent) :
   ui->mapDockWidget->sizePolicy().setHorizontalPolicy(QSizePolicy::MinimumExpanding);
 
   ui->mapDockWidget->setFloating(true);
-  ui->mapDockWidget->move(100,100);
+  ui->mapDockWidget->move(100,230);
   ui->mapDockWidget->resize(1000,700);
   ui->mapDockWidget->updateGeometry();
 
@@ -84,14 +84,13 @@ TrafficControl::TrafficControl(QWidget *parent) :
                                       *handleQMLObject);
 
   connect(ui->actionImport_Network_File, SIGNAL(triggered(bool)), this, SLOT(readNetworkDefinitionFromFile()));
-
   connect(ui->actionStep_Simulation, SIGNAL(triggered(bool)), networkControl, SLOT(stepTimeForNetwork()));
-
-  ui->actionToggle_Simulation->setChecked(true);
   connect(ui->actionToggle_Simulation, SIGNAL(toggled(bool)), this, SLOT(onPlayStopButtonClicked(bool)));
-
+  connect(ui->actionMapToggle, SIGNAL(toggled(bool)), this, SLOT(onToggleMapDockWidget(bool)));
+  connect(ui->actionTrackToggle, SIGNAL(toggled(bool)), this, SLOT(onToggleTrackDockWidget(bool)));
+  connect(ui->actionStationToggle, SIGNAL(toggled(bool)), this, SLOT(onToggleStationDockWidget(bool)));
+  connect(ui->actionTrainToggle, SIGNAL(toggled(bool)), this, SLOT(onToggleTrainDockWidget(bool)));
   connect(fastForwardSpinBox, SIGNAL(valueChanged(double)), networkControl, SLOT(onFastForwardSpeedChanged(double)));
-
   connect(networkControl, SIGNAL(updateCalculationLoad(int)), this, SLOT(updateCalculationTime(int)));
   connect(networkControl, SIGNAL(updateSimulatedTimeSignalLabel(QString)), this, SLOT(updateSimulatedTimeLabel(QString)));
   ui->stationListTableView->resizeColumnsToContents();
@@ -141,6 +140,22 @@ void TrafficControl::updateCalculationTime(int calculationTimeMs){//This can be 
   calculationTimeLabel->setText(QString::number(calculationTimeMs)+ " ms ( "+QString::number(systemLoad)+" % )");
 }
 
+void TrafficControl::onToggleMapDockWidget(bool isChecked){
+  ui->mapDockWidget->setVisible(!isChecked);
+}
+
+void TrafficControl::onToggleTrainDockWidget(bool isChecked){
+  ui->trainDockWidget->setVisible(!isChecked);
+}
+
+void TrafficControl::onToggleTrackDockWidget(bool isChecked){
+    ui->trackDockWidget->setVisible(!isChecked);
+}
+
+void TrafficControl::onToggleStationDockWidget(bool isChecked){
+    ui->stationDockWidget->setVisible(!isChecked);
+}
+
 /*
  * isChecked is TRUE if the simulation is paused.
  * Icon credit:
@@ -149,6 +164,7 @@ void TrafficControl::updateCalculationTime(int calculationTimeMs){//This can be 
 void TrafficControl::onPlayStopButtonClicked(bool isPaused){
   // If the simulation isn't paused (isPaused=FALSE), the step button should be disabled (setEnabled = FALSE)
   ui->actionStep_Simulation->setEnabled(isPaused);
+  ui->actionImport_Network_File->setEnabled(isPaused);
   if(true ==  isPaused) {
     ui->actionToggle_Simulation->setText("Resume Simulation");
     ui->actionToggle_Simulation->setToolTip("Resume Simulation");

@@ -51,6 +51,10 @@ public slots:
   void updateSimulatedTimeLabel(QString message);
   void updateCalculationTime(int calculationTimeMs);
   void onPlayStopButtonClicked(bool isChecked);
+  void onToggleMapDockWidget(bool isChecked);
+  void onToggleTrainDockWidget(bool isChecked);
+  void onToggleTrackDockWidget(bool isChecked);
+  void onToggleStationDockWidget(bool isChecked);
 
 private:
   NetworkControl *networkControl;
