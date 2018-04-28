@@ -212,10 +212,7 @@ bool Track::deleteTrainFromTrack(int trainID){
  * set the total number ofstations to zero. This is done mainly in the tests
  * to ensure that the test environment is reset.
  */
-void Track::destructorResetTotalNumberOfTracks()
-{
-  totalNbrOfTracks = 0;
-}
+void Track::destructorResetTotalNumberOfTracks() { totalNbrOfTracks = 0; }
 
 /*!
  * The method calculates the coordinates for a position on the track.
@@ -228,17 +225,17 @@ QList<float> Track::getCoordinatesFromPosition(int position)
 {
   int iii;
   float fractionOfLeg;
-  QList<float> thisList;
+  QList<float> returnList;
   if(!this->hasValidCoordinates)
   {
     qDebug()<<"ERROR   : Trying to get coordinates from "<< this->getName();
     qDebug()<<"that has no coordinates";
-    thisList<<0.0<<0.0;
-    return thisList;
+    returnList<<0.0<<0.0;
+    return returnList;
   }
   if(0 == position){
-    thisList<<coordinateList.at(0)<<coordinateList.at(1);
-    return thisList;
+    returnList<<coordinateList.at(0)<<coordinateList.at(1);
+    return returnList;
   }
   for (iii=0; iii < coordinateList.length(); iii++){
     if (coordinateCumulatedDistanceList.at(iii) >= position){
@@ -248,9 +245,9 @@ QList<float> Track::getCoordinatesFromPosition(int position)
   }
   fractionOfLeg = ( (float) position-coordinateCumulatedDistanceList.at(iii))/
                   (coordinateCumulatedDistanceList.at(iii+1)-coordinateCumulatedDistanceList.at(iii));
-  thisList<< (coordinateList.at(iii*2+2)-coordinateList.at(iii*2)) * fractionOfLeg + coordinateList.at(iii*2);
-  thisList<< (coordinateList.at(iii*2+2+1)-coordinateList.at(iii*2+1)) * fractionOfLeg + coordinateList.at(iii*2+1);
-  return thisList;
+  returnList << (coordinateList.at(iii*2+2)-coordinateList.at(iii*2)) * fractionOfLeg + coordinateList.at(iii*2);
+  returnList << (coordinateList.at(iii*2+2+1)-coordinateList.at(iii*2+1)) * fractionOfLeg + coordinateList.at(iii*2+1);
+  return returnList;
 }
 
 /*!
@@ -267,19 +264,17 @@ int Track::getEndStation() { return endStation; }
  */
 int Track::getID() { return trackID;}
 
-
 /*!
- * The method returns the length for this Track object. The unit is meters.
+ * The method returns the length for this Track object. [m]
  *
  * @return length The length for this Track object.
  */
 int Track::getLength() { return length;}
 
 /*!
- * The method returns the maximum allowed speed for this Track object.
- * The unit is meters per second.
+ * The method returns the maximum allowed speed for this Track object. [m/s]
  *
- * @return length The length in meters for this Track object.
+ * @return maxAllowedSpeed The maximum allowed speed.
  */
 int Track::getMaxAllowedSpeed() { return maxAllowedSpeed ; }
 
@@ -293,28 +288,52 @@ QString Track::getName() {return name;}
 /*!
  * The method returns the start station for this Track object.
  *
- * @return startStation The station ID for the startStation for this Track
- *                      object.
+ * @return startStation The station ID for the startStation for this Track object.
  */
 int Track::getStartStation(){ return startStation;}
 
+/*!
+ * The method returns the total number of tracks for this station.
+ *
+ * @return totalNbrOfTracks The number of tracks for this station.
+ */
 int Track::getTotalNbrOfTracks(){ return totalNbrOfTracks;}
 
+/*!
+ * The method returns a list of all trains on the track. The list is a FIFO queue.
+ *
+ * @return trainsOnTrackQueue A list of trains on the track.
+ */
 QList<int> Track::getTrainList()
 {
   return trainsOnTrackQueue;
 }
 
+/*!
+ * The method tells whether the track has valid coordinates or not.
+ *
+ * @return hasValidCoordinates TRUE if there are valid coordinates.
+ */
 bool Track::hasCoordinates(){ return hasValidCoordinates;}
 
+/*!
+ * The method tells whether the track is locked in downStream (start station to end station).
+ *
+ * @return lockedDownStream TRUE if the track is locked downStream.
+ */
 bool Track::isLockedDownStream(){ return lockedDownStream; }
 
+/*!
+ * The method tells whether the track is locked in upStream (end station to start station).
+ *
+ * @return lockedUpStream TRUE if the track is locked upStream.
+ */
 bool Track::isLockedUpStream(){ return lockedUpStream; }
 
 /*!
  * The method returns whether the track operates in reversed directon (from end to start).
  *
- * return rt true if the traffic is in reversed direction.
+ * return reversedTraffic TRUE if the traffic is in reversed direction.
  */
 bool Track::isReversedTraffic() { return reversedTraffic; }
 
@@ -374,6 +393,11 @@ void Track::setEndStation(int stationID) {
   sendDataChangedSignal(trackID);
 }
 
+/*!
+ * The method sets a lock in downStream (from start to end).
+ *
+ * @param lockDS TRUE if the track shall be locked in downStream.
+ */
 void Track::setLockDownStream(bool lockDS) {
   lockedDownStream = lockDS;
   sendDataChangedSignal(this->getID());
@@ -382,6 +406,11 @@ void Track::setLockDownStream(bool lockDS) {
   }
 }
 
+/*!
+ * The method sets a lock in upStream
+ *
+ * @param lockUS TRUE if the track shall be locked in upStream.
+ */
 void Track::setLockUpStream(bool lockUS) {
   lockedUpStream = lockUS;
   sendDataChangedSignal(this->getID());

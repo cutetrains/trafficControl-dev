@@ -52,8 +52,8 @@ int Station::totalNbrOfStations = 0;
  */
 Station::Station(QString stationName,
                  bool isJunction,
-                 QString inLatitude,
-                 QString inLongitude,
+                 QString latitude,
+                 QString longitude,
                  QList<Track*>& trackList,
                  QList<Train*>& trainList,
                  QList<Station*>& stationList)
@@ -66,9 +66,9 @@ Station::Station(QString stationName,
   bool isOk;
   float tempLatitude;
   float tempLongitude;
-  tempLatitude = inLatitude.toFloat(&isOk);
+  tempLatitude = latitude.toFloat(&isOk);
   if (isOk) {
-    tempLongitude = inLongitude.toFloat(&isOk);
+    tempLongitude = longitude.toFloat(&isOk);
   }
   if(isOk) {  //Verify that coordinates are not too out of scope
     isOk = (qFabs(tempLatitude) < 90 && qFabs(tempLongitude) < 180);
@@ -96,7 +96,7 @@ Station::Station(QString stationName,
  * @todo Check if track is already connected to the station
  */
 bool Station::addTrack(int trackID) {
-  if (trackID<= -1 ||
+  if (trackID<= UNDEFINED ||
       trackID > thisTrackList->length() - 1 ||
       this->leavingTrackList.contains(trackID)){
     qDebug()<<"ERROR  : Station::addTrack" << name
@@ -128,7 +128,7 @@ bool Station::changeNbrOfPassengers(int nbrPassengersToAdd) {
   }
   else
   {
-    bool result = nbrPassengersToAdd + waitingPassengers<0 ? false: true;
+    bool result = nbrPassengersToAdd + waitingPassengers < 0 ? false: true;
     waitingPassengers = max((waitingPassengers + nbrPassengersToAdd), 0);
     sendDataChangedSignal(stationID);
     return result;
@@ -161,10 +161,7 @@ bool Station::checkIfTrackLeavesStation(int trackID)
  * set the total number ofstations to zero. This is done mainly in the tests
  * to ensure that the test environment is reset.
  */
-void Station::destructorResetTotalNumberOfStations()
-{
-  totalNbrOfStations = 0;
-}
+void Station::destructorResetTotalNumberOfStations() { totalNbrOfStations = 0; }
 
 /*!
  * The method finds the track index in leavingTrackList to the adjacent
@@ -318,6 +315,8 @@ void Station::sendDataChangedSignal(int stationID){
  * platforms is 2.
  *
  * @param nbrOfPlatforms The new number of platfoms/tracks on the station.
+ *
+ * @return TRUE if successful
  */
 bool Station::setNbrOfPlatforms(int nbrOfPlatforms){
   if(nbrOfPlatforms > 0){
@@ -328,7 +327,6 @@ bool Station::setNbrOfPlatforms(int nbrOfPlatforms){
     return false;
   }
 }
-
 
 /*!
  * The method shows information about the Station object (Name, number of
@@ -350,6 +348,8 @@ void Station::showInfo() {
  * emits a signal to QML.
  *
  * @param trainID The ID of the train.
+ *
+ * @return TRUE if successful
  */
 bool Station::trainArrival(int trainID)
 {

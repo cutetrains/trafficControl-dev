@@ -47,14 +47,14 @@ public:
   QWidget *mapContainer;
 
 public slots:
-  bool readNetworkDefinitionFromFile();
-  void updateSimulatedTimeLabel(QString message);
-  void updateCalculationTime(int calculationTimeMs);
   void onPlayStopButtonClicked(bool isChecked);
-  void onToggleMapDockWidget(bool isChecked);
-  void onToggleTrainDockWidget(bool isChecked);
-  void onToggleTrackDockWidget(bool isChecked);
-  void onToggleStationDockWidget(bool isChecked);
+  void onToggleMapDockWidget(bool isVisible);
+  void onToggleTrainDockWidget(bool isVisible);
+  void onToggleTrackDockWidget(bool isVisible);
+  void onToggleStationDockWidget(bool isVisible);
+  bool readNetworkDefinitionFromFile();
+  void updateCalculationTime(int calculationTimeMs);
+  void updateSimulatedTimeLabel(QString message);
 
 private:
   NetworkControl *networkControl;

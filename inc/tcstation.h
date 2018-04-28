@@ -59,19 +59,19 @@ public:
   bool addTrack(int trackID); //To be handled in trafficcontrol
   bool changeNbrOfPassengers(int n);
   bool checkIfTrackLeavesStation(int trackID);
+  void destructorResetTotalNumberOfStations();
   int findLeavingTrackIndexToStation(int targetStationID);
   int getID();
   float getLatitude();
   float getLongitude();
-  QString getName();
   QList<int> getLeavingTrackList();
+  QString getName();
+  int getNbrOfWaitingPassengers();
   int getNbrOfPlatforms();
   int getTotalNbrOfStations();
   QList<int> getTrainList();
-  int getNbrOfWaitingPassengers();
   bool hasCoordinates();
   bool isJunction();
-  void destructorResetTotalNumberOfStations();
   void sendDataChangedSignal(int stationID);
   bool setNbrOfPlatforms(int nbrOfPlatforms);
   void showInfo();

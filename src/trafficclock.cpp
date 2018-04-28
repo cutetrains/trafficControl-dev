@@ -47,7 +47,9 @@ void TrafficClock::disconnectThread()
 }
 
 /*!
- * Increments system time by 1 second
+ * Increments system time
+ *
+ * @param iSeconds time to add
  */
 void TrafficClock::incrementSimulatedTime(int iSeconds)
 {

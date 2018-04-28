@@ -79,21 +79,22 @@ Train::Train(QString trainName,
  * @todo investigate if it is better to use a list of stations instead.
  * 
  * @param trackID the ID number of the track to add.
+ *
+ * @return true if successful, false if unsuccessful
  */
-int Train::addStationToTravelPlan(int stationID)
+bool Train::addStationToTravelPlan(int stationID)
 {
   if (stationID < 0){
     qDebug()<<"ERROR  : Train::addTrackToTrainRoute Error: negative number specified."
             << stationID<<" : "<< thisStationList->at(stationID)->getName();
-    return 0;
+    return false;
     }
   else
   {
     travelPlanByStationID << stationID;
   }
   sendDataChangedSignal(trainID);
-  //showInfo();
-  return 1;
+  return true;
 }
 
 /*!
@@ -101,7 +102,7 @@ int Train::addStationToTravelPlan(int stationID)
  *
  * @param n Time remaining for the train in this trafficClock tick
  *
- * @return n
+ * @return n Time remaining after operations
  */
 int Train::closingState(int n)
 {
@@ -224,6 +225,9 @@ QList<int> Train::getTravelPlan() {return travelPlanByStationID;}
  * @todo The load function is faulty. Also send a signal.
  * @param nbrOfPassengersToLoad The numer of passengers to load to the train.
  *                              This number can be negative for unloading.
+ *
+ * @return deniedPassengers the number of passengers that weren't allowed to enter the or leave
+ *                              the train.
  */
 int Train::load(int nbrOfPassengersToLoad) {
   int newNbrOfPassengers = min(passengerCapacity,
@@ -240,7 +244,7 @@ int Train::load(int nbrOfPassengersToLoad) {
  *
  * @param n Time remaining for the train in this trafficClock tick
  *
- * @return n
+ * @return n remaining time
  */
 int Train::loadingState(int n)
 {
@@ -272,10 +276,10 @@ int Train::move(int n)
     if (stateTable.value("WAITING") == state) { n = this->waitingState(n); }
     else if (stateTable.value("READY") == state) { n = this->readyState(n); }
     else if (stateTable.value("RUNNING") == state) { n = this->runningState(n); }
-    else if(stateTable.value("OPENING") == state) { n = this->openingState(n); }
-    else if(stateTable.value("LOADING") == state) { n = this->loadingState(n); }
-    else if(stateTable.value("CLOSING") == state) { n = this->closingState(n); }
-    else if(stateTable.value("STOPPED") == state) { }
+    else if (stateTable.value("OPENING") == state) { n = this->openingState(n); }
+    else if (stateTable.value("LOADING") == state) { n = this->loadingState(n); }
+    else if (stateTable.value("CLOSING") == state) { n = this->closingState(n); }
+    else if (stateTable.value("STOPPED") == state) { }
     n--;
   }
   sendDataChangedSignal(trainID);//INVESTIGATE WHEN DATACHANGEDSIGNAL SHALL BE SENT!
@@ -287,7 +291,7 @@ int Train::move(int n)
  *
  * @param n Time remaining for the train in this trafficClock tick
  *
- * @return n
+ * @return n Remaining time after operations
  */
 int Train::openingState(int n)
 {
@@ -306,7 +310,7 @@ int Train::openingState(int n)
  *
  * @param n Time remaining for the train in this trafficClock tick
  *
- * @return n
+ * @return n Time remaining after operations
  */
 int Train::readyState(int n)
 {
@@ -359,7 +363,7 @@ int Train::readyState(int n)
  *
  * @param n Time remaining for the train in this trafficClock tick
  *
- * @return n
+ * @return n Time remaining after operations
  */
 int Train::readyToRunningState(int n)
 {
@@ -427,7 +431,7 @@ int Train::runningState(int n)
  *
  * @param n Time remaining for the train in this trafficClock tick
  *
- * @return n
+ * @return n Remaining time after operation
  */
 int Train::runningToOpeningState(int n)
 {
@@ -442,7 +446,7 @@ int Train::runningToOpeningState(int n)
     qDebug()<<"ERROR   : Train removal failed";
   }
   currentTrack = UNDEFINED;
-  nextTrack = UNDEFINED;//Why remove nextTrack?
+  nextTrack = UNDEFINED;
 
   emit qmlTrainPositionSignal(this->getName(),
                               thisStationList->at(currentStation)->getLatitude(),
@@ -473,7 +477,7 @@ void Train::sendDataChangedSignal(int trainID){//Name, Track/Station , Position,
   }
   else if (UNDEFINED != currentTrack)
   {
-    message<<"T["+QString::number(currentTrack)+"] "+thisTrackList->at(currentTrack)->getName();
+    message<<thisTrackList->at(currentTrack)->getName();
   }
   message<<QString::number(positionOnTrack);
   message<<QString::number(currentSpeed);
@@ -483,6 +487,7 @@ void Train::sendDataChangedSignal(int trainID){//Name, Track/Station , Position,
 
 /*!
  * Set the current station for the Train.
+ * @todo Later: reserve place in station for the train
  *
  * @param stationID The ID for the station that will be the current station for this Train.
  */
@@ -495,11 +500,10 @@ void Train::setCurrentStation(int stationID) {
   emit qmlTrainPositionSignal(this->getName(),
                               thisStationList->at(stationID)->getLatitude(),
                               thisStationList->at(stationID)->getLongitude());
-}//Later: reserve place in station for the train
+}
 
 /*!
  * The method sets the current Track of the Train object.
- * @TODO CHECK IF NEEDED
  * @TODO ADD PPOSITION
  *
  * @param trackID The ID of the Train object that has information to update.
@@ -512,13 +516,13 @@ void Train::setCurrentTrack(int trackID) {
 /*!
  * Set the desired speed for the Train.
  *
- * @param n The desired speed for the Train [m/s].
+ * @param newDesiredSpeed The desired speed for the Train [m/s].
  */
-void Train::setDesiredSpeed(int n) {
-  desiredSpeed = min(maxSpeed, n);
+void Train::setDesiredSpeed(int newDesiredSpeed) {
+  desiredSpeed = min(maxSpeed, newDesiredSpeed);
   if (currentTrack != UNDEFINED){
   int maxSpeed = thisTrackList->at(currentTrack)->getMaxAllowedSpeed();
-    desiredSpeed = min(n, maxSpeed);
+    desiredSpeed = min(newDesiredSpeed, maxSpeed);
   }
   sendDataChangedSignal(trainID);//+1?
 }
@@ -537,12 +541,12 @@ void Train::setName(QString trainName) {
  * Set the position on the current Track for the train in meters. This is done
  * only if the train is located on a track. After completion, a signal is sent.
  *
- * @param n The desired position for the train [m].
+ * @param newPosition The desired position for the train [m].
  */
-void Train::setTrackPosition(int n)
+void Train::setTrackPosition(int newPosition)
 {
   if (currentTrack != UNDEFINED){
-    positionOnTrack = max(n, 0);
+    positionOnTrack = max(newPosition, 0);
     positionOnTrack = min(positionOnTrack,
                           thisTrackList->at(currentTrack)->getLength());
     if(thisTrackList->at(currentTrack)->hasCoordinates())
@@ -592,7 +596,7 @@ void Train::showInfo()
  *
  * @param n Time remaining for the train in this trafficClock tick
  *
- * @return n
+ * @return n Remaining time after operation
  */
 int Train::waitingState(int n)
 {

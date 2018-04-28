@@ -32,7 +32,7 @@ using namespace std;
  *
  * @param inputLine One network commands as a QStringList.
  *
- * @return Success of Failure
+ * @return Success or Failure
  */
 bool NetworkControl::parseMultipleNetworkCommand(QStringList inputLines)
 {
@@ -51,9 +51,10 @@ bool NetworkControl::parseMultipleNetworkCommand(QStringList inputLines)
  *
  * @param inputLine One network command.
  *
- * @return Success of Failure
+ * @return Success or Failure
  *
  * @todo: If this part becomes too extensive, place this code in a separate source file.
+ * @todo: Use Regular Expressions
  * @todo: Introduce consistensy checks for files.
  */
 bool NetworkControl::parseCmd(QString inputLine)
@@ -293,8 +294,4 @@ bool NetworkControl::parseCmd(QString inputLine)
       qDebug()<<"ERROR  : TC:IPN Command not recognised: "<<inputLine;
   }
   return approvedCommand;
-
-  //ui->trainListTableView->resizeColumnsToContents();
-  //ui->trackListTableView->resizeColumnsToContents();
-  //ui->stationListTableView->resizeColumnsToContents();
 }

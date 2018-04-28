@@ -67,7 +67,57 @@ NetworkControl::NetworkControl(TrafficDataModel &trackListModel,
   cmdParserCurrentTrack = UNDEFINED;
   connect(&trafficClock, SIGNAL(stepTimeSignal()), this, SLOT(stepTimeForNetwork()));
   //This is an intermediate step, relaying a signal from trafficClock via networkControl to UI
-  connect(&trafficClock, SIGNAL(updateSimulatedTimeSignal(QString)), this, SLOT(onUpdatedSimulatedTimeSignal(QString)));
+  connect(&trafficClock,
+          SIGNAL(updateSimulatedTimeSignal(QString)),
+          this,
+          SLOT(onUpdatedSimulatedTimeSignal(QString)));
+}
+
+/*!
+ * The method addStationToNetwork creates a Train object, connects it to the
+ * onDataChanged slot and appends it to the trainList and the trainListModel.
+ *
+ * @param stationName Name of the station
+ * @param isJunction TRUE if this is a junction that doesn't handle passengers
+ * @param stationLat Latitude of the station.
+ * @param stationLon Longitude of the station
+ */
+void NetworkControl::addStationToNetwork(QString stationName,
+                                         bool isJunction,
+                                         QString stationLat,
+                                         QString stationLon)
+{
+  Station* newStation = new Station(stationName,
+                                  isJunction,
+                                  stationLat,
+                                  stationLon,
+                                  trackList,
+                                  trainList,
+                                  stationList);
+  connect(newStation,
+          SIGNAL(dataChangedSignal(int, const QVariant &)),
+          stationListModel,
+          SLOT(onDataChanged(int , const QVariant &)));
+  stationList.append(newStation);
+  stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
+
+  if( 0 != stationLat.compare("") &&
+      0 != stationLon.compare("") &&
+      NULL != &handleQMLObject){
+    QVariant returnedValue;
+    QMetaObject::invokeMethod(handleQMLObject,
+                              "createQMLStation",
+                              Q_RETURN_ARG(QVariant, returnedValue),
+                              Q_ARG(QVariant, stationName),
+                              Q_ARG(QVariant, isJunction),
+                              Q_ARG(QVariant, stationLat),
+                              Q_ARG(QVariant, stationLon));
+    connect(newStation,
+            SIGNAL(qmlStationOccupancySignal(QVariant ,QVariant ,QVariant)),
+            handleQMLObject,
+            SLOT(qmlStationOccupancySlot(QVariant, QVariant, QVariant)));
+  }
+  newStation = NULL;
 }
 
 /*!
@@ -123,7 +173,7 @@ bool NetworkControl::addTrackToNetwork(QString trackName,
  */
 void NetworkControl::addTrainToNetwork(QString trainName)
 {
-  Train* newTrain =new Train(trainName, trackList, trainList, stationList);
+  Train* newTrain = new Train(trainName, trackList, trainList, stationList);
   connect(newTrain,
           SIGNAL(dataChangedSignal(int, const QVariant &)),
           trainListModel,
@@ -146,50 +196,6 @@ void NetworkControl::addTrainToNetwork(QString trainName)
 }
 
 /*!
- * The method addStationToNetwork creates a Train object, connects it to the
- * onDataChanged slot and appends it to the trainList and the trainListModel.
- *
- * @param stationName Name of the station
- */
-void NetworkControl::addStationToNetwork(QString stationName,
-                                         bool isJunction,
-                                         QString stationLat,
-                                         QString stationLon)
-{
-  Station* newStation = new Station(stationName,
-                                  isJunction,
-                                  stationLat,
-                                  stationLon,
-                                  trackList,
-                                  trainList,
-                                  stationList);
-  connect(newStation,
-          SIGNAL(dataChangedSignal(int, const QVariant &)),
-          stationListModel,
-          SLOT(onDataChanged(int , const QVariant &)));
-  stationList.append(newStation);
-  stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
-
-  if( 0 != stationLat.compare("") &&
-      0 != stationLon.compare("") &&
-      NULL != &handleQMLObject){
-    QVariant returnedValue;
-    QMetaObject::invokeMethod(handleQMLObject,
-                              "createQMLStation",
-                              Q_RETURN_ARG(QVariant, returnedValue),
-                              Q_ARG(QVariant, stationName),
-                              Q_ARG(QVariant, isJunction),
-                              Q_ARG(QVariant, stationLat),
-                              Q_ARG(QVariant, stationLon));
-    connect(newStation,
-            SIGNAL(qmlStationOccupancySignal(QVariant ,QVariant ,QVariant)),
-            handleQMLObject,
-            SLOT(qmlStationOccupancySlot(QVariant, QVariant, QVariant)));
-  }
-  newStation = NULL;
-}
-
-/*!
  * The method connects at Track object to a Start Station and an End Station.
  *
  * @param trackID The ID number of the track.
@@ -197,9 +203,6 @@ void NetworkControl::addStationToNetwork(QString stationName,
  * @param endStation The ID number of the end station for the track.
  *
  * @return Status 1 indicates success. 0 indicates failure.
- * @TODO Insert constraints in this function, similar as the name based
- *       connectTrackToStations method
- *
  * @TODO Add error detection
  */
 bool NetworkControl::connectTrackToStations(int trackID,
@@ -239,36 +242,61 @@ bool NetworkControl::connectTrackToStations(int trackID,
  * @todo Add error handling
  */
 bool NetworkControl::connectTrackToStationsByName(QString trackName,
-                                           QString startStationName,
-                                           QString endStationName)
+                                                  QString startStationName,
+                                                  QString endStationName)
 {
   int foundStartStationID = UNDEFINED;
   int foundEndStationID = UNDEFINED;
   int foundTrackID = UNDEFINED;
+
   foreach(Station* thisStation, stationList)
   {
-      if (QString::compare(startStationName, thisStation->getName()) == 0)
-      {
-          foundStartStationID=thisStation->getID();
-      }
-      if (QString::compare(endStationName, thisStation->getName()) == 0)
-      {
-          foundEndStationID=thisStation->getID();
-      }
-      if ((foundStartStationID != UNDEFINED) &&
-              (foundEndStationID != UNDEFINED))
-      {
-          break;
-      }
+    if (QString::compare(startStationName, thisStation->getName()) == 0)
+    {
+      foundStartStationID=thisStation->getID();
+    }
+    if (QString::compare(endStationName, thisStation->getName()) == 0)
+    {
+      foundEndStationID=thisStation->getID();
+    }
+    if ((foundStartStationID != UNDEFINED) &&
+        (foundEndStationID != UNDEFINED))
+    {
+      break;
+    }
   }
+
   foreach(Track* thisTrack, trackList){
-      if(QString::compare(trackName, thisTrack->getName()) == 0)
-      {
-          foundTrackID=thisTrack->getID();
-          break;
-      }
+    if(QString::compare(trackName, thisTrack->getName()) == 0)
+    {
+      foundTrackID=thisTrack->getID();
+      break;
+    }
   }
   return this->connectTrackToStations(foundTrackID, foundStartStationID, foundEndStationID);
+}
+
+
+/*!
+ * The method changes the interval between each tick, depending on the
+ * interval parameter.
+ *
+ * @param fastForwardSpeed The new speed of the thread, compared with the clock time.
+ */
+void NetworkControl::onFastForwardSpeedChanged(double newFastForwardSpeed)
+{
+  int newInterval = newFastForwardSpeed=0 ? 1000 : (int) 1000/newFastForwardSpeed;
+  trafficClock.setTickInterval(newInterval);
+}
+
+/*!
+ * This method relays the simulated time to the user interface.
+ *
+ * @param simulatedTime the simulated time in the network.
+ */
+void NetworkControl::onUpdatedSimulatedTimeSignal(QString simulatedTime)
+{
+  emit updateSimulatedTimeSignalLabel(simulatedTime);
 }
 
 /*!
@@ -283,24 +311,10 @@ void NetworkControl::setSimulationPaused(bool isPaused)
 }
 
 /*!
- * The method changes the interval between each tick, depending on the
- * interval parameter.
- *
- * @param newInterval The new interval of the thread.
- */
-void NetworkControl::onFastForwardSpeedChanged(double newFastForwardSpeed)
-{
-  int newInterval = newFastForwardSpeed=0 ? 1000 : (int) 1000/newFastForwardSpeed;
-  trafficClock.setTickInterval(newInterval);
-}
-
-void NetworkControl::onUpdatedSimulatedTimeSignal(QString msg)
-{
-  emit updateSimulatedTimeSignalLabel(msg);
-}
-/*!
  * This method commands all trains to move the amount of time defined in the stepTimeBox item in the UI.
  * @TODO: make method update all traffic elements, such as TRACK and STATION
+ *
+ * @param n number of seconds to step
  */
 void NetworkControl::stepTimeForNetwork(int n)
 {

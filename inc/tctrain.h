@@ -35,15 +35,16 @@ signals:
   void qmlTrainPositionSignal(QVariant, QVariant, QVariant);
 
 private:
-  int currentStation;//-1 indicates that train is not on a station
-  int currentSpeed;//[m/s]
-  int currentTrack;//-1 indicates that train is not on a track
-  int desiredSpeed;//[m/s]
-  int doorOpenProgress;//Doors needs 5 seconds to open and close. 0=closed, 100=open
-  bool hasValidCoordinates; //For trains, this is dependent on the track or station.
-  int positionOnTrack;//[m]
+  int currentSpeed;
+  int currentStation;
+  int currentTrack;
+  int desiredSpeed;
+  int doorOpenProgress;
+  bool hasValidCoordinates;
   int maxSpeed;
+  int positionOnTrack;
   QMutex mutex;
+  QString name;
   int nextIndexTravelPlanByStationID;
   int nextTrack;
   int nbrOfPassengers;
@@ -54,7 +55,6 @@ private:
   static int totalNbrOfTrains;
   QList<float> trainCoordinates;
   int trainID;
-  QString name;
   QList<int> travelPlanByStationID;
   QList<Track*> *thisTrackList;
   QList<Train*> *thisTrainList;
@@ -67,7 +67,7 @@ public:
         QList<Train*>& trainList,
         QList<Station*>& stationList);
   ~Train();
-  int addStationToTravelPlan(int stationID);//To be removed and replaced by addStationToTrainRoute
+  bool addStationToTravelPlan(int stationID);//To be removed and replaced by addStationToTrainRoute
   int closingState(int n);
   void destructorResetTotalNumberOfTrains();
   int getCurrentSpeed();
@@ -85,21 +85,21 @@ public:
   QList<int> getTravelPlan();
   int load(int nbrOfPassengersToLoad);
   int loadingState(int n);
-  int move(int n);//if train shall wait for other elements, return int>0.
+  int move(int n);
   int openingState(int n);
   int readyState(int n);
   int readyToRunningState(int n);
   int runningState(int n);
   int runningToOpeningState(int n);
-  int waitingState(int n);
   void sendDataChangedSignal(int trainID);
   void setCurrentStation(int StationID);
   void setCurrentTrack(int trackID);
+  void setDesiredSpeed(int newDesiredSpeed);
   void setName(QString trainName);
   void setModel(QString const& modelID);
-  void setDesiredSpeed(int n);
   void setTrackPosition(int n);
   void showInfo();
+  int waitingState(int n);
 };
 
 #endif

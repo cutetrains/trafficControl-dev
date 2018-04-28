@@ -49,8 +49,8 @@ public:
   TrafficClock trafficClock;
 
 signals:
-  void updateSimulatedTimeSignalLabel(QString sMessage);
   void updateCalculationLoad(int calculationTimeMs);
+  void updateSimulatedTimeSignalLabel(QString simulatedTime);
 
 public slots:
   bool addTrackToNetwork(QString trackName,
@@ -64,15 +64,14 @@ public slots:
   bool connectTrackToStationsByName(QString trackName,
                              QString startStationName,
                              QString endStationName);
-  /* Two functions that are doing the same thing. Simplify */
   bool connectTrackToStations(int trackID,
                              int startStationID,
                              int endStationID);
+  void onFastForwardSpeedChanged(double newFastForwardSpeed);
+  void onUpdatedSimulatedTimeSignal(QString simulatedTime);
   bool parseCmd(QString inputLine);
   bool parseMultipleNetworkCommand(QStringList inputLines);
   void setSimulationPaused(bool isPaused);
-  void onFastForwardSpeedChanged(double newFastForwardSpeed);
-  void onUpdatedSimulatedTimeSignal(QString msg);
   void stepTimeForNetwork();
   void stepTimeForNetwork(int n);
     
