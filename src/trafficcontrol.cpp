@@ -23,6 +23,7 @@
 #include <QQuickItem>
 #include <QQmlComponent>
 #include <QQmlEngine>
+#include <QDesktopServices>//Delete?
 #include "../inc/TrafficControl.h"
 #include "ui_TrafficControl.h"
 #define TRACK 1
@@ -78,7 +79,11 @@ TrafficControl::TrafficControl(QWidget *parent) :
   ui->mapDockWidget->move(100,230);
   ui->mapDockWidget->resize(1000,700);
   ui->mapDockWidget->updateGeometry();
+  //ui->mapDockWidget->setVisible(false);//remove
+// http://doc.qt.io/qt-5/qtwidgets-mainwindows-dockwidgets-example.html
+  //How to address members of the widget?
 
+  //QDesktopServices::openUrl(QUrl("http://www.example.com/"));
   networkControl = new NetworkControl(*trackListModel,
                                       *trainListModel,
                                       *stationListModel,
@@ -110,6 +115,11 @@ TrafficControl::TrafficControl(QWidget *parent) :
   connect(ui->trainDockWidget, SIGNAL(visibilityChanged(bool)),
           this, SLOT(onToggleTrainDockWidget(bool)));
 
+  connect(ui->actionImport_KML_File, SIGNAL(triggered(bool)),
+          this, SLOT(onOpenKmlFile()));
+  connect(ui->importKmlPushButton, SIGNAL(clicked(bool)),
+          this, SLOT(onOpenKmlFile()));
+
   connect(fastForwardSpinBox, SIGNAL(valueChanged(double)),
           networkControl, SLOT(onFastForwardSpeedChanged(double)));
   connect(networkControl, SIGNAL(updateCalculationLoad(int)),
@@ -122,6 +132,97 @@ TrafficControl::TrafficControl(QWidget *parent) :
 }
 
 /*!
+ * isChecked is TRUE if the simulation is paused.
+ * Icon credit:
+ * http://icons8.com/
+ *
+ * @param
+ */
+void TrafficControl::onPlayStopButtonClicked(bool isPaused){
+  // If the simulation isn't paused (isPaused=FALSE), the step button should be disabled (setEnabled = FALSE)
+  ui->actionStep_Simulation->setEnabled(isPaused);
+  ui->actionImport_Network_File->setEnabled(isPaused);
+  if(true ==  isPaused) {
+    ui->actionToggle_Simulation->setText("Resume Simulation");
+    ui->actionToggle_Simulation->setToolTip("Resume Simulation");
+  } else {
+    ui->actionToggle_Simulation->setText("Pause Simulation");
+    ui->actionToggle_Simulation->setToolTip("Pause Simulation");
+  }
+  networkControl->setSimulationPaused(isPaused);
+}
+
+/*!
+ * Toggles the map window
+ *
+ * @param isVisible TRUE if the window should be visible
+ */
+void TrafficControl::onToggleMapDockWidget(bool isVisible){
+  ui->actionMapToggle->setChecked(isVisible);
+  ui->mapDockWidget->setVisible(isVisible);
+}
+
+/*!
+ * Toggles the train window
+ *
+ * @param isVisible TRUE if the window should be visible
+ */
+void TrafficControl::onToggleTrainDockWidget(bool isVisible){
+  ui->actionTrainToggle->setChecked(isVisible);
+  ui->trainDockWidget->setVisible(isVisible);
+}
+
+/*!
+ * Toggles the track window
+ *
+ * @param isVisible TRUE if the window should be visible
+ */
+void TrafficControl::onToggleTrackDockWidget(bool isVisible){
+  ui->actionTrackToggle->setChecked(isVisible);
+  ui->trackDockWidget->setVisible(isVisible);
+}
+
+/*!
+ * Toggles the station window
+ *
+ * @param isVisible TRUE if the window should be visible
+ */
+void TrafficControl::onToggleStationDockWidget(bool isVisible){
+  ui->actionStationToggle->setChecked(isVisible);
+  ui->stationDockWidget->setVisible(isVisible);
+}
+
+/*!
+ * Open a KML file and send the contents to tcNetworkDesigner, if found
+ *
+ * @return TRUE if file OK
+ */
+bool TrafficControl::onOpenKmlFile(){
+  QString thisLine;
+  QString fileName = QFileDialog::getOpenFileName(this,
+                                                  tr("Open KML File"),
+                                                  "C://temp//train//",
+                                                  tr("Files (*.kml)"));
+  QFile file(fileName);
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+  {
+    qDebug()<<"ERROR  : Could not open file.";
+  }
+  QTextStream in(&file);
+  QStringList fileStrings;
+  while(!in.atEnd())
+  {
+    thisLine = in.readLine();
+    fileStrings << thisLine;
+  }
+
+  file.close();
+  qDebug()<<fileStrings.length();
+  //Now, parse the contents to a python script
+  return false;
+}
+
+/*!
  * Opens a file and parses the commands to networkControl
  *
  * @return result
@@ -129,7 +230,7 @@ TrafficControl::TrafficControl(QWidget *parent) :
 bool TrafficControl::readNetworkDefinitionFromFile()
 {
   QString fileName = QFileDialog::getOpenFileName(this,
-                                                  tr("Open File"),
+                                                  tr("Open Train Network File"),
                                                   "C://temp//train//",
                                                   tr("Files (*.*)"));
   QFile file(fileName);
@@ -174,66 +275,6 @@ void TrafficControl::updateCalculationTime(int calculationTimeMs){
   calculationTimeLabel->setText(QString::number(calculationTimeMs)+ " ms ( "+QString::number(systemLoad)+" % )");
 }
 
-/*!
- * Toggles the map window
- *
- * @param isVisible TRUE if the window should be visible
- */
-void TrafficControl::onToggleMapDockWidget(bool isVisible){
-  ui->actionMapToggle->setChecked(isVisible);
-  ui->mapDockWidget->setVisible(isVisible);
-}
-
-/*!
- * Toggles the train window
- *
- * @param isVisible TRUE if the window should be visible
- */
-void TrafficControl::onToggleTrainDockWidget(bool isVisible){
-  ui->actionTrainToggle->setChecked(isVisible);
-  ui->trainDockWidget->setVisible(isVisible);
-}
-
-/*!
- * Toggles the track window
- *
- * @param isVisible TRUE if the window should be visible
- */
-void TrafficControl::onToggleTrackDockWidget(bool isVisible){
-  ui->actionTrackToggle->setChecked(isVisible);
-  ui->trackDockWidget->setVisible(isVisible);
-}
-
-/*!
- * Toggles the station window
- *
- * @param isVisible TRUE if the window should be visible
- */
-void TrafficControl::onToggleStationDockWidget(bool isVisible){
-  ui->actionStationToggle->setChecked(isVisible);
-  ui->stationDockWidget->setVisible(isVisible);
-}
-
-/*!
- * isChecked is TRUE if the simulation is paused.
- * Icon credit:
- * http://icons8.com/
- *
- * @param
- */
-void TrafficControl::onPlayStopButtonClicked(bool isPaused){
-  // If the simulation isn't paused (isPaused=FALSE), the step button should be disabled (setEnabled = FALSE)
-  ui->actionStep_Simulation->setEnabled(isPaused);
-  ui->actionImport_Network_File->setEnabled(isPaused);
-  if(true ==  isPaused) {
-    ui->actionToggle_Simulation->setText("Resume Simulation");
-    ui->actionToggle_Simulation->setToolTip("Resume Simulation");
-  } else {
-    ui->actionToggle_Simulation->setText("Pause Simulation");
-    ui->actionToggle_Simulation->setToolTip("Pause Simulation");
-  }
-  networkControl->setSimulationPaused(isPaused);
-}
 
 /*!
  * The destructor method

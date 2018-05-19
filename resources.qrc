@@ -14,5 +14,6 @@
         <file>resources/icons8-train-50.png</file>
         <file>resources/icons8-railway-station-50.png</file>
         <file>resources/icons8-tracks-50.png</file>
+        <file>resources/icons8-open-kml-50.png</file>
     </qresource>
 </RCC>

@@ -48,6 +48,7 @@ public:
 
 public slots:
   void onPlayStopButtonClicked(bool isChecked);
+  bool onOpenKmlFile();
   void onToggleMapDockWidget(bool isVisible);
   void onToggleTrainDockWidget(bool isVisible);
   void onToggleTrackDockWidget(bool isVisible);
@@ -66,6 +67,7 @@ private:
   QString line;
   QLabel *simulatedTimeLabel;
   QLabel *calculationTimeLabel;
+  QLabel *designInstructionLabel;//Delete?
   QDoubleSpinBox *fastForwardSpinBox;
 };
 
