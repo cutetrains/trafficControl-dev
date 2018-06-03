@@ -51,7 +51,6 @@ HEADERS  += inc/trafficcontrol.h \
     inc/trafficclock.h \
     inc/trafficdatamodel.h \
     inc/tcnetworkcontrol.h
-
 FORMS    += trafficcontrol.ui
 
 OTHER_FILES  =

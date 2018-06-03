@@ -115,7 +115,7 @@ TrafficControl::TrafficControl(QWidget *parent) :
   connect(ui->trainDockWidget, SIGNAL(visibilityChanged(bool)),
           this, SLOT(onToggleTrainDockWidget(bool)));
 
-  connect(ui->actionImport_KML_File, SIGNAL(triggered(bool)),
+  connect(ui->actionImportKMLFile, SIGNAL(triggered(bool)),
           this, SLOT(onOpenKmlFile()));
   connect(ui->importKmlPushButton, SIGNAL(clicked(bool)),
           this, SLOT(onOpenKmlFile()));
@@ -198,27 +198,26 @@ void TrafficControl::onToggleStationDockWidget(bool isVisible){
  * @return TRUE if file OK
  */
 bool TrafficControl::onOpenKmlFile(){
-  QString thisLine;
+  QString  program( "python.exe " );
+  QProcess p;
+  QStringList args = QStringList();
+  //QString thisLine;
   QString fileName = QFileDialog::getOpenFileName(this,
                                                   tr("Open KML File"),
                                                   "C://temp//train//",
                                                   tr("Files (*.kml)"));
-  QFile file(fileName);
-  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-  {
-    qDebug()<<"ERROR  : Could not open file.";
-  }
-  QTextStream in(&file);
-  QStringList fileStrings;
-  while(!in.atEnd())
-  {
-    thisLine = in.readLine();
-    fileStrings << thisLine;
-  }
+  //qDebug()<<fileName;
 
-  file.close();
-  qDebug()<<fileStrings.length();
+  args << "C:/Users/gusta/GIT/trafficControl-dev/scripts/KMLParser/TrackStationConnector.py";
+  args <<fileName;
+  //  args << "C:/Users/gusta/GIT/trafficControl-dev/scripts/KMLParser/Hyllie2Triangeln.kml";
+
+  p.start(program,args);
+  p.waitForFinished(-1);
+  QString trafficMapFile = p.readAll();
+  qDebug()<<trafficMapFile;
   //Now, parse the contents to a python script
+  ui->trafficNetworkDescriptionEdit->setText(trafficMapFile);
   return false;
 }
 

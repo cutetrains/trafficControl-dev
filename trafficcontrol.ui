@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1360</width>
-    <height>794</height>
+    <height>848</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -215,7 +215,7 @@
     <property name="title">
      <string>Design</string>
     </property>
-    <addaction name="actionImport_KML_File"/>
+    <addaction name="actionImportKMLFile"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSimulation"/>
@@ -328,13 +328,13 @@
       <string>Step 1: Generate a Network file from a valid KML file.</string>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit_2">
+    <widget class="QTextEdit" name="trafficNetworkDescriptionEdit">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>80</y>
        <width>261</width>
-       <height>291</height>
+       <height>411</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -367,7 +367,7 @@ p, li { white-space: pre-wrap; }
        <x>290</x>
        <y>80</y>
        <width>250</width>
-       <height>291</height>
+       <height>411</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -421,7 +421,7 @@ p, li { white-space: pre-wrap; }
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionImport_KML_File"/>
+   <addaction name="actionImportKMLFile"/>
   </widget>
   <action name="actionImport_Network_File">
    <property name="icon">
@@ -520,7 +520,7 @@ p, li { white-space: pre-wrap; }
     <string>Toggle Track List</string>
    </property>
   </action>
-  <action name="actionImport_KML_File">
+  <action name="actionImportKMLFile">
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/resources/icons8-open-kml-50.png</normaloff>:/resources/icons8-open-kml-50.png</iconset>
