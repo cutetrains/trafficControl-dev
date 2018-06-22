@@ -38,7 +38,7 @@ TrafficControl::TrafficControl(QWidget *parent) :
   ui(new Ui::TrafficControl)
 {
   ui->setupUi(this);
-
+  //TODO: COLLECT SETTINGS IN SEPARATE FUNCTIONS
   fastForwardSpinBox = new QDoubleSpinBox(this);
   fastForwardSpinBox->setMaximum(50);
   fastForwardSpinBox->setMinimum(0.5);
@@ -74,27 +74,25 @@ TrafficControl::TrafficControl(QWidget *parent) :
   ui->actionTrackToggle->setChecked(true);
   ui->actionStationToggle->setChecked(true);
   ui->actionTrainToggle->setChecked(true);
-
+  ui->actionDesignToggle->setChecked(true);
   ui->mapDockWidget->setFloating(true);
   ui->mapDockWidget->move(100,230);
   ui->mapDockWidget->resize(1000,700);
   ui->mapDockWidget->updateGeometry();
-  //ui->mapDockWidget->setVisible(false);//remove
-// http://doc.qt.io/qt-5/qtwidgets-mainwindows-dockwidgets-example.html
-  //How to address members of the widget?
 
   //QDesktopServices::openUrl(QUrl("http://www.example.com/"));
   networkControl = new NetworkControl(*trackListModel,
                                       *trainListModel,
                                       *stationListModel,
                                       *handleQMLObject);
-
+  networkDesigner = new NetworkDesigner();
   connect(ui->actionImport_Network_File, SIGNAL(triggered(bool)),
           this, SLOT(readNetworkDefinitionFromFile()));
   connect(ui->actionStep_Simulation, SIGNAL(triggered(bool)),
           networkControl, SLOT(stepTimeForNetwork()));
   connect(ui->actionToggle_Simulation, SIGNAL(toggled(bool)),
           this, SLOT(onPlayStopButtonClicked(bool)));
+
   connect(ui->actionMapToggle, SIGNAL(toggled(bool)),
           this, SLOT(onToggleMapDockWidget(bool)));
   connect(ui->mapDockWidget, SIGNAL(visibilityChanged(bool)),
@@ -115,10 +113,18 @@ TrafficControl::TrafficControl(QWidget *parent) :
   connect(ui->trainDockWidget, SIGNAL(visibilityChanged(bool)),
           this, SLOT(onToggleTrainDockWidget(bool)));
 
+  connect(ui->actionDesignToggle, SIGNAL(toggled(bool)),
+          this, SLOT(onToggleDesignDockWidget(bool)));
+  connect(ui->designDockWidget, SIGNAL(visibilityChanged(bool)),
+          this, SLOT(onToggleDesignDockWidget(bool)));
+
   connect(ui->actionImportKMLFile, SIGNAL(triggered(bool)),
           this, SLOT(onOpenKmlFile()));
   connect(ui->importKmlPushButton, SIGNAL(clicked(bool)),
           this, SLOT(onOpenKmlFile()));
+
+  connect(ui->importTnoPushButton, SIGNAL(clicked(bool)),
+          this, SLOT(onOpenTnoFile()));
 
   connect(fastForwardSpinBox, SIGNAL(valueChanged(double)),
           networkControl, SLOT(onFastForwardSpeedChanged(double)));
@@ -126,6 +132,10 @@ TrafficControl::TrafficControl(QWidget *parent) :
           this, SLOT(updateCalculationTime(int)));
   connect(networkControl, SIGNAL(updateSimulatedTimeSignalLabel(QString)),
           this, SLOT(updateSimulatedTimeLabel(QString)));
+
+  connect(networkDesigner, SIGNAL(kmlToTnmConversionDone(QString)),
+          this, SLOT(updateTnmTextBox(QString)));
+
   ui->stationListTableView->resizeColumnsToContents();
   ui->trackListTableView->resizeColumnsToContents();
   ui->trainListTableView->resizeColumnsToContents();
@@ -150,6 +160,16 @@ void TrafficControl::onPlayStopButtonClicked(bool isPaused){
     ui->actionToggle_Simulation->setToolTip("Pause Simulation");
   }
   networkControl->setSimulationPaused(isPaused);
+}
+
+/*!
+ * Toggles the design window
+ *
+ * @param isVisible TRUE if the window should be visible
+ */
+void TrafficControl::onToggleDesignDockWidget(bool isVisible){
+  ui->actionDesignToggle->setChecked(isVisible);
+  ui->designDockWidget->setVisible(isVisible);
 }
 
 /*!
@@ -198,26 +218,30 @@ void TrafficControl::onToggleStationDockWidget(bool isVisible){
  * @return TRUE if file OK
  */
 bool TrafficControl::onOpenKmlFile(){
-  QString  program( "python.exe " );
-  QProcess p;
-  QStringList args = QStringList();
-  //QString thisLine;
   QString fileName = QFileDialog::getOpenFileName(this,
                                                   tr("Open KML File"),
                                                   "C://temp//train//",
                                                   tr("Files (*.kml)"));
   //qDebug()<<fileName;
 
-  args << "C:/Users/gusta/GIT/trafficControl-dev/scripts/KMLParser/TrackStationConnector.py";
-  args <<fileName;
-  //  args << "C:/Users/gusta/GIT/trafficControl-dev/scripts/KMLParser/Hyllie2Triangeln.kml";
+  //TODO: call networkDesigner method with path to kml file
+  networkDesigner->convertKmlToTnm(fileName);
 
-  p.start(program,args);
-  p.waitForFinished(-1);
-  QString trafficMapFile = p.readAll();
-  qDebug()<<trafficMapFile;
-  //Now, parse the contents to a python script
-  ui->trafficNetworkDescriptionEdit->setText(trafficMapFile);
+  return false;
+}
+
+/*!
+ * Open a TNO file and send the contents to tcNetworkDesigner, if found
+ *
+ * @return TRUE if file OK
+ */
+bool TrafficControl::onOpenTnoFile(){
+  QString fileName = QFileDialog::getOpenFileName(this,
+                                                  tr("Open Traffic Network Operations (TNO) File"),
+                                                  "C://temp//train//",
+                                                  tr("Files (*.tno)"));
+  qDebug()<<fileName;
+  networkDesigner->importTno(fileName);
   return false;
 }
 
@@ -259,6 +283,24 @@ void TrafficControl::updateSimulatedTimeLabel(QString sTime)
 {
   simulatedTimeLabel->setText(sTime);
 }
+
+/*!
+ * Updates the TrafficNetworkMap textbox in user interface.
+ * TNM is generated from KML file using KML parser.
+ *
+ * @param tnmFile the generated TrafficNetworkMap string
+ */
+void TrafficControl::updateTnmTextBox(QString tnmFile)
+{
+  ui->trafficNetworkDescriptionEdit->setText(tnmFile);
+
+  QStringList tnmFileSplitted = tnmFile.split("\r\n", QString::SkipEmptyParts);
+  QString s;
+  foreach(s, tnmFileSplitted){
+    networkControl->parseCmd(s);
+  }
+}
+
 
 /*!
 * Prints the time needed for the last calculation, both in milliseconds and as a percentage

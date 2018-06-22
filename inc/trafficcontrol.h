@@ -31,6 +31,7 @@
 #include "trafficdatamodel.h"
 #include "trafficclock.h"
 #include "tcnetworkcontrol.h"
+#include "networkdesigner.h"
 
 namespace Ui {
   class TrafficControl;
@@ -49,6 +50,8 @@ public:
 public slots:
   void onPlayStopButtonClicked(bool isChecked);
   bool onOpenKmlFile();
+  bool onOpenTnoFile();
+  void onToggleDesignDockWidget(bool isVisible);
   void onToggleMapDockWidget(bool isVisible);
   void onToggleTrainDockWidget(bool isVisible);
   void onToggleTrackDockWidget(bool isVisible);
@@ -56,9 +59,11 @@ public slots:
   bool readNetworkDefinitionFromFile();
   void updateCalculationTime(int calculationTimeMs);
   void updateSimulatedTimeLabel(QString message);
+  void updateTnmTextBox(QString tnmFile);
 
 private:
   NetworkControl *networkControl;
+  NetworkDesigner *networkDesigner;
   Ui::TrafficControl *ui;
   QObject* handleQMLObject;
   TrafficDataModel *trackListModel;

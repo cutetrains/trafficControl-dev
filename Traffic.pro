@@ -26,7 +26,8 @@ SOURCES += src/main.cpp \
     src/tcstation.cpp \
     src/trafficclock.cpp \
     src/tcnetworkcontrol.cpp \
-    src/tcnetworkcontrolcommandparser.cpp
+    src/tcnetworkcontrolcommandparser.cpp \
+    src/networkdesigner.cpp
 
 #UNCOMMENT SECTION BELOW TO TEST
 #debug {
@@ -50,7 +51,8 @@ HEADERS  += inc/trafficcontrol.h \
     inc/tctrain.h \
     inc/trafficclock.h \
     inc/trafficdatamodel.h \
-    inc/tcnetworkcontrol.h
+    inc/tcnetworkcontrol.h \
+    inc/networkdesigner.h
 FORMS    += trafficcontrol.ui
 
 OTHER_FILES  =
