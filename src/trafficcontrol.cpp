@@ -123,6 +123,13 @@ TrafficControl::TrafficControl(QWidget *parent) :
   connect(ui->importKmlPushButton, SIGNAL(clicked(bool)),
           this, SLOT(onOpenKmlFile()));
 
+  connect(ui->actionSaveTnfFile, SIGNAL(triggered(bool)),
+          this, SLOT(onSaveTnfFile()));
+  connect(ui->saveTnfPushButton, SIGNAL(clicked(bool)),
+          this, SLOT(onSaveTnfFile()));
+
+  connect(ui->actionOpenTnoFile, SIGNAL(triggered(bool)),
+          this, SLOT(onOpenTnoFile()));
   connect(ui->importTnoPushButton, SIGNAL(clicked(bool)),
           this, SLOT(onOpenTnoFile()));
 
@@ -135,6 +142,9 @@ TrafficControl::TrafficControl(QWidget *parent) :
 
   connect(networkDesigner, SIGNAL(kmlToTnmConversionDone(QString)),
           this, SLOT(updateTnmTextBox(QString)));
+
+  connect(networkDesigner, SIGNAL(tnoFileOpened(QString)),
+          this, SLOT(updateTnoTextBox(QString)));
 
   ui->stationListTableView->resizeColumnsToContents();
   ui->trackListTableView->resizeColumnsToContents();
@@ -220,7 +230,7 @@ void TrafficControl::onToggleStationDockWidget(bool isVisible){
 bool TrafficControl::onOpenKmlFile(){
   QString fileName = QFileDialog::getOpenFileName(this,
                                                   tr("Open KML File"),
-                                                  "C://temp//train//",
+                                                  QDir::homePath(),
                                                   tr("Files (*.kml)"));
   //qDebug()<<fileName;
 
@@ -238,10 +248,36 @@ bool TrafficControl::onOpenKmlFile(){
 bool TrafficControl::onOpenTnoFile(){
   QString fileName = QFileDialog::getOpenFileName(this,
                                                   tr("Open Traffic Network Operations (TNO) File"),
-                                                  "C://temp//train//",
+                                                  QDir::homePath(),
                                                   tr("Files (*.tno)"));
   qDebug()<<fileName;
   networkDesigner->importTno(fileName);
+  return false;
+}
+
+/*!
+ * Open a TNO file and send the contents to tcNetworkDesigner, if found
+ *
+ * @return TRUE if file OK
+ */
+bool TrafficControl::onSaveTnfFile()
+{
+  QString fileName = QFileDialog::getSaveFileName(this,
+                                                  tr("Save Traffic Network File (TNF)"),
+                                                  QDir::homePath(),
+                                                  tr("Files (*.tnf)"));
+  qDebug()<<fileName;
+  qDebug()<<ui->trafficNetworkMapTextEdit->toPlainText()+ui->trafficNetworkOperationTextEdit->toPlainText();
+  QFile f( fileName );
+  if(!f.open( QIODevice::WriteOnly  | QIODevice::Text ))
+  {
+    qDebug()<<"ERROR  : Could not open file.";
+  }
+  QTextStream stream(&f);
+  stream << ui->trafficNetworkMapTextEdit->toPlainText();
+  stream << ui->trafficNetworkOperationTextEdit->toPlainText();
+  stream <<endl;
+  f.close();
   return false;
 }
 
@@ -254,7 +290,7 @@ bool TrafficControl::readNetworkDefinitionFromFile()
 {
   QString fileName = QFileDialog::getOpenFileName(this,
                                                   tr("Open Train Network File"),
-                                                  "C://temp//train//",
+                                                  QDir::homePath(),
                                                   tr("Files (*.*)"));
   QFile file(fileName);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -292,8 +328,9 @@ void TrafficControl::updateSimulatedTimeLabel(QString sTime)
  */
 void TrafficControl::updateTnmTextBox(QString tnmFile)
 {
-  ui->trafficNetworkDescriptionEdit->setText(tnmFile);
+  ui->trafficNetworkMapTextEdit->setText(tnmFile);
 
+  //TODO CALL NW CONTROL FROM NETWORKDESIGNER USING SIGNALS/SLOTS
   QStringList tnmFileSplitted = tnmFile.split("\r\n", QString::SkipEmptyParts);
   QString s;
   foreach(s, tnmFileSplitted){
@@ -301,6 +338,23 @@ void TrafficControl::updateTnmTextBox(QString tnmFile)
   }
 }
 
+/*!
+ * Updates the TrafficNetworkOperation textbox in user interface.
+ * TNO is created manually
+ *
+ * @param tnoFile
+ */
+void TrafficControl::updateTnoTextBox(QString tnoFile)
+{
+  ui->trafficNetworkOperationTextEdit->setText(tnoFile);
+
+  QStringList tnoFileSplitted = tnoFile.split("\r\n", QString::SkipEmptyParts);
+
+  QString s;
+  foreach(s, tnoFileSplitted){
+    networkControl->parseCmd(s);
+  }
+}
 
 /*!
 * Prints the time needed for the last calculation, both in milliseconds and as a percentage
@@ -315,7 +369,6 @@ void TrafficControl::updateCalculationTime(int calculationTimeMs){
   int systemLoad = (int) calculationTimeMs / 10 * fastForwardSpinBox->value();
   calculationTimeLabel->setText(QString::number(calculationTimeMs)+ " ms ( "+QString::number(systemLoad)+" % )");
 }
-
 
 /*!
  * The destructor method

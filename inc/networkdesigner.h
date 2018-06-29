@@ -16,6 +16,7 @@ public:
 
 signals:
   void kmlToTnmConversionDone(QString tnmOutput);
+  void tnoFileOpened(QString tnoOutput);
 
 public slots:
 };

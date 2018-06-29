@@ -2,7 +2,6 @@
 
 NetworkDesigner::NetworkDesigner(QObject *parent) : QObject(parent)
 {
-  qDebug()<<"Network designer instance created!";
 }
 
 /*!
@@ -44,5 +43,6 @@ bool NetworkDesigner::importTno(QString tnoFileName)
     }
     file.close();
     qDebug()<<"FILE: "<<fileStrings;
+    emit tnoFileOpened(fileStrings.join("\r\n"));
     return false;
 }

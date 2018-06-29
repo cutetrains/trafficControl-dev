@@ -51,6 +51,7 @@ public slots:
   void onPlayStopButtonClicked(bool isChecked);
   bool onOpenKmlFile();
   bool onOpenTnoFile();
+  bool onSaveTnfFile();
   void onToggleDesignDockWidget(bool isVisible);
   void onToggleMapDockWidget(bool isVisible);
   void onToggleTrainDockWidget(bool isVisible);
@@ -60,6 +61,7 @@ public slots:
   void updateCalculationTime(int calculationTimeMs);
   void updateSimulatedTimeLabel(QString message);
   void updateTnmTextBox(QString tnmFile);
+  void updateTnoTextBox(QString tnoFile);
 
 private:
   NetworkControl *networkControl;
