@@ -13,6 +13,7 @@ public:
   explicit NetworkDesigner(QObject *parent = nullptr);
   bool convertKmlToTnm(QString kmlFileName);
   bool importTno(QString tnoFileName);
+  bool importTnmOrTnf(QString tnmOrTnfFileName);
 
 signals:
   void kmlToTnmConversionDone(QString tnmOutput);

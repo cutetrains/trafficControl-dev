@@ -1,4 +1,5 @@
 import sys
+import re
 from operator import itemgetter
 from math import radians, sin, cos, sqrt, asin, atan
 
@@ -24,120 +25,107 @@ else:
   #print("OK")
   inputfile = str(sys.argv[1])
 
-  trackList=[] # The track list contains name, line in file, start coordinates, start station name, end coordinates, 
+  trackList=[] # The track list contains name, start coordinates, start station name, end coordinates, 
                # end station name, length
-  trackListItem=["","","","","",""]
-  stationList=[] # The station list contains name, line in file, the coordinates, and (S) or (J)
+  trackListItem=["","","","",""]
+  stationList=[] # The station list contains name, the coordinates, and (S) or (J)
   stationListItem=["","","",""]
   thisTrackCoordinates=""
   ignorePM = 0
 
+  file = ""
   with open(inputfile, "r", encoding='utf8') as ins:
-    maxAllowedDist=200
-    numLines=0
-    placeMarkType=""
-    placeMarkName=""
-    isNextLineCoordinateList=False
     for line in ins:
-      numLines += 1
-
-      if ( ("\t\t\t<name>" in line) and not (("\t\t\t\t<name>") in line) ) :
-        placeMarkType=line[9:-8]
-        ignorePM = 0
-      if ( ("\t\t\t\t<name>" in line) and not (("\t\t\t\t\t<name>") in line) ) :
-        #placeMarkName=line[10:-8].replace("Å","Aa").replace("Ä","Ae").replace("Ö","Oe").replace("å","aa").replace("ä","ae").replace("ö","oe")
-        placeMarkName=line[10:-8].replace("-","_")
-        ignorePM = 0
-      if("visibility>0</visibility>" in line):
-        ignorePM = 1
-
-      ###########
-      # STATION #
-      ###########
-      if ( ( "<coordinates>" in line) and ( ( "Station" in placeMarkType) or ("Junction" in placeMarkType ) ) ) :
-        if(ignorePM == 0):
-          if " " in placeMarkName:
-            print("-"*2000)
-          stationListItem=[placeMarkName, numLines, line[18:-17].split(","), ("Junction" in placeMarkType) and "(S)" or "(J)"]
-          #print(stationListItem[2][1])
-          stationList.append(stationListItem)
-          print("ADD STATION " + placeMarkName + str(" AS JUNCTION" if ("Junction" in placeMarkType) else "") + " COORDINATES " + stationListItem[2][1] +" " +
-              stationListItem[2][0] )
-        
-      #########################
-      # COORDINATES FOR TRACK #
-      #########################
-      if(isNextLineCoordinateList==True):#This happens directly after coordinates are found below
-        summa=0.0
-        coordinateList=str(line[6:-2]).split(" ")
-        thisTrackCoordinates=""
-        reversedTrackCoordinates=""
-  
-        # IS DELTA north-south OR west-east?
-        startLong = float(coordinateList[0].split(",")[0])
-        startLat = float(coordinateList[0].split(",")[1])
-        endLong = float(coordinateList[-1].split(",")[0])
-        endLat = float(coordinateList[-1].split(",")[1])
-        #print("      DeltaLon: "+ str(endLong-startLong) + " DeltaLat: "+ str(endLat-startLat) + " Angle: " + str(180/3.14*atan((endLat-startLat)/(endLong-startLong))))
-        lonShift = -0.0005*(endLat-startLat)/(sqrt((endLong-startLong)**2+(endLat-startLat)**2))
-        latShift = 0.0005*(endLong-startLong)/(sqrt((endLong-startLong)**2+(endLat-startLat)**2))
-        #print("      Shift: Long: " + str(lonShift ) + " Lat: " + str(latShift )+ " Angle: " + str(180/3.14*atan(latShift/lonShift)))
-        if (abs(endLat - startLat) < abs(endLong - startLong)):
-          if(startLong<endLong):
-            #print("E")
-            placeMarkName = placeMarkName+"_E"
-          else:
-            #print("W")
-            placeMarkName = placeMarkName+"_W"
-        else:
-          if(startLat<endLat):
-            #print("N")
-            placeMarkName = placeMarkName+"_N"
-          else:
-            #print("S")
-            placeMarkName = placeMarkName+"_S"
+      file += line
       
-        for iii in range(1, len(coordinateList)):
-          orgLon=coordinateList[iii-1].split(",")[0]
-          orgLat=coordinateList[iii-1].split(",")[1]
-          desLon=coordinateList[iii].split(",")[0]
-          desLat=coordinateList[iii].split(",")[1]
-          summa=summa+haversine(float(orgLon),float(orgLat),float(desLon),float(desLat))
-        
-          if(placeMarkName[0]=="d"):
-            orgLonR = str(float(orgLon) + lonShift)
-            orgLatR = str(float(orgLat) + latShift)
-            reversedTrackCoordinates=orgLatR + " " + orgLonR + " " + reversedTrackCoordinates
-          thisTrackCoordinates=thisTrackCoordinates+" " + orgLat + " " + orgLon
-        if(placeMarkName[0]=="d"):
-          desLonR = str(float(desLon) + lonShift)
-          desLatR = str(float(desLat) + latShift)   
-          reversedTrackCoordinates=  desLatR + " " + desLonR + " " + reversedTrackCoordinates 
-        thisTrackCoordinates=thisTrackCoordinates+" " + desLat + " " + desLon
+    placemarkList=re.findall('<Placemark>(.*?)<\/Placemark>', file, re.MULTILINE| re.DOTALL)
+    
+    for pm in placemarkList:
+      nameList = re.findall('<name>(.*?)<\/name>', pm)
+      thisName=nameList[0].replace("-","_")
+      thisCoordinate = re.findall('<coordinates>\n*\t*(.*?)\n*\t*<\/coordinates>', pm, re.MULTILINE| re.DOTALL)
+      thisIsVisible = re.findall('<visibility>(.*?)<\/visibility>', pm, re.MULTILINE| re.DOTALL)
+      if(len(thisIsVisible) ==0):
+        coordinateList=thisCoordinate[0].split(" ")
+        coordinateList = [x[:-2] for x in coordinateList]
+        #SWAP LAT, LON
+        swappedCoordinateList = []
+        for x in coordinateList:
+          xtemp=x.split(',')
+          if(len(xtemp)>1):#EMPTY LINE SOMETIMES
+            swappedCoordinateList.append(xtemp[1]+" " + xtemp[0])
+            
+        if(len(swappedCoordinateList) > 1 ):
+          #TRACK
+          cSum = 0
+          for iii in range(1, len(swappedCoordinateList)):
+            orgLat=swappedCoordinateList[iii-1].split(" ")[0]
+            orgLon=swappedCoordinateList[iii-1].split(" ")[1]
+            desLat=swappedCoordinateList[iii].split(" ")[0]
+            desLon=swappedCoordinateList[iii].split(" ")[1]
+            cSum=cSum+haversine(float(orgLon),float(orgLat),float(desLon),float(desLat))
 
-        isNextLineCoordinateList=False
-        trackListItem=[placeMarkName, numLines, coordinateList[0].split(",")[:-1], "", coordinateList[-1].split(",")[:-1], "", summa]
-        trackList.append(trackListItem)
-      
-        print("ADD TRACK "+ placeMarkName + " " + str(int(summa*1000) ) +  " COORDINATES" +thisTrackCoordinates)
-        if(placeMarkName[0]=="d"):#dLunGunN shall have a friend dLunGunS (same name, but in opposite direction)
-          tempPlaceMarkName=""
-          if (placeMarkName[-1]=='N'): tempPlaceMarkName='S'
-          if (placeMarkName[-1]=='S'): tempPlaceMarkName='N'
-          if (placeMarkName[-1]=='E'): tempPlaceMarkName='W'
-          if (placeMarkName[-1]=='W'): tempPlaceMarkName='E'
-          print("ADD TRACK " + str(placeMarkName[:-1])+tempPlaceMarkName + " " + str(int(summa*1000))  +  " COORDINATES " +reversedTrackCoordinates[:-1])
-          trackListItem=[str(placeMarkName[:-1])+tempPlaceMarkName, numLines, coordinateList[0].split(",")[:-1], "", coordinateList[-1].split(",")[:-1], "", summa]
+          #del swappedCoordinateList[-1] #FINAL WHITESPACE CONFUSES THE SPLIT METHOD FOR POLYLINES
+          #TODO ADD TRACKS TO INTERNAL LIST OF TRACKS
+          if(thisName[0]=="d"):
+            #FIND THE DIRECTION OF THE TRACK
+            startLat = float(swappedCoordinateList[0].split(" ")[0])
+            startLong = float(swappedCoordinateList[0].split(" ")[1])
+            endLat = float(swappedCoordinateList[-1].split(" ")[0])
+            endLong = float(swappedCoordinateList[-1].split(" ")[1])
+            lonShift = -0.0005*(endLat-startLat)/(sqrt((endLong-startLong)**2+(endLat-startLat)**2))
+            latShift = 0.0005*(endLong-startLong)/(sqrt((endLong-startLong)**2+(endLat-startLat)**2))
+            #print("      Shift: Long: " + str(lonShift ) + " Lat: " + str(latShift )+ " Angle: " + str(180/3.14*atan(latShift/lonShift)))
+            if (abs(endLat - startLat) < abs(endLong - startLong)):
+              if(startLong<endLong):
+                #print("E")
+                reversedName = thisName+ "_W"
+                thisName = thisName+"_E"
+              else:
+                #print("W")
+                reversedName = thisName+ "_E"
+                thisName = thisName+"_W"
+            else:
+              if(startLat<endLat):
+                #print("N")
+                reversedName = thisName+ "_S"
+                thisName = thisName+"_N"
+              else:
+                #print("S")
+                reversedName = thisName+ "_N"
+                thisName = thisName+"_S"
+            reversedCoordinates=[]
+            for iii in range(1, len(coordinateList)):
+              orgLon=coordinateList[iii-1].split(",")[0]
+              orgLat=coordinateList[iii-1].split(",")[1]
+              orgLonR = str(float(orgLon) + lonShift)
+              orgLatR = str(float(orgLat) + latShift)
+              reversedCoordinates.insert(0,orgLatR + " " + orgLonR)
+
+            trackListItem = [reversedName, reversedCoordinates[0].split(' '), "", reversedCoordinates[-1].split(' '), "", cSum]
+            print("ADD TRACK " + reversedName +" "+ str(int(cSum*1000))+ " COORDINATES " + ' '.join(reversedCoordinates))
+            trackList.append(trackListItem)
+          trackListItem = [thisName, swappedCoordinateList[0].split(' '), "", swappedCoordinateList[-1].split(' '), "", cSum]  
+          #print(trackListItem)
+          print("ADD TRACK " + thisName +" "+ str(int(cSum*1000))+ " COORDINATES " + ' '.join(swappedCoordinateList))
           trackList.append(trackListItem)
-
-      #########
-      # TRACK #
-      #########
-      if ( ( "<coordinates>" in line) and ( "Track" in placeMarkType ) ):
-        if(ignorePM == 0):
-          isNextLineCoordinateList=True
+        else:
+          #TRACK
+          if(( thisName[0]=="J" ) and (thisName[1].isupper() ) ) :
+            junctionText=" AS JUNCTION"
+          else:
+            junctionText=""
+          print("ADD STATION " + thisName + junctionText + " COORDINATES " + ' '.join(swappedCoordinateList))
+          stationListItem = [thisName, swappedCoordinateList[0].split(' ')]
+          #print(stationListItem)
+          stationList.append(stationListItem)#TODO: ADD INFO ABOUT HOW MANY TRACKS TO USE IN TRACK NAME
+          #NEXT STEP: CONNECT TRACKS TO STATIONS
+        
 
     for track in trackList: #FIND START AND END STATION FOR TRACK
+      #print("TRACK: ")
+      #print(track)
+      maxAllowedDist=200
       startDist=100000000.0
       startCandidate=""
       startCoordinate=[]
@@ -145,16 +133,28 @@ else:
       endCandidate=""
       endCoordinate=[]
       for station in stationList:
-        thisDist=haversine(float(track[2][0]), float(track[2][1]) ,float(station[2][0]), float(station[2][1] ))
+
+        thisDist=haversine(float(track[1][0]), float(track[1][1]) ,float(station[1][0]), float(station[1][1] ))
         if(thisDist<startDist):
+          #print("smallest found for start!")
+          #print(station)
+          #print(thisDist)
           startDist=thisDist
           startCandidate=station[0]
-          startCoordinate=station[2]
-        thisDist=haversine(float(track[4][0]), float(track[4][1]) ,float(station[2][0]), float(station[2][1] ))
+          startCoordinate=station[1]
+          
+        thisDist=haversine(float(track[3][0]), float(track[3][1]) ,float(station[1][0]), float(station[1][1] ))
         if(thisDist<endDist):
+          #print("smallest found for end!")
+          #print(station)
+          #print(thisDist)
           endDist=thisDist
           endCandidate=station[0]
-          endCoordinate=station[2]
+          endCoordinate=station[1]
+
+      #print("COORDINATES")
+      #print(startCoordinate)
+      #print(endCoordinate)
       trackDir=( "__N" ) if ( float(startCoordinate[1] )<  float(endCoordinate[1]) ) else ( "__S" )  
       trackDir=trackDir +("__E" ) if ( float(startCoordinate[0] )<  float(endCoordinate[0]) ) else (trackDir + "__W" )
       if ((startDist<maxAllowedDist) and (endDist<maxAllowedDist) and (startCandidate != endCandidate)):
@@ -165,4 +165,6 @@ else:
           print("CONNECT TRACK " + track[0] + " FROM " + endCandidate + " TO " + startCandidate)
           print("CONNECT TRACK " + track[0] + " FROM " + startCandidate + " TO " + endCandidate)
       else:
-        print("ERROR: missing station at start or end for track: " + track[0])
+        print("   ERROR: missing station at start or end for track: " + track[0] +" "+ str(startDist)+" " + str(endDist)+" " + startCandidate +" "+ endCandidate )    
+  #print(" ")
+  #print(trackList)

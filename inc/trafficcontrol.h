@@ -63,7 +63,10 @@ public slots:
   void updateTnmTextBox(QString tnmFile);
   void updateTnoTextBox(QString tnoFile);
 
+  void onHelpOverviewSelected();
+
 private:
+  void connectSignalSlot();
   NetworkControl *networkControl;
   NetworkDesigner *networkDesigner;
   Ui::TrafficControl *ui;

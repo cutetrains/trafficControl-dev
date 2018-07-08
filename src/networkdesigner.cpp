@@ -27,6 +27,26 @@ bool NetworkDesigner::convertKmlToTnm(QString kmlFileName)
   return false;
 }
 
+bool NetworkDesigner::importTnmOrTnf(QString tnmOrTnfFileName)
+{
+    QFile file(tnmOrTnfFileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+      qDebug()<<"ERROR  : Could not open file.";
+    }
+
+    QTextStream in(&file);
+    QStringList fileStrings;
+    while(!in.atEnd())
+    {
+      fileStrings << in.readLine();
+    }
+    file.close();
+    //THIS MAY NEED TO BE MODIFIED IF THERE IS ERROR HANDLING!!!
+    emit kmlToTnmConversionDone(fileStrings.join("\r\n"));
+    return false;
+}
+
 bool NetworkDesigner::importTno(QString tnoFileName)
 {
     QFile file(tnoFileName);
@@ -42,7 +62,6 @@ bool NetworkDesigner::importTno(QString tnoFileName)
       fileStrings << in.readLine();
     }
     file.close();
-    qDebug()<<"FILE: "<<fileStrings;
     emit tnoFileOpened(fileStrings.join("\r\n"));
     return false;
 }

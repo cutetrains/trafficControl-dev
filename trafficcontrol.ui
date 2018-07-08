@@ -218,10 +218,17 @@
     </property>
     <addaction name="actionImportKMLFile"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionHelpOverview"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSimulation"/>
    <addaction name="menuWindow"/>
    <addaction name="menuDesign"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="enabled">
@@ -273,7 +280,7 @@
    <property name="minimumSize">
     <size>
      <width>790</width>
-     <height>534</height>
+     <height>519</height>
     </size>
    </property>
    <property name="font">
@@ -323,12 +330,12 @@
         <rect>
          <x>10</x>
          <y>50</y>
-         <width>211</width>
+         <width>281</width>
          <height>32</height>
         </rect>
        </property>
        <property name="text">
-        <string>Generate Network Map from KML...</string>
+        <string>Generate Network Map from KML or TNM/TNF...</string>
        </property>
        <property name="icon">
         <iconset resource="resources.qrc">
@@ -371,6 +378,8 @@
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Here, the tracks and stations of a traffic network are described. &lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;You can also open a TNM/TNF file directly.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Example: &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ADD STATION &amp;lt;stationName&amp;gt; COORDINATES &amp;lt;coordinates&amp;gt;&lt;/p&gt;
@@ -645,6 +654,11 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="toolTip">
     <string>Open TNO File</string>
+   </property>
+  </action>
+  <action name="actionHelpOverview">
+   <property name="text">
+    <string>Overview</string>
    </property>
   </action>
  </widget>
