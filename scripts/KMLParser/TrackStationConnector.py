@@ -30,16 +30,12 @@ else:
   trackListItem=["","","","",""]
   stationList=[] # The station list contains name, the coordinates, and (S) or (J)
   stationListItem=["","","",""]
-  thisTrackCoordinates=""
-  ignorePM = 0
 
   file = ""
   with open(inputfile, "r", encoding='utf8') as ins:
     for line in ins:
       file += line
-      
     placemarkList=re.findall('<Placemark>(.*?)<\/Placemark>', file, re.MULTILINE| re.DOTALL)
-    
     for pm in placemarkList:
       nameList = re.findall('<name>(.*?)<\/name>', pm)
       thisName=nameList[0].replace("-","_")
@@ -65,7 +61,7 @@ else:
             desLon=swappedCoordinateList[iii].split(" ")[1]
             cSum=cSum+haversine(float(orgLon),float(orgLat),float(desLon),float(desLat))
 
-          #del swappedCoordinateList[-1] #FINAL WHITESPACE CONFUSES THE SPLIT METHOD FOR POLYLINES
+          #FINAL WHITESPACE CONFUSES THE SPLIT METHOD FOR POLYLINES
           #TODO ADD TRACKS TO INTERNAL LIST OF TRACKS
           if(thisName[0]=="d"):
             #FIND THE DIRECTION OF THE TRACK
@@ -117,14 +113,9 @@ else:
             junctionText=""
           print("ADD STATION " + thisName + junctionText + " COORDINATES " + ' '.join(swappedCoordinateList))
           stationListItem = [thisName, swappedCoordinateList[0].split(' ')]
-          #print(stationListItem)
           stationList.append(stationListItem)#TODO: ADD INFO ABOUT HOW MANY TRACKS TO USE IN TRACK NAME
-          #NEXT STEP: CONNECT TRACKS TO STATIONS
-        
 
     for track in trackList: #FIND START AND END STATION FOR TRACK
-      #print("TRACK: ")
-      #print(track)
       maxAllowedDist=200
       startDist=100000000.0
       startCandidate=""
@@ -133,28 +124,16 @@ else:
       endCandidate=""
       endCoordinate=[]
       for station in stationList:
-
         thisDist=haversine(float(track[1][0]), float(track[1][1]) ,float(station[1][0]), float(station[1][1] ))
         if(thisDist<startDist):
-          #print("smallest found for start!")
-          #print(station)
-          #print(thisDist)
           startDist=thisDist
           startCandidate=station[0]
           startCoordinate=station[1]
-          
         thisDist=haversine(float(track[3][0]), float(track[3][1]) ,float(station[1][0]), float(station[1][1] ))
         if(thisDist<endDist):
-          #print("smallest found for end!")
-          #print(station)
-          #print(thisDist)
           endDist=thisDist
           endCandidate=station[0]
           endCoordinate=station[1]
-
-      #print("COORDINATES")
-      #print(startCoordinate)
-      #print(endCoordinate)
       trackDir=( "__N" ) if ( float(startCoordinate[1] )<  float(endCoordinate[1]) ) else ( "__S" )  
       trackDir=trackDir +("__E" ) if ( float(startCoordinate[0] )<  float(endCoordinate[0]) ) else (trackDir + "__W" )
       if ((startDist<maxAllowedDist) and (endDist<maxAllowedDist) and (startCandidate != endCandidate)):
@@ -166,5 +145,3 @@ else:
           print("CONNECT TRACK " + track[0] + " FROM " + startCandidate + " TO " + endCandidate)
       else:
         print("   ERROR: missing station at start or end for track: " + track[0] +" "+ str(startDist)+" " + str(endDist)+" " + startCandidate +" "+ endCandidate )    
-  #print(" ")
-  #print(trackList)

@@ -411,7 +411,7 @@ int Train::runningState(int n)
                                      getLength() - virtualPositionOnTrack -
                                      currentSpeed) * 2));
     desiredSpeed = max(desiredSpeed, 1);
-    if (currentSpeed != desiredSpeed)
+    if (currentSpeed != desiredSpeed)//Accelerate by 1 or -1
     {
       currentSpeed = currentSpeed + (desiredSpeed - currentSpeed) /
                      abs(desiredSpeed-currentSpeed);

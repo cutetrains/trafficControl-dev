@@ -262,7 +262,7 @@ bool NetworkControl::parseCmd(QString inputLine)
           approvedCommand=true;
       } }
 
-  /* ADD TRACK <track name> <length> */
+  /* TRAIN TRAVELPLAN ADD STATION <track name> <length> */
   if ((0 == argumentList.indexOf("TRAIN")) &&
           (1 == argumentList.indexOf("TRAVELPLAN")) &&
           (2 == argumentList.indexOf("ADD")) &&
