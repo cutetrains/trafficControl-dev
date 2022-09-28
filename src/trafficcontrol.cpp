@@ -25,7 +25,7 @@
 #include <QQmlEngine>
 #include <QDesktopServices>//Delete?
 #include "../inc/TrafficControl.h"
-#include "ui_TrafficControl.h"
+#include "ui_trafficcontrol.h"
 #define TRACK 1
 #define TRAIN 2
 #define STATION 3
@@ -38,6 +38,7 @@ TrafficControl::TrafficControl(QWidget *parent) :
   ui(new Ui::TrafficControl)
 {
   ui->setupUi(this);
+  qInfo()<<"Setting up UI";
   //TODO: COLLECT SETTINGS IN SEPARATE FUNCTIONS
   fastForwardSpinBox = new QDoubleSpinBox(this);
   fastForwardSpinBox->setMaximum(50);
@@ -292,7 +293,7 @@ bool TrafficControl::onSaveTnfFile()
   QTextStream stream(&f);
   stream << ui->trafficNetworkMapTextEdit->toPlainText();
   stream << ui->trafficNetworkOperationTextEdit->toPlainText();
-  stream <<endl;
+  stream.flush();
   f.close();
   return false;
 }
@@ -347,7 +348,7 @@ void TrafficControl::updateTnmTextBox(QString tnmFile)
   ui->trafficNetworkMapTextEdit->setText(tnmFile);
 
   //TODO CALL NW CONTROL FROM NETWORKDESIGNER USING SIGNALS/SLOTS
-  QStringList tnmFileSplitted = tnmFile.split("\r\n", QString::SkipEmptyParts);
+  QStringList tnmFileSplitted = tnmFile.split("\r\n", Qt::SkipEmptyParts);
   QString s;
   foreach(s, tnmFileSplitted){
     networkControl->parseCmd(s);
@@ -364,7 +365,7 @@ void TrafficControl::updateTnoTextBox(QString tnoFile)
 {
   ui->trafficNetworkOperationTextEdit->setText(tnoFile);
 
-  QStringList tnoFileSplitted = tnoFile.split("\r\n", QString::SkipEmptyParts);
+  QStringList tnoFileSplitted = tnoFile.split("\r\n", Qt::SkipEmptyParts);
 
   QString s;
   foreach(s, tnoFileSplitted){

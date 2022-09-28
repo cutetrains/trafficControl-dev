@@ -268,11 +268,9 @@ bool NetworkControl::parseCmd(QString inputLine)
           (2 == argumentList.indexOf("ADD")) &&
           (3 == argumentList.indexOf("STATION")) &&
           (5 == argumentList.count())){
-      //qDebug()<<"INFO   : TRAIN TRAVELPLAN ADD TRACK recognised with Track="
-      //        <<argumentList.at(4)<<". TODO: Check that the station exists.";
       foreach (Station* s, stationList) {
           if( s->getName()==argumentList.at(4)){
-              //    qDebug()<<"IMPORT : "<<argumentList.at(4) <<" found. Adding to travelplan";
+              //qDebug()<<"IMPORT : "<<argumentList.at(4) <<" found. Adding to travelplan";
               trainList.at(cmdParserCurrentTrain)->addStationToTravelPlan(s->getID());
               approvedCommand=true;
           }

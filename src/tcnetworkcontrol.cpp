@@ -99,7 +99,11 @@ void NetworkControl::addStationToNetwork(QString stationName,
           stationListModel,
           SLOT(onDataChanged(int , const QVariant &)));
   stationList.append(newStation);
-  stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
+
+  stationListModel->insertRows(stationListModel->rowCount(), 1 , QModelIndex());
+
+  //stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
+  qDebug()<<"In tcnetworkcontrol__addStationToNetwork, after adding to stationlist model";
 
   if( 0 != stationLat.compare("") &&
       0 != stationLon.compare("") &&
@@ -140,12 +144,14 @@ bool NetworkControl::addTrackToNetwork(QString trackName,
                               trainList,
                               stationList);
   trackList.append(newTrack);
-  trackListModel->insertRows(trackList.size(), 1 , QModelIndex());
+  //trackListModel->insertRows(trackList.size(), 1 , QModelIndex()); //trackList is already incremented
+  trackListModel->insertRows(trackListModel->rowCount(), 1 , QModelIndex()); //Better to use actual size of trackListModel
+
   connect(newTrack,
           SIGNAL(dataChangedSignal(int, const QVariant &)),
           trackListModel,
           SLOT(onDataChanged(int, const QVariant &)));
-  if(FALSE == coordinates.empty() &&
+  if(false == coordinates.empty() &&
      &handleQMLObject != NULL)
   {
     QVariant returnedValue;
@@ -179,7 +185,8 @@ void NetworkControl::addTrainToNetwork(QString trainName)
           trainListModel,
           SLOT(onDataChanged(int , const QVariant &)));
   trainList.append(newTrain);
-  trainListModel->insertRows(trainList.size(), 1 , QModelIndex());
+  //trainListModel->insertRows(trainList.size(), 1 , QModelIndex());
+  trainListModel->insertRows(trainListModel->rowCount(), 1 , QModelIndex());
 
   if( NULL != &handleQMLObject){
     QVariant returnedValue;

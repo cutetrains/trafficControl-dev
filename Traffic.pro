@@ -9,9 +9,10 @@ QT       += core gui
 QT       += qml
 QT       += quickwidgets
 QT       += positioning
-QT       += location
+#QT       += location
 
 RC_FILE = resources/trafficControl.rc
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x050F00
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TEMPLATE = app
@@ -29,7 +30,7 @@ SOURCES += src/main.cpp \
     src/tcnetworkcontrolcommandparser.cpp \
     src/networkdesigner.cpp
 
-#UNCOMMENT SECTION BELOW TO TEST
+#UNCOMMENT SECTION BELOW TO TEST AND BUILD "PROFILE"
 #debug {
 #    GOOGLETEST_DIR = $$PWD/../googletest
 #    include(gtest_dependency.pri)

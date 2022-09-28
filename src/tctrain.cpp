@@ -84,6 +84,7 @@ Train::Train(QString trainName,
  */
 bool Train::addStationToTravelPlan(int stationID)
 {
+  qInfo()<<"To add station in T::asttp "<<stationID;
   if (stationID < 0){
     qDebug()<<"ERROR  : Train::addTrackToTrainRoute Error: negative number specified."
             << stationID<<" : "<< thisStationList->at(stationID)->getName();

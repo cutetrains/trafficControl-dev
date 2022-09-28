@@ -1,7 +1,7 @@
-import QtQuick 2.5
-import QtQuick.Controls 1.4
-import QtLocation 5.6
-import QtPositioning 5.5
+import QtQuick 2.3
+import QtQuick.Controls 2.12
+import QtLocation 5.15
+import QtPositioning 5.15
 
 Item {
   id: mainItemGustaf
@@ -53,7 +53,7 @@ Item {
       if(mainMap.children[i].objectName === "track_"+trackName+"_END") {foundEndSignalId = i;}
     }
     mainMap.children[foundTrackId].line.width = nbrOfTrains+1;
-    if ("FREE" == trackStatus){
+    if ("FREE" === trackStatus){
       mainMap.children[foundTrackId].line.color = "green";
       for (j = 0; j < mainMap.children.length; ++j) {
         if(mainMap.children[j].objectName === "track_"+trackName+"_START") {
@@ -82,15 +82,15 @@ Item {
         qmlAddTrackSignal(mainMap.children[foundTrackId].objectName, "END", endtMarkLat, endMarkLon);
         foundEndSignalId = i++;
       }
-      if ("LOCKED_START" == trackStatus){
+      if ("LOCKED_START" === trackStatus){
         mainMap.children[foundTrackId].line.color = "yellow";
         mainMap.children[foundStartSignalId].color="red";
         mainMap.children[foundEndSignalId].color="green";
-      } else if ("LOCKED_END" == trackStatus){
+      } else if ("LOCKED_END" === trackStatus){
         mainMap.children[foundTrackId].line.color = "yellow";
         mainMap.children[foundStartSignalId].color="green";
         mainMap.children[foundEndSignalId].color="red";
-      } else if ("BUSY" == trackStatus || "EMERGENCY" == trackStatus){
+      } else if ("BUSY" === trackStatus || "EMERGENCY" === trackStatus){
         mainMap.children[foundTrackId].line.color = "red";
         mainMap.children[foundStartSignalId].color="red";
         mainMap.children[foundEndSignalId].color="red";
@@ -101,7 +101,7 @@ Item {
 
   function qmlAddTrackSignal(name, startOrEnd, lat, lon)
   {
-    var circle = Qt.createQmlObject('import QtLocation 5.6; import QtQuick 2.5; MapCircle {id:'
+    var circle = Qt.createQmlObject('import QtLocation 5.15; import QtQuick 2.3; MapCircle {id:'
                                      +name+'_'+startOrEnd
                                      +';objectName:"'+name+'_'+startOrEnd + '"}',
                                      mainMap,
@@ -129,7 +129,7 @@ Item {
   }
 
   function createQMLTrain(trainName) {
-    var circle = Qt.createQmlObject('import QtLocation 5.6; import QtQuick 2.5; MapCircle {id:train_'
+    var circle = Qt.createQmlObject('import QtLocation 5.15; import QtQuick 2.3; MapCircle {id:train_'
                                      +trainName
                                      +';objectName:"train_'+trainName+'"}',
                                      mainMap,
@@ -145,7 +145,7 @@ Item {
   }
 
   function createQMLTrack(trackName, length, coordinates) {
-    var polyline = Qt.createQmlObject('import QtLocation 5.6; import QtQuick 2.5; MapPolyline {id:track_'
+    var polyline = Qt.createQmlObject('import QtLocation 5.15; import QtQuick 2.3; MapPolyline {id:track_'
                                        +trackName
                                        +';objectName:"track_'+trackName+'"}',
                                        mainMap,
@@ -162,7 +162,7 @@ Item {
   }
 
   function createQMLStation(stationName, isJunction, stationLat, stationLong) {
-    var circle = Qt.createQmlObject('import QtLocation 5.6; import QtQuick 2.5; MapCircle {id:station_'
+    var circle = Qt.createQmlObject('import QtLocation 5.15; import QtQuick 2.3; MapCircle {id:station_'
                                      +stationName
                                      +';objectName:"station_'
                                      +stationName
