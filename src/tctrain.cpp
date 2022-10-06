@@ -42,7 +42,6 @@ Train::Train(QString trainName,
              QList<Train*>& trainList,
              QList<Station*>& stationList)
 {
-  //trainName = QString::fromUtf16(tn.utf16());
   name = trainName;
   passengerCapacity = 100;
   positionOnTrack = 0;
@@ -293,10 +292,10 @@ int Train::move(int n)
  * @param n Time remaining for the train in this trafficClock tick
  *
  * @return n Remaining time after operations
+ * @todo avoid magic numbers
  */
 int Train::openingState(int n)
 {
-  //TODO Avoid magic numbers
   doorOpenProgress += 20;
   if (doorOpenProgress== 100)
   {
@@ -312,46 +311,39 @@ int Train::openingState(int n)
  * @param n Time remaining for the train in this trafficClock tick
  *
  * @return n Time remaining after operations
+ * @todo Will the train be at UNDEFINED station in ready state?
  */
 int Train::readyState(int n)
 {
-  if (currentStation == UNDEFINED)
-  {
-    qDebug()<<this->getName()<<" is in READY and at a track: "<<this->getCurrentTrack()<<". TODO: implement resume running code";
-    return 0;
+  if ( (nextIndexTravelPlanByStationID ==  (int) travelPlanByStationID.size() - 1  ) &&
+       (travelPlanByStationID.at(nextIndexTravelPlanByStationID) == currentStation) )
+  { // Train at end of travel plan
+      state = stateTable.value("STOPPED");
+      return 0;
   }
   else
   {
-    if ( (nextIndexTravelPlanByStationID ==  (int) travelPlanByStationID.size() - 1  ) &&
-         (travelPlanByStationID.at(nextIndexTravelPlanByStationID) == currentStation) )
-    { // Train at end of travel plan
-      state = stateTable.value("STOPPED");
-      return 0;
-    }
-    else
-    {
+    if (UNDEFINED == nextTrack)
+    { //Find next station to travel towards
+      nextTrack = thisStationList->at(currentStation)
+                  ->findLeavingTrackIndexToStation(//What track to next station?
+                                                   travelPlanByStationID.at(nextIndexTravelPlanByStationID));
       if (UNDEFINED == nextTrack)
-      { //Find next station to travel towards
-        nextTrack = thisStationList->at(currentStation)
-                      ->findLeavingTrackIndexToStation(//What track to next station?
-                        travelPlanByStationID.at(nextIndexTravelPlanByStationID));
-        if (UNDEFINED == nextTrack)
-        {
-          //qDebug() << "ERROR  : "<< this->getName()<<" No leaving track";
-          waitingTimer=3;
-          n--;
-          return n;
+      {
+        //qDebug() << "ERROR  : "<< this->getName()<<" No leaving track";
+        waitingTimer=3;
+        n--;
+        return n;
+      }
+      else
+      { //Wait if an available track has been found and the waiting timer is bigger than 0.
+        if (waitingTimer>0){
+          waitingTimer--;
+          nextTrack = UNDEFINED;
+        } else {
+          n = this->readyToRunningState(n);
         }
-        else
-        { //Wait if an available track has been found and the waiting timer is bigger than 0.
-          if (waitingTimer>0){
-            waitingTimer--;
-            nextTrack = UNDEFINED;
-          } else {
-            n = this->readyToRunningState(n);
-          }
-          return n;
-        }
+        return n;
       }
     }
   }
@@ -505,7 +497,7 @@ void Train::setCurrentStation(int stationID) {
 
 /*!
  * The method sets the current Track of the Train object.
- * @TODO ADD PPOSITION
+ * @todo ADD PPOSITION
  *
  * @param trackID The ID of the Train object that has information to update.
  */
@@ -520,12 +512,13 @@ void Train::setCurrentTrack(int trackID) {
  * @param newDesiredSpeed The desired speed for the Train [m/s].
  */
 void Train::setDesiredSpeed(int newDesiredSpeed) {
+  int maxSpeed = 0;
   desiredSpeed = min(maxSpeed, newDesiredSpeed);
   if (currentTrack != UNDEFINED){
-  int maxSpeed = thisTrackList->at(currentTrack)->getMaxAllowedSpeed();
+    maxSpeed = thisTrackList->at(currentTrack)->getMaxAllowedSpeed();
     desiredSpeed = min(newDesiredSpeed, maxSpeed);
   }
-  sendDataChangedSignal(trainID);//+1?
+  sendDataChangedSignal(trainID);
 }
 
 /*!

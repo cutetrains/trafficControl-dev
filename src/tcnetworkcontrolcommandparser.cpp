@@ -19,8 +19,8 @@
 #include <QString>
 #include <QTextStream>
 #include <QFileDialog>
-#include "../inc/tcNetworkControl.h"
-#include "ui_TrafficControl.h"
+#include "../inc/tcnetworkcontrol.h"
+//#include "ui_trafficcontrol.h"
 #define TRACK 1//Replace with constants that are global!
 #define TRAIN 2
 #define STATION 3
@@ -54,7 +54,7 @@ bool NetworkControl::parseMultipleNetworkCommand(QStringList inputLines)
  * @return Success or Failure
  *
  * @todo: If this part becomes too extensive, place this code in a separate source file.
- * @todo: Use Regular Expressions
+ * @todo: Use Regular Expressions and redo code
  * @todo: Introduce consistensy checks for files.
  */
 bool NetworkControl::parseCmd(QString inputLine)

@@ -29,7 +29,7 @@
 #include "tctrack.h"
 #include "tcstation.h"
 #include "trafficdatamodel.h"
-#include "trafficclock.h"
+//#include "trafficclock.h"
 #include "tcnetworkcontrol.h"
 #include "networkdesigner.h"
 
@@ -49,9 +49,9 @@ public:
 
 public slots:
   void onPlayStopButtonClicked(bool isChecked);
-  bool onOpenKmlFile();
-  bool onOpenTnoFile();
-  bool onSaveTnfFile();
+  bool onOpenKmlFile();//Map file
+  bool onOpenTnoFile();//Operation File
+  bool onSaveTnfFile();//Entire network
   void onToggleDesignDockWidget(bool isVisible);
   void onToggleMapDockWidget(bool isVisible);
   void onToggleTrainDockWidget(bool isVisible);

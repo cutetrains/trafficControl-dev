@@ -67,7 +67,7 @@ public:
         QList<Train*>& trainList,
         QList<Station*>& stationList);
   ~Train();
-  bool addStationToTravelPlan(int stationID);//To be removed and replaced by addStationToTrainRoute
+  bool addStationToTravelPlan(int stationID);//Travel plans and routes will be handled by tcNetworkControl, or a new class, for example tcTrafficPlanner
   int closingState(int n);
   void destructorResetTotalNumberOfTrains();
   int getCurrentSpeed();

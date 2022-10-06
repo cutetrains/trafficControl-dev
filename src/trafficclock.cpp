@@ -58,7 +58,7 @@ void TrafficClock::incrementSimulatedTime(int iSeconds)
 }
 
 /*!
-* The is the is called by the thread. This is called everythime the counter is activated by the user.
+* This is called everythime the counter is activated by the user.
 *
 */
 void TrafficClock::threadTick()

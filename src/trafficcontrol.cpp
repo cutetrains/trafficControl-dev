@@ -24,7 +24,7 @@
 #include <QQmlComponent>
 #include <QQmlEngine>
 #include <QDesktopServices>//Delete?
-#include "../inc/TrafficControl.h"
+#include "../inc/trafficcontrol.h"
 #include "ui_trafficcontrol.h"
 #define TRACK 1
 #define TRAIN 2
@@ -41,7 +41,7 @@ TrafficControl::TrafficControl(QWidget *parent) :
   qInfo()<<"Setting up UI";
   //TODO: COLLECT SETTINGS IN SEPARATE FUNCTIONS
   fastForwardSpinBox = new QDoubleSpinBox(this);
-  fastForwardSpinBox->setMaximum(50);
+  fastForwardSpinBox->setMaximum(50);//TODO: use yaml file for settings?
   fastForwardSpinBox->setMinimum(0.5);
   fastForwardSpinBox->setSingleStep(0.5);
   fastForwardSpinBox->setValue(1);
@@ -81,7 +81,6 @@ TrafficControl::TrafficControl(QWidget *parent) :
   ui->mapDockWidget->resize(1000,700);
   ui->mapDockWidget->updateGeometry();
 
-  //QDesktopServices::openUrl(QUrl("http://www.example.com/"));
   networkControl = new NetworkControl(*trackListModel,
                                       *trainListModel,
                                       *stationListModel,
@@ -170,7 +169,7 @@ void TrafficControl::onHelpOverviewSelected()
  * Icon credit:
  * http://icons8.com/
  *
- * @param
+ * @param isPaused True to pause, False to resume
  */
 void TrafficControl::onPlayStopButtonClicked(bool isPaused){
   // If the simulation isn't paused (isPaused=FALSE), the step button should be disabled (setEnabled = FALSE)
@@ -267,13 +266,13 @@ bool TrafficControl::onOpenTnoFile(){
                                                   tr("Open Traffic Network Operations (TNO) File"),
                                                   QDir::homePath(),
                                                   tr("Files (*.tno)"));
-  qDebug()<<fileName;
+  qInfo()<<fileName;
   networkDesigner->importTno(fileName);
   return false;
 }
 
 /*!
- * Open a TNO file and send the contents to tcNetworkDesigner, if found
+ * Save he contents of the two textEdif fields to a TNF (Traffic Network File)
  *
  * @return TRUE if file OK
  */
@@ -288,20 +287,21 @@ bool TrafficControl::onSaveTnfFile()
   QFile f( fileName );
   if(!f.open( QIODevice::WriteOnly  | QIODevice::Text ))
   {
-    qDebug()<<"ERROR  : Could not open file.";
+    qDebug()<<"ERROR  : Could not open file."; // TODO: Add popup window with error message? Check the caller function!
+    return false;
   }
   QTextStream stream(&f);
   stream << ui->trafficNetworkMapTextEdit->toPlainText();
   stream << ui->trafficNetworkOperationTextEdit->toPlainText();
   stream.flush();
   f.close();
-  return false;
+  return true;
 }
 
 /*!
  * Opens a file and parses the commands to networkControl
  *
- * @return result
+ * @return result True for succes
  */
 bool TrafficControl::readNetworkDefinitionFromFile()
 {
@@ -312,7 +312,8 @@ bool TrafficControl::readNetworkDefinitionFromFile()
   QFile file(fileName);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
   {
-    qDebug()<<"ERROR  : Could not open file.";
+    qDebug()<<"ERROR  : Could not open file.";// TODO Create a pop up window?
+    return false;
   }
 
   QTextStream in(&file);
@@ -359,7 +360,7 @@ void TrafficControl::updateTnmTextBox(QString tnmFile)
  * Updates the TrafficNetworkOperation textbox in user interface.
  * TNO is created manually
  *
- * @param tnoFile
+ * @param tnoFile Traffic Network Operations file
  */
 void TrafficControl::updateTnoTextBox(QString tnoFile)
 {
@@ -389,10 +390,10 @@ void TrafficControl::updateCalculationTime(int calculationTimeMs){
 
 /*!
  * The destructor method
- * @TODO Investigate what objects ad data structures shall be removed at
+ * @todo Investigate what objects ad data structures shall be removed at
  * termination of the program.
  *
- * @TODO Investigate dependencies when removing objects
+ * @todo Investigate dependencies when removing objects
  */
 TrafficControl::~TrafficControl()
 {

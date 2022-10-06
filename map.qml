@@ -4,7 +4,7 @@ import QtLocation 5.15
 import QtPositioning 5.15
 
 Item {
-  id: mainItemGustaf
+  id: mainItem
   objectName: "nameMainItem"
   PositionSource {
     active: true

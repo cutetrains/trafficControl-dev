@@ -7,23 +7,27 @@ NetworkDesigner::NetworkDesigner(QObject *parent) : QObject(parent)
 /*!
  * Updates the TrafficNetworkMap textbox in user interface.
  * TNM is generated from KML file using KML parser.
+ * This is using a python command interpreter.
+ * TODO: Make this OS-agnostic.
+ * TODO: Investigate if it is possible to use python from within the program, without relying on a file on the local file system.
  *
  * @param tnmFile the generated TrafficNetworkMap string
  */
 bool NetworkDesigner::convertKmlToTnm(QString kmlFileName)
 {
+  //TODO: Make os-agnostic
   QString  program( "python.exe " );
   QProcess p;
   QStringList args = QStringList();
-  //HARDCODED, MUST BE GENERIC!!!
+  //TODO: Relies on GIT, move to resources instead?
   args << "C:/Users/gusta/GIT/trafficControl-dev/scripts/KMLParser/TrackStationConnector.py";
-  args <<kmlFileName;
+  args << kmlFileName;
   p.start(program,args);
   p.waitForFinished(-1);
   QString trafficNetworkMapFile = p.readAll();
   emit kmlToTnmConversionDone(trafficNetworkMapFile);
 
-  //TODO: ANALYSE TNM OUTPUT AND SEND REPORT TO USER INTERFACE. THIS CAN BE ADDED TO THE EXISTING SIGNAL
+  //TODO: ANALYSE TNM OUTPUT AND SEND REPORT TO ERROR, ALONG WITH BOOLEAN. THIS CAN BE ADDED TO THE EXISTING SIGNAL
   return false;
 }
 
@@ -42,7 +46,7 @@ bool NetworkDesigner::importTnmOrTnf(QString tnmOrTnfFileName)
       fileStrings << in.readLine();
     }
     file.close();
-    //THIS MAY NEED TO BE MODIFIED IF THERE IS ERROR HANDLING!!!
+    //TODO: THIS MAY NEED TO BE MODIFIED IF THERE IS ERROR HANDLING!!!
     emit kmlToTnmConversionDone(fileStrings.join("\r\n"));
     return false;
 }
@@ -53,6 +57,7 @@ bool NetworkDesigner::importTno(QString tnoFileName)
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
       qDebug()<<"ERROR  : Could not open file.";
+      return false;
     }
 
     QTextStream in(&file);
@@ -63,5 +68,6 @@ bool NetworkDesigner::importTno(QString tnoFileName)
     }
     file.close();
     emit tnoFileOpened(fileStrings.join("\r\n"));
-    return false;
+
+    return true;
 }

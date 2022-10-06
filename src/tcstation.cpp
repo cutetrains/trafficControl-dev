@@ -27,7 +27,7 @@
  * Contact: gustaf_brannberg@hotmail.com
  */
 
-#include <qDebug>
+#include <QDebug>
 #include "../inc/tcstation.h"
 #include "../inc/trafficcontrol.h"
 #define UNDEFINED -1
@@ -46,9 +46,9 @@ int Station::totalNbrOfStations = 0;
  * @param trainList is a pointer to the trackList
  * @param stationList is a pointer to the stationList
  *
- * @TODO Rename cn to a more readable name
- * @TODO numberOfPlatforms is hardcoded to 2,  should be station-dependent.
- * @TODO emit signal at initialisation so that QML has updated info
+ * @todo Rename cn to a more readable name
+ * @todo numberOfPlatforms is hardcoded to 2,  should be station-dependent.
+ * @todo emit signal at initialisation so that QML has updated info
  */
 Station::Station(QString stationName,
                  bool isJunction,
@@ -74,8 +74,8 @@ Station::Station(QString stationName,
     isOk = (qFabs(tempLatitude) < 90 && qFabs(tempLongitude) < 180);
   }
   hasValidCoordinates = isOk;
-  if(isOk){ thisCoordinate<<tempLatitude<<tempLongitude;
-  }
+  if (isOk) thisCoordinate<<tempLatitude<<tempLongitude;
+
   stationID = totalNbrOfStations;
   totalNbrOfStations++;
   thisTrackList = &trackList;
@@ -128,7 +128,7 @@ bool Station::changeNbrOfPassengers(int nbrPassengersToAdd) {
   }
   else
   {
-    bool result = nbrPassengersToAdd + waitingPassengers < 0 ? false: true;
+    bool result = (nbrPassengersToAdd + waitingPassengers < 0) ? false: true;
     waitingPassengers = max((waitingPassengers + nbrPassengersToAdd), 0);
     sendDataChangedSignal(stationID);
     return result;
@@ -174,7 +174,7 @@ void Station::destructorResetTotalNumberOfStations() { totalNbrOfStations = 0; }
  * @param stationID The ID of the station to reach.
  *
  * @return trackID The ID number the station.
- * @TODO consider whether track is locked or not
+ * @todo consider whether track is locked or not
  */
 int Station::findLeavingTrackIndexToStation(int targetStationID)
 {
@@ -227,14 +227,7 @@ int Station::getNbrOfWaitingPassengers() { return waitingPassengers; }
  * @return latitude The latitude of the station.
  */
 float Station::getLatitude() {
-  if(hasValidCoordinates)
-  {
-    return thisCoordinate.at(0);
-  }
-  else
-  {
-    return 0;
-  }
+  return (hasValidCoordinates ? thisCoordinate.at(0): 0);
 }
 
 /*!
@@ -251,14 +244,7 @@ QList<int> Station::getLeavingTrackList() { return leavingTrackList;}
  * @return latitude The longitude of the station.
  */
 float Station::getLongitude() {
-  if(hasValidCoordinates)
-  {
-    return thisCoordinate.at(1);
-  }
-  else
-  {
-    return 0;
-  }
+  return (hasValidCoordinates ? thisCoordinate.at(1): 0);
 }
 
 /*!
@@ -271,7 +257,7 @@ int Station::getNbrOfPlatforms(){ return numberOfPlatforms;}
 /*!
  * The method returns the number of platforms.
  *
- * @return nbrOfPlatforms The number of platfoms/tracks on the station.
+ * @return totalNbrOfStations The number of stations in the entire network.
  */
 int Station::getTotalNbrOfStations(){ return totalNbrOfStations; }
 
@@ -334,11 +320,11 @@ bool Station::setNbrOfPlatforms(int nbrOfPlatforms){
  * @todo Check if a foreach statement can simplify the code.
  */
 void Station::showInfo() {
-  qDebug() << name << " (" << stationID << ") has " << waitingPassengers
+  qInfo() << name << " (" << stationID << ") has " << waitingPassengers
            << " waiting passengers. ";
-  qDebug() << "INFO   : Leaving tracks: ";
-  foreach(int i, leavingTrackList)  { qDebug() <<"        "<<i; }
-  qDebug() << "INFO : thisTrackList: Size is " << thisTrackList->size()
+  qInfo() << "INFO   : Leaving tracks: ";
+  foreach(int i, leavingTrackList)  { qInfo() <<"        "<<i; }
+  qInfo() << "INFO : thisTrackList: Size is " << thisTrackList->size()
            << "thisStationList: Size is " << thisStationList->size()
            << " thisTrainList: Size is " << thisTrainList->size() << "\n";
 }

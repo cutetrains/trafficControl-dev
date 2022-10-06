@@ -35,7 +35,7 @@
 #include <QQuickItem>
 #include <QQmlComponent>
 #include <QQmlEngine>
-#include "../inc/trafficControl.h"
+#include "../inc/trafficcontrol.h"
 #include "../inc/tcnetworkcontrol.h"
 #define TRACK 1
 #define TRAIN 2
@@ -53,10 +53,6 @@ NetworkControl::NetworkControl(TrafficDataModel &trackListModel,
   this->trainListModel = &trainListModel;
   this->stationListModel = &stationListModel;
   this->handleQMLObject = &handleQMLObject;
-  if(&handleQMLObject == NULL)
-  {
-    qDebug()<<"NC: trackListModel is a null pointer";
-  }
 
   trafficClock.threadSetup(clockThread);
   trafficClock.moveToThread(&clockThread);
@@ -102,12 +98,7 @@ void NetworkControl::addStationToNetwork(QString stationName,
 
   stationListModel->insertRows(stationListModel->rowCount(), 1 , QModelIndex());
 
-  //stationListModel->insertRows(stationList.size(), 1 , QModelIndex());
-  qDebug()<<"In tcnetworkcontrol__addStationToNetwork, after adding to stationlist model";
-
-  if( 0 != stationLat.compare("") &&
-      0 != stationLon.compare("") &&
-      NULL != &handleQMLObject){
+  if( 0 != stationLat.compare("") && 0 != stationLon.compare("")){
     QVariant returnedValue;
     QMetaObject::invokeMethod(handleQMLObject,
                               "createQMLStation",
@@ -135,7 +126,7 @@ bool NetworkControl::addTrackToNetwork(QString trackName,
                                        int trackLength,
                                        QStringList coordinates)
 {
-  if(trackLength <= 0) { return false; }
+  if(trackLength <= 0) return false;
 
   Track* newTrack = new Track(trackName,
                               trackLength,
@@ -144,15 +135,13 @@ bool NetworkControl::addTrackToNetwork(QString trackName,
                               trainList,
                               stationList);
   trackList.append(newTrack);
-  //trackListModel->insertRows(trackList.size(), 1 , QModelIndex()); //trackList is already incremented
   trackListModel->insertRows(trackListModel->rowCount(), 1 , QModelIndex()); //Better to use actual size of trackListModel
 
   connect(newTrack,
           SIGNAL(dataChangedSignal(int, const QVariant &)),
           trackListModel,
           SLOT(onDataChanged(int, const QVariant &)));
-  if(false == coordinates.empty() &&
-     &handleQMLObject != NULL)
+  if(false == coordinates.empty())
   {
     QVariant returnedValue;
     QMetaObject::invokeMethod(handleQMLObject,
@@ -167,7 +156,7 @@ bool NetworkControl::addTrackToNetwork(QString trackName,
             SLOT(qmlTrackStatusSlot(QVariant, QVariant, QVariant)));
   }
   newTrack = NULL;
-  return true;
+  return true; //TODO: SHOULD THERE BE A CHECK, OR SHOULD THE FUNCTION BE VOID?
 }
 
 /*!
@@ -176,6 +165,7 @@ bool NetworkControl::addTrackToNetwork(QString trackName,
  *
  * @param nbrOfPassengers Maximum allowed number of passengers. COMMENT: This
  *        naming is confusing and should be maxNbrOfPassengers.
+ * @todo: CHANGE NAME TO maxNbrOfPassengers
  */
 void NetworkControl::addTrainToNetwork(QString trainName)
 {
@@ -185,20 +175,18 @@ void NetworkControl::addTrainToNetwork(QString trainName)
           trainListModel,
           SLOT(onDataChanged(int , const QVariant &)));
   trainList.append(newTrain);
-  //trainListModel->insertRows(trainList.size(), 1 , QModelIndex());
   trainListModel->insertRows(trainListModel->rowCount(), 1 , QModelIndex());
 
-  if( NULL != &handleQMLObject){
-    QVariant returnedValue;
-    QMetaObject::invokeMethod(handleQMLObject,
-                              "createQMLTrain",
-                              Q_RETURN_ARG(QVariant, returnedValue),
-                              Q_ARG(QVariant, trainName));
-    connect(newTrain,
-            SIGNAL(qmlTrainPositionSignal(QVariant, QVariant, QVariant)),
-            handleQMLObject,
-            SLOT(qmlTrainPositionSlot(QVariant, QVariant, QVariant)));
-  }
+  QVariant returnedValue;
+  QMetaObject::invokeMethod(handleQMLObject,
+                            "createQMLTrain",
+                            Q_RETURN_ARG(QVariant, returnedValue),
+                            Q_ARG(QVariant, trainName));
+  connect(newTrain,
+          SIGNAL(qmlTrainPositionSignal(QVariant, QVariant, QVariant)),
+          handleQMLObject,
+          SLOT(qmlTrainPositionSlot(QVariant, QVariant, QVariant)));
+
   newTrain = NULL;
 }
 
@@ -210,11 +198,11 @@ void NetworkControl::addTrainToNetwork(QString trainName)
  * @param endStation The ID number of the end station for the track.
  *
  * @return Status 1 indicates success. 0 indicates failure.
- * @TODO Add error detection
+ * @todo Add error detection
  */
 bool NetworkControl::connectTrackToStations(int trackID,
-                                           int startStationID,
-                                           int endStationID)
+                                            int startStationID,
+                                            int endStationID)
 {
   if(trackID != UNDEFINED && trackID < trackList.length() &&
      startStationID != UNDEFINED && startStationID < stationList.length() &&
@@ -247,6 +235,8 @@ bool NetworkControl::connectTrackToStations(int trackID,
  * @return Status 1 indicates success. 0 indicates failure.
  *
  * @todo Add error handling
+ * @todo Add separate function for searching stationList/trackList/trainList
+ *       to get an ID match to a specific name
  */
 bool NetworkControl::connectTrackToStationsByName(QString trackName,
                                                   QString startStationName,
@@ -319,7 +309,7 @@ void NetworkControl::setSimulationPaused(bool isPaused)
 
 /*!
  * This method commands all trains to move the amount of time defined in the stepTimeBox item in the UI.
- * @TODO: make method update all traffic elements, such as TRACK and STATION
+ * @todo: Make method update all traffic elements, such as TRACK and STATION
  *
  * @param n number of seconds to step
  */
@@ -328,7 +318,6 @@ void NetworkControl::stepTimeForNetwork(int n)
   int calculationTime;
   QMutexLocker locker(&mutex);
   startTime = QTime::currentTime();
-  int response = 0;
   trafficClock.incrementSimulatedTime(n);
   /* ASSERTS TO VERIFY THAT TRAFFIC ELEMENTS HAS NEVER BEEN DELETED */
   bool result = false;
@@ -348,25 +337,31 @@ void NetworkControl::stepTimeForNetwork(int n)
   Q_ASSERT_X(result,
              Q_FUNC_INFO,
              "Station ID/list mismatch. Station objects mustn't be deleted!");
+
   for(int iii=0;iii<n;iii++)
   {
     foreach(Train* thisTrain, trainList){
-      response = thisTrain->move(1);
+      thisTrain->move(1);
     }
   }
+
   calculationTime = startTime.msecsTo(QTime::currentTime());
-  //qDebug()<<"Calculation time: "<<calculationTime;
   emit updateCalculationLoad((int) calculationTime/n);
 }
 
-void NetworkControl::stepTimeForNetwork(){ stepTimeForNetwork(1);}
+/*!
+ * This method commands all trains to move one unit of time.
+ */
+void NetworkControl::stepTimeForNetwork(){
+  stepTimeForNetwork(1);
+}
 
 /*!
  * The destructor method
- * @TODO Investigate what objects ad data structures shall be removed at
+ * @todo Investigate what objects ad data structures shall be removed at
  * termination of the program.
- *
- * @TODO Investigate dependencies when removing objects
+ * @todo Check if the lists are empty
+ * @todo Investigate dependencies when removing objects
  */
 NetworkControl::~NetworkControl()
 {

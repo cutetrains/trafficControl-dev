@@ -115,7 +115,7 @@ Track::Track( const Track& sTrack)
   maxAllowedSpeed = sTrack.maxAllowedSpeed;
   trackID = sTrack.trackID;
   coordinateList = sTrack.coordinateList;
-  coordinateCumulatedDistanceList = coordinateCumulatedDistanceList;
+  coordinateCumulatedDistanceList = sTrack.coordinateCumulatedDistanceList;
   thisTrackList = sTrack.thisTrackList;
   thisTrainList = sTrack.thisTrainList;
   thisStationList = sTrack.thisStationList;
@@ -138,7 +138,7 @@ Track& Track::operator=( const Track& sTrack )
   maxAllowedSpeed = sTrack.maxAllowedSpeed;
   trackID = sTrack.trackID;
   coordinateList = sTrack.coordinateList;
-  coordinateCumulatedDistanceList = coordinateCumulatedDistanceList;
+  coordinateCumulatedDistanceList = sTrack.coordinateCumulatedDistanceList;
   thisTrackList = sTrack.thisTrackList;
   thisTrainList = sTrack.thisTrainList;
   thisStationList = sTrack.thisStationList;
@@ -342,12 +342,13 @@ bool Track::isReversedTraffic() { return reversedTraffic; }
  * update it.
  *
  * @param trackID The ID of the Track object that has changed.
+ * @todo Check that stationID is within upper range too
  */
 void Track::sendDataChangedSignal(int trackID){
   QStringList message;
   message << name;
   message << QString::number(length);
-  //TODO: Check that stationID is within upper range too
+
   if(isLockedDownStream()){
     if(isLockedUpStream()){
       message << "Locked";
@@ -401,7 +402,7 @@ void Track::setEndStation(int stationID) {
 void Track::setLockDownStream(bool lockDS) {
   lockedDownStream = lockDS;
   sendDataChangedSignal(this->getID());
-  if(lockDS == true){
+  if(true == lockDS){
     emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "LOCKED_START");
   }
 }
@@ -414,7 +415,7 @@ void Track::setLockDownStream(bool lockDS) {
 void Track::setLockUpStream(bool lockUS) {
   lockedUpStream = lockUS;
   sendDataChangedSignal(this->getID());
-  if(lockUS == true){
+  if(true == lockUS){
     emit qmlTrackStatusSignal(this->getName(), trainsOnTrackQueue.length(), "LOCKED_END");
   }
 }
@@ -432,7 +433,9 @@ void Track::setMaxAllowedSpeed(int n) { maxAllowedSpeed = n; }
 /*!
  * The method sets whether the track operates in reversed directon (from end to start).
  *
- * param rt true if the traffic is in reversed direction.
+ * @param rt true if the traffic is in reversed direction.
+ * @todo investigate how this is used, and if it should reflect the current status, or whether
+ * traffic shall be allowed to run in reversed mode
  */
 void Track::setReversedTraffic(bool rt) { reversedTraffic = rt; }
 
