@@ -369,16 +369,21 @@ NetworkControl::~NetworkControl()
   clockThread.terminate();
   while(!clockThread.isFinished()){}
   foreach(Station* thisStation, stationList){
+    qInfo()<<"Deleting Station: "<<thisStation->getName();
     thisStation->destructorResetTotalNumberOfStations();
     delete thisStation;
-    thisStation=NULL;}
+    thisStation=NULL;
+  }
   foreach(Track* thisTrack, trackList){
+    qInfo()<<"Deleting Track: "<<thisTrack->getName();
     thisTrack->destructorResetTotalNumberOfTracks();
     delete thisTrack;
     thisTrack=NULL;
   }
   foreach(Train* thisTrain, trainList){
+    qInfo()<<"Deleting Train: "<<thisTrain->getName();
     thisTrain->destructorResetTotalNumberOfTrains();
     delete thisTrain;
-    thisTrain=NULL;}
+    thisTrain=NULL;
+  }
  }

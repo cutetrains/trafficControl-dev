@@ -339,6 +339,7 @@ void Station::showInfo() {
  */
 bool Station::trainArrival(int trainID)
 {
+  bool result = false;
   if(trainsAtStationList.length() >= numberOfPlatforms)
   {
     qDebug()<<"ERROR  : TOO MANY TRAINS!" <<thisTrainList->at(trainID)->getName()<<
@@ -349,10 +350,15 @@ bool Station::trainArrival(int trainID)
   {
     if(trainsAtStationList.contains(trainID))
     {
-      bool result = false;
-      Q_ASSERT_X(result,
-                 Q_FUNC_INFO,
-                 "Station::Arrival, the train is already at the station!");
+      //exit(1); // OK
+      //exit(0) //exits, but wrong exit code
+      qFatal("test123");// OK, but different strings accepted with messagehandler
+      //Q_ASSERT_X(result,
+      //           Q_FUNC_INFO,
+      //           "Station::Arrival, the train is already at the station!"); //NOK
+      //Q_ASSERT(result); //NOK
+      //assert(result); //NOK
+      //FAIL()<<"This shouldn't happen!"; //NOK
       return false;
     } else {
       if(trainID < 0 ||

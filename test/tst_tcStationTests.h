@@ -1,6 +1,18 @@
 #ifndef _TST_TCSTATIONTESTS_H_
 #define _TST_TCSTATIONTESTS_H_
 
+#include <gtest/gtest.h>
+#include <gmock/gmock-matchers.h>
+#include <QApplication>
+
+#include <QString>
+//#include <QMainWindow>
+//#include <QCoreApplication>
+#include <QObject>
+
+#include "tst_tcNetworkTests.h"
+//#include "inc/trafficdatamodel.h"
+
 #define UNDEFINED -1
 
 using namespace testing;
@@ -177,12 +189,15 @@ TEST_F(stationTest, constructor_noPassengersAfterCreated)
   EXPECT_THAT(nc->stationList.at(0)->getNbrOfWaitingPassengers(), Eq(0));
 }
 
+//CONTINUE HERE!
 TEST_F(stationTest, constructor_noTrainsAfterCreation)
 { /* Verify that the station has no trains after created */
   nc->parseCmd("ADD STATION station");
+  qDebug()<<nc->stationList.at(0)->getTrainList().length();
   EXPECT_THAT(nc->stationList.at(0)->getTrainList().length(), Eq(0));
 }
 
+//ADD BEFORE
 TEST_F(stationTest, constructor_validCoordinatesAtCreation)
 { /* Will station add coordinates and set "hasCoordinates=TRUE"*/
   QString latitude = "55.72729652532263";
@@ -284,7 +299,7 @@ TEST_F(stationTest, assertIfDuplicateTrainAtStation)
   EXPECT_THAT(nc->stationList.at(0)->trainArrival(0), Eq(true));
   EXPECT_THAT(nc->stationList.at(0)->getTrainList().at(0), Eq(0));
   qInstallMessageHandler(myMessageOutput);
-  EXPECT_DEATH(nc->stationList.at(0)->trainArrival(0),"");
+  EXPECT_DEATH(nc->stationList.at(0)->trainArrival(0),"test123");
   qInstallMessageHandler(0);
 }
 

@@ -5,6 +5,7 @@
 #include <gmock/gmock-matchers.h>
 #include <QApplication>
 #include <QList>
+
 #include <QString>
 #include <QMainWindow>
 #include <QCoreApplication>
@@ -20,7 +21,6 @@
 #define UNDEFINED -1
 
 using namespace testing;
-
 
 class networkTest : public ::testing::Test
 {
