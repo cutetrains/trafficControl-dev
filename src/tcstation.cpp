@@ -339,7 +339,7 @@ void Station::showInfo() {
  */
 bool Station::trainArrival(int trainID)
 {
-  bool result = false;
+  //bool result = false; Used later
   if(trainsAtStationList.length() >= numberOfPlatforms)
   {
     qDebug()<<"ERROR  : TOO MANY TRAINS!" <<thisTrainList->at(trainID)->getName()<<
