@@ -242,9 +242,9 @@ void TrafficControl::onToggleStationDockWidget(bool isVisible){
  */
 bool TrafficControl::onOpenKmlFile(){
   QString fileName = QFileDialog::getOpenFileName(this,
-                                                  tr("Open KML, TNO or TNM File"),
+                                                  tr("Open KML, TNF or TNM File"),
                                                   QDir::homePath(),
-                                                  tr("Files (*.kml *.tno *.tnf)"));
+                                                  tr("Files (*.kml *.tnf *.tnm)"));
   QFileInfo fi(fileName);
   QString suffix = fi.suffix();
   if(QString::compare(suffix, "kml", Qt::CaseInsensitive ) == 0  ){

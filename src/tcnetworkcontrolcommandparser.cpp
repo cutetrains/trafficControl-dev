@@ -40,7 +40,7 @@ bool NetworkControl::parseMultipleNetworkCommand(QStringList inputLines)
 
   foreach(QString thisString, inputLines)
   {
-    qDebug()<<thisString;
+    //qDebug()<<thisString;
     result = result && parseCmd(thisString);
   }
   return result;

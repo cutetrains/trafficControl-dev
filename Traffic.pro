@@ -4,11 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += quick
-QT       += core gui
-QT       += qml
-QT       += quickwidgets
-QT       += positioning
+QT       += quick core gui qml \
+   quickwidgets positioning xml
 #QT       += location
 #QT       += network
 
@@ -36,14 +33,12 @@ SOURCES += src/main.cpp \
     src/networkdesigner.cpp \
 
 #QTTEST
-debug {
-    QT += testlib
-    SOURCES -= src/main.cpp
-    #SOURCES +=     test/tst_traffic.cpp
-    SOURCES += \
-    test/tst_trafficcontrol.cpp
-
-}
+#debug {
+#    QT += testlib
+#    SOURCES -= src/main.cpp
+#    SOURCES += \
+#    test/tst_trafficcontrol.cpp
+#}
 
 #UNCOMMENT SECTION BELOW TO TEST AND BUILD "PROFILE"
 #debug {
