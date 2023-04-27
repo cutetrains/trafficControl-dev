@@ -165,16 +165,19 @@ bool NetworkDesigner::convertKmlToTnm(QString kmlFileName)
         {
           case PlaceMarkType::junction:
             {
-              cmdString.append(" AS JUNCTION");
+              cmdString.append("ADD JUNCTION ");
               [[fallthrough]];
             }
           case PlaceMarkType::station:
             {
+              if(cmdString.isEmpty()){
+                  cmdString.append("ADD STATION ");
+              }
               stationListItem.name = thisName.toLatin1();//.replace("\"", "");
               stationListItem.isJunction = false;
               stationListItem.coordinates = coordinateList.at(0);
               stationList<<stationListItem;
-              outFile.append("ADD STATION " + stationListItem.name + cmdString + " COORDINATES "
+              outFile.append(cmdString + stationListItem.name + " COORDINATES "
                 + QString::number(stationListItem.coordinates.latitude(), 'g', 8) +" "
                 + QString::number(stationListItem.coordinates.longitude(), 'g', 8)+'\n');
               break;
@@ -251,9 +254,9 @@ bool NetworkDesigner::convertKmlToTnm(QString kmlFileName)
             outFile.append("CONNECT TRACK " + trackList.at(ttt).name + " FROM " + stationList.at(closestEndIndex).name + " TO " +
                            stationList.at(closestStartIndex).name +'\n');
         } else {
-            outFile.append("ERROR - too long distance from station. Closest start distance for " + trackList.at(ttt).name + " is " +
+            qDebug()<<"ERROR - too long distance from station. Closest start distance for " + trackList.at(ttt).name + " is " +
                            closestStartDistance + " " + stationList.at(closestStartIndex).name + ". Closest end distance for " +
-                           trackList.at(ttt).name + " is " + closestEndDistance + " " + stationList.at(closestEndIndex).name + '\n');
+                           trackList.at(ttt).name + " is " + closestEndDistance + " " + stationList.at(closestEndIndex).name + '\n';
         }
     }
 

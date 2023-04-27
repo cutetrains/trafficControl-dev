@@ -19,6 +19,7 @@
 #include <QString>
 #include <QTextStream>
 #include <QFileDialog>
+#include <QRegularExpression>
 #include "../inc/tcnetworkcontrol.h"
 //#include "ui_trafficcontrol.h"
 #define TRACK 1//Replace with constants that are global!
@@ -36,14 +37,13 @@ using namespace std;
  */
 bool NetworkControl::parseMultipleNetworkCommand(QStringList inputLines)
 {
-  bool result = true;
+    bool result = true;
 
-  foreach(QString thisString, inputLines)
-  {
-    //qDebug()<<thisString;
-    result = result && parseCmd(thisString);
-  }
-  return result;
+    foreach(QString thisString, inputLines)
+    {
+        result = result && parseCmd(thisString);
+    }
+    return result;
 }
 
 /*!
@@ -59,237 +59,210 @@ bool NetworkControl::parseMultipleNetworkCommand(QStringList inputLines)
  */
 bool NetworkControl::parseCmd(QString inputLine)
 {
-  QStringList argumentList=inputLine.split(" ");
-  bool approvedCommand = false;
+    QStringList argumentList=inputLine.split(" ");
+    bool approvedCommand = false;
 
-  //Code for analysing track commands
-  if ((0 == argumentList.indexOf("TRACK")) &&
-      (UNDEFINED == cmdParserCurrentTrack)){
-    qDebug()<<"ERROR  : Train definition file modifies train before creating it!";
-    return false;
-  }
+    QStringList reResults;
+    QRegularExpression re;
+    QRegularExpressionMatch match;
 
-  /* ADD TRACK <track name> <length> [COORDINATES lat long]
-   * Redo code: check that length is a number. After that, check if coordinates are included.
-   * No coordinates: Check that there is 4 arguments, and that the fourth argument is an integer
-   * Note that dXXX-YYYN will have a twin eYYY-XXXS, with falling accumulated distance.
-   * The python script will need to add the second track four meters away.*/
-  if ((0 == argumentList.indexOf("ADD")) &&
-      (1 == argumentList.indexOf("TRACK"))) {
-    bool isLengthInt = false;
-    int iLength = argumentList.at(3).toInt(&isLengthInt, 10) ;// THIS CHECK AT OTHER PLACES TOO!!!!
-    if (true == isLengthInt){
-      if ( 4 == argumentList.count() )
-      {
-        QStringList emptyCoordinates;
-        approvedCommand = addTrackToNetwork(argumentList.at(2), iLength, emptyCoordinates);
-      }
-      else if (4 == argumentList.indexOf("COORDINATES")  &&
-             ( argumentList.count()%2 == 1 ) ){
-        bool ok;
-        float coordinate;
-        for(int iii=5; iii<argumentList.length();iii++)
-        {
-          coordinate = argumentList.at(iii).toFloat(&ok);
-          if(!ok){break;}
-          if(iii%2 == 0)
-          {
-            if(abs(coordinate) > 180)
-            {
-              ok = false;
-              break;
-            }
-          } else {
-            if(abs(coordinate)>90)
-            {
-              ok = false;
-              break;
-            }
-          }
+    //Code for analysing track commands
+    if ((0 == argumentList.indexOf("TRACK")) &&
+            (UNDEFINED == cmdParserCurrentTrack)){
+        qDebug()<<"ERROR  : Train definition file modifies train before creating it!";
+        return false;
+    }
+
+    //Code for analysing train commands
+    if ((0 == argumentList.indexOf("TRAIN")) &&
+            (UNDEFINED == cmdParserCurrentTrain)){
+        qDebug()<<"ERROR  : Train definition file modifies train before creating it!";
+        return false;
+    }
+
+    re.setPattern("^ADD (STATION|JUNCTION) ([a-zA-Z0-9_]*) ?(COORDINATES)? ?(-?[0-9]*.[0-9]* -?[0-9]*.[0-9]*)?");
+    match = re.match(inputLine);
+    if (match.hasMatch()){
+        reResults = match.capturedTexts();
+        if(3 == reResults.length()){//Coordinates do not exist
+            addStationToNetwork(reResults.at(2),
+                                QString::compare(reResults.at(1), "JUNCTION", Qt::CaseInsensitive) == 0 ? true: false,
+                                "", "");
+            approvedCommand = true;
+        } else if (5 == reResults.length()) { // Coordinates
+            QStringList coordinates = reResults.at(4).split(" ");
+            addStationToNetwork(reResults.at(2),
+                                QString::compare(reResults.at(1), "JUNCTION", Qt::CaseInsensitive) == 0 ? true: false,
+                                coordinates.at(0), coordinates.at(1));
+            approvedCommand = true;
         }
-        if(ok){
-          approvedCommand = addTrackToNetwork(argumentList.at(2), iLength, argumentList.mid(5,-1));
-          return true;
-        } else {
-          return false;
-        }
-      }
-      if(approvedCommand) {
-        cmdParserCurrentTrack = trackList.length()-1;
-      }
-  } }
+        else {qDebug()<<"COORDINATE ERROR "<<inputLine;}
+    }
 
-  /* TRACK SELECT <track name> */
-  if ((0 == argumentList.indexOf("TRACK")) &&
-      (1 == argumentList.indexOf("SELECT")) &&
-      (3 == argumentList.count())){
-    foreach(Track* t, trackList){
-      if(t->getName() == argumentList.at(2)){
-        cmdParserCurrentTrack = t->getID();
+    re.setPattern("^ADD TRACK ([a-zA-Z0-9_]*) ([0-9]*) ?(COORDINATES)?( -?[0-9]+.[0-9]+)*$");
+    match = re.match(inputLine);
+    if (match.hasMatch()){
+        reResults = match.capturedTexts();
+        //qDebug()<<reResults;
+        QStringList coordinateList = reResults.at(0).split(" ");
+        double coordinate;
+        bool ok = true;
+
+        if(coordinateList.length()==4){
+            QStringList emptyCoordinates;
+            approvedCommand = addTrackToNetwork(argumentList.at(2), argumentList.at(3).toInt(), emptyCoordinates);
+        }
+        else if( (coordinateList.length() % 2) == 1 && coordinateList.length() >5) {
+            for(int iii=5; iii<coordinateList.length();iii++) {
+                coordinate = coordinateList.at(iii).toFloat(&ok);
+                if(!ok){break;}
+                if(iii%2 == 1) {
+                    if(abs(coordinate)>90) {
+                        qDebug()<<"coordinate too big (90): "<<coordinate;
+                        ok = false;
+                        break;
+                    }
+                } else {
+                    if(abs(coordinate) > 180) {
+                        qDebug()<<"coordinate too big (180): "<<coordinate;
+                        ok = false;
+                        break;
+            }   }   }
+            if(ok){
+                approvedCommand = addTrackToNetwork(coordinateList.at(2), coordinateList.at(3).toInt(), argumentList.mid(5,-1));
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    re.setPattern("^TRACK SELECT ([a-zA-Z0-9_]*)");
+    match = re.match(inputLine);
+    if (match.hasMatch()){
+        reResults = match.capturedTexts();
+        foreach(Track* t, trackList){
+            if(t->getName() == reResults.at(0)){
+                cmdParserCurrentTrack = t->getID();
+                approvedCommand = true;
+            } } }
+
+    re.setPattern("^TRACK SET MAX SPEED ([0-9]*)");
+    match = re.match(inputLine);
+    if (match.hasMatch()){
+        reResults = match.capturedTexts();
+        bool speedIsInt = true;
+        int iSpeed=reResults.at(0).toInt(&speedIsInt,10) ;// THIS CHECK AT OTHER PLACES TOO!!!!
+        if (true == speedIsInt){
+            trackList.at(cmdParserCurrentTrack)->setMaxAllowedSpeed(iSpeed);
+        }
         approvedCommand = true;
-  } } }
-
-  /* TRACK SET MAX_SPEED <speed> */
-  if ((0 == argumentList.indexOf("TRACK")) &&
-      (1 == argumentList.indexOf("SET")) &&
-      (2 == argumentList.indexOf("MAX_SPEED")) &&
-      (4 == argumentList.count())) {
-    bool speedIsInt = true;
-    int iSpeed=argumentList.at(3).toInt(&speedIsInt,10) ;// THIS CHECK AT OTHER PLACES TOO!!!!
-    if (true == speedIsInt){
-      trackList.at(cmdParserCurrentTrack)->setMaxAllowedSpeed(iSpeed);
-     }
-    approvedCommand = true;
-  }
-
-  /* ADD STATION <station name> [AS JUNCTION] [COORDINATES lat long] */
-  if ((0 == argumentList.indexOf("ADD")) &&
-      (1 == argumentList.indexOf("STATION"))){
-    bool isJunction = ((3 == argumentList.indexOf("AS")) &&
-                       (4 == argumentList.indexOf("JUNCTION")));
-    if ((argumentList.indexOf("COORDINATES") == (isJunction==true ? 5 : 3) ) ) {
-      addStationToNetwork(argumentList.at(2),
-                          isJunction,
-                          argumentList.at(true == isJunction ? 6 : 4),
-                          argumentList.at(true == isJunction ? 7 : 5));
-    } else {
-      addStationToNetwork(argumentList.at(2),
-                          isJunction,
-                          "",
-                          "");
     }
-    approvedCommand = true;
-  }
 
-  /* CONNECT TRACK <track name> FROM <station> TO <station> */
-  if ((0 == argumentList.indexOf("CONNECT")) &&
-      (1 == argumentList.indexOf("TRACK")) &&
-      (3 == argumentList.indexOf("FROM")) &&
-      (5 == argumentList.indexOf("TO")) &&
-      (7 == argumentList.count()) ) {
-      //Check that the second argument reflects an existing track, and that the stations exist.
-    int foundTrack = UNDEFINED;
-    foreach(Track* t, trackList) {
-      if (t->getName()==argumentList.at(2)) { foundTrack=t->getID(); }
-    }
-    int foundStartStation = UNDEFINED;
-    int foundEndStation = UNDEFINED;
-    foreach(Station* s, stationList) {
-      if(s->getName()==argumentList.at(4)) { foundStartStation=s->getID(); }
-      if(s->getName()==argumentList.at(6)) { foundEndStation=s->getID(); }
-    }
-    if ((foundStartStation != UNDEFINED) &&
-        (foundEndStation != UNDEFINED) &&
-        (foundStartStation != foundEndStation) &&
-        (foundTrack != UNDEFINED)) {
-      connectTrackToStationsByName(argumentList.at(2),
-                                   argumentList.at(4),
-                                   argumentList.at(6));
-      approvedCommand=true;
-  } }
+    re.setPattern("^CONNECT TRACK ([a-zA-Z0-9_]*) FROM ([a-zA-Z0-9_]*) TO ([a-zA-Z0-9_]*)$");
+    match = re.match(inputLine);
+    if (match.hasMatch()){
+        reResults = match.capturedTexts();
+        int foundTrack = UNDEFINED;
+        foreach(Track* t, trackList) {
+            if (t->getName()==reResults.at(1)) { foundTrack=t->getID(); }
+        }
+        int foundStartStation = UNDEFINED;
+        int foundEndStation = UNDEFINED;
+        foreach(Station* s, stationList) {
+            if(s->getName()==reResults.at(2)) { foundStartStation=s->getID(); }
+            if(s->getName()==reResults.at(3)) { foundEndStation=s->getID(); }
+        }
+        if ((foundStartStation != UNDEFINED) &&
+                (foundEndStation != UNDEFINED) &&
+                (foundStartStation != foundEndStation) &&
+                (foundTrack != UNDEFINED)) {
+            connectTrackToStationsByName(reResults.at(1),
+                                         reResults.at(2),
+                                         reResults.at(3));
+            approvedCommand=true;
+        } }
 
-  //Code for analysing train commands
-  if ((0 == argumentList.indexOf("TRAIN")) &&
-      (UNDEFINED == cmdParserCurrentTrain)){
-    qDebug()<<"ERROR  : Train definition file modifies train before creating it!";
-    exit(1);
-  }
-
-  /* ADD TRAIN <train name> */
-  if ((0 == argumentList.indexOf("ADD")) &&
-      (1 == argumentList.indexOf("TRAIN")) &&
-      (3 == argumentList.count())){
-    //qDebug()<<"INFO   : ADD TRAIN recognised";
-    addTrainToNetwork(QString(argumentList.at(2)));
-    cmdParserCurrentTrain=trainList.length()-1;
-    approvedCommand=true;
-  }
-
-  /* TRAIN SET <track name> <length> */
-  if ((0 == argumentList.indexOf("TRAIN")) &&
-      (1 == argumentList.indexOf("SET")) &&
-      (2 == argumentList.indexOf("NAME")) &&
-      (4 == argumentList.count())){
-    bool foundTrain = false;
-    foreach (Train* t, trainList){
-      if (t->getName() == argumentList.at(3)) {
-        foundTrain = true;
-        qDebug()<<"FATAL ERROR: Name is taken.";
-      }
-    }
-    if (false == foundTrain){
-      //qDebug()<<"INFO   : TRAIN SET NAME recognised with Name="<<argumentList.at(3);
-      trainList[cmdParserCurrentTrain]->setName(argumentList.at(3));
-      approvedCommand=true;
-    } else {
-      qDebug()<<"ERROR  : TRAIN SET NAME, name alredy taken:"<<argumentList.at(3);
-    }
-  }
-
-  /* TRAIN SET STATION <station name> */
-  if ((0 == argumentList.indexOf("TRAIN")) &&
-      (1 == argumentList.indexOf("SET")) &&
-      (2 == argumentList.indexOf("CURRENT")) &&
-      (3 == argumentList.indexOf("STATION")) &&
-      (5 == argumentList.count())){
-    //qDebug()<<"INFO   : TRAIN SET STATION recognised with Station="<<argumentList.at(4)<<". Check that the station exists.";
-    foreach(Station* s, stationList){
-      if (s->getName() == argumentList.at(4)){
-        trainList[cmdParserCurrentTrain]->setCurrentStation(s->getID());
+    re.setPattern("^ADD TRAIN ([a-zA-Z0-9_]*)$");
+    match = re.match(inputLine);
+    if (match.hasMatch()){
+        reResults = match.capturedTexts();
+        addTrainToNetwork(reResults.at(1));
+        cmdParserCurrentTrain=trainList.length()-1;
         approvedCommand=true;
-  } } }
+    }
 
-  /* TRAIN SET MODEL <model type> */
-  if ((0 == argumentList.indexOf("TRAIN")) &&
-          (1 == argumentList.indexOf("SET")) &&
-          (2 == argumentList.indexOf("MODEL")) &&
-          (4 == argumentList.count())){
-      //qDebug()<<"INFO   : TRAIN SET MODEL recognised with Model="<<argumentList.at(3)<<". To be implemented!";
-      approvedCommand=true;
-  }
+    re.setPattern("^TRAIN SET NAME ([a-zA-Z0-9_]*)$");
+    match = re.match(inputLine);
+    if (match.hasMatch()){
+        reResults = match.capturedTexts();
+        bool foundTrain = false;
+        foreach (Train* t, trainList){
+            if (t->getName() == reResults.at(1)) {
+                foundTrain = true;
+                qDebug()<<"FATAL ERROR: Name is taken.";
+            }
+        }
+        if (false == foundTrain){
+            //qDebug()<<"INFO   : TRAIN SET NAME recognised with Name="<<argumentList.at(3);
+            trainList[cmdParserCurrentTrain]->setName(reResults.at(1));
+            approvedCommand=true;
+        } else {
+            qDebug()<<"ERROR  : TRAIN SET NAME, name alredy taken:"<<reResults.at(1);
+        }
+    }
 
-  /* TRAIN SET DESIRED SPEED <desired speed> */
-  if ((0 == argumentList.indexOf("TRAIN")) &&
-          (1 == argumentList.indexOf("SET")) &&
-          (2 == argumentList.indexOf("DESIRED")) &&
-          (3 == argumentList.indexOf("SPEED")) &&
-          (5 == argumentList.count())){
-      //qDebug()<<"INFO   : TRAIN SET DESIRED SPEED recognised with DesiredSpeed="<<argumentList.at(4);
-      bool isSpeedInt=false;
-      int iSpeed=argumentList.at(4).toInt(&isSpeedInt,10) ;// THIS CHECK AT OTHER PLACES TOO!!!!
-      if (true == isSpeedInt){
-          trainList.at(cmdParserCurrentTrain)->setDesiredSpeed(iSpeed);
-          approvedCommand=true;
-      } }
+    re.setPattern("^TRAIN SET CURRENT STATION ([a-zA-Z0-9_]*)$");
+    match = re.match(inputLine);
+    if (match.hasMatch()){
+        reResults = match.capturedTexts();
+        foreach(Station* s, stationList){
+            if (s->getName() == reResults.at(1)){
+                trainList[cmdParserCurrentTrain]->setCurrentStation(s->getID());
+                approvedCommand=true;
+    } } }
 
-  /* TRAIN TRAVELPLAN ADD STATION <track name> <length> */
-  if ((0 == argumentList.indexOf("TRAIN")) &&
-          (1 == argumentList.indexOf("TRAVELPLAN")) &&
-          (2 == argumentList.indexOf("ADD")) &&
-          (3 == argumentList.indexOf("STATION")) &&
-          (5 == argumentList.count())){
-      foreach (Station* s, stationList) {
-          if( s->getName()==argumentList.at(4)){
-              //qDebug()<<"IMPORT : "<<argumentList.at(4) <<" found. Adding to travelplan";
-              trainList.at(cmdParserCurrentTrain)->addStationToTravelPlan(s->getID());
-              approvedCommand=true;
-          }
-      }
-  }
+    re.setPattern("^TRAIN SET MODEL ([a-zA-Z0-9_]*)$");
+    match = re.match(inputLine);
+    if (match.hasMatch()){
+        reResults = match.capturedTexts();
+        qDebug()<<"INFO   : TRAIN SET MODEL recognised with Model="<<reResults.at(1)<<". To be implemented!";
+        approvedCommand=true;
+    }
 
-  /* TRAIN SELECT <train name name> */
-  if ((0 == argumentList.indexOf("TRAIN")) &&
-          (1 == argumentList.indexOf("SELECT")) &&
-          (3 == argumentList.count())){
-      foreach(Train* t, trainList){
-          if(t->getName()==argumentList.at(2)){
-              cmdParserCurrentTrain=t->getID();
-              approvedCommand=true;
-          }
-      }
-  }
-  if (!approvedCommand){
-      qDebug()<<"ERROR  : TC:IPN Command not recognised: "<<inputLine;
-  }
-  return approvedCommand;
+    re.setPattern("^TRAIN SET DESIRED SPEED ([0-9]*)$");
+    match = re.match(inputLine);
+    if (match.hasMatch()){
+        reResults = match.capturedTexts();
+        bool isSpeedInt=false;
+        int iSpeed=reResults.at(1).toInt(&isSpeedInt,10) ;// THIS CHECK AT OTHER PLACES TOO!!!!
+        if (true == isSpeedInt){
+            trainList.at(cmdParserCurrentTrain)->setDesiredSpeed(iSpeed);
+            approvedCommand=true;
+        } }
+
+    re.setPattern("^TRAIN TRAVELPLAN ADD STATION ([a-zA-Z0-9_]*)$");
+    match = re.match(inputLine);
+    if (match.hasMatch()){
+        reResults = match.capturedTexts();
+        foreach (Station* s, stationList) {
+            if( s->getName()==reResults.at(1)){;
+                trainList.at(cmdParserCurrentTrain)->addStationToTravelPlan(s->getID());
+                approvedCommand=true;
+    } } }
+
+    re.setPattern("^TRAIN SELECT ([a-zA-Z0-9_]*)$");
+    match = re.match(inputLine);
+    if (match.hasMatch()){
+        reResults = match.capturedTexts();
+        foreach(Train* t, trainList){
+            if(t->getName()==reResults.at(1)){
+                cmdParserCurrentTrain=t->getID();
+                approvedCommand=true;
+    }  }  }
+
+    if (!approvedCommand){
+        qDebug()<<"ERROR  : TC:IPN Command not recognised: "<<inputLine;
+    }
+    return approvedCommand;
 }

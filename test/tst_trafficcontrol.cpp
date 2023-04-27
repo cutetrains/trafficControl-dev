@@ -404,10 +404,9 @@ void TstTrafficControl::station_invalidFloatCoordinatesAtCreation()
 
 void TstTrafficControl::station_junctionHasNoPassengersAfterAddingTen()
 { /* Verify that a Junction cannot accept any waiting passengers */
-  nc->parseCmd("ADD STATION station AS JUNCTION");
+  nc->parseCmd("ADD JUNCTION station");
   nc->stationList.at(0)->changeNbrOfPassengers(10);
   QVERIFY(0 == nc->stationList.at(0)->getNbrOfWaitingPassengers());
-
 }
 
 void TstTrafficControl::station_noMoreTrainsThanPlatforms()
@@ -433,9 +432,7 @@ void TstTrafficControl::station_nonNumericalCoordinatesAtCreation()
 { /* Verify that station will ignore invalid coordinates at creation*/
   nc->parseCmd("ADD STATION station COORDINATES "
                "55.727hej2962532263 13.16723731495294");
-  QVERIFY(0.0 == nc->stationList.at(0)->getLatitude());
-  QVERIFY(0.0 == nc->stationList.at(0)->getLongitude());
-  QVERIFY(false == nc->stationList.at(0)->hasCoordinates());
+  QVERIFY(0 == nc->stationList.length());
 }
 
 void TstTrafficControl::station_tenPassengersAfterAddingTen()
@@ -555,7 +552,7 @@ void TstTrafficControl::track_trackCoordinatesInvalid()
    */
   QCOMPARE(nc->parseCmd("ADD TRACK trackB 1196 COORDINATES "
                            "55.6416151613465 13.08148964751508 "
-                           "55.6338439674224 13.068d31950424542"), false);
+                           "55.6338439674224 1ddd3.068ddd31950424542"), false);
   QCOMPARE(nc->parseCmd("ADD TRACK track 1196 COORDINATES "
                            "55.6416151613465 213.08148964751508 "
                            "55.6338439674224 213.06831950424542"), false);

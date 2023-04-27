@@ -81,6 +81,7 @@ Station::Station(QString stationName,
   thisTrackList = &trackList;
   thisTrainList = &trainList;
   thisStationList = &stationList;
+  //sendDataChangedSignal(stationID);
 }
 
 /*!
