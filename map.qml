@@ -1,7 +1,7 @@
 import QtQuick 2.3
 import QtQuick.Controls 2.12
 import QtLocation 5.15
-import QtPositioning 5.15
+import QtPositioning
 
 Item {
   id: mainItem
@@ -13,28 +13,132 @@ Item {
     }
   }
 
+  Plugin
+  {
+    id:googleMapView
+    name:"osm"
+    //PluginParameter {
+    //    name: "osm.mapping.custom.host";
+    //    //value: "https://tile.thunderforest.com/cycle/%z/%x/%y.png?apikey=<my key>"
+    //    value: "https://tile.openstreetmapView.org"
+    //}
+  }
+
   Map {
-    id: mainMap
-    objectName: "nameMainMap"
+    id: mapView
+    objectName: "namemapview"
     anchors.fill: parent
-    plugin: Plugin { name: "osm" }
+    plugin:googleMapView
     zoomLevel: (maximumZoomLevel+minimumZoomLevel-3.3)/2
     center: QtPositioning.coordinate(55.9,13.5)
+
+    PinchArea {
+      id: pincharea
+      //! Holds map object to be controlled
+      property var mapView
+
+      //! Holds previous zoom level value
+      property double __oldZoom
+
+      anchors.fill: parent
+
+      //! Calculate zoom level
+      function calcZoomDelta(zoom, percent) {
+          return zoom + Math.log(percent)/Math.log(2)
+      }
+
+      //! Save previous zoom level when pinch gesture started
+      onPinchStarted: {
+          __oldZoom = mapView.zoomLevel
+      }
+
+      //! Update map's zoom level when pinch is updating
+      onPinchUpdated: {
+           mapView.setZoomLevel(calcZoomDelta(__oldZoom, pinch.scale), pinch.center)
+      }
+
+      //! Update map's zoom level when pinch is finished
+      onPinchFinished: {
+          mapView.setZoomLevel(calcZoomDelta(__oldZoom, pinch.scale), pinch.center)
+      }
+
+      //! Map's mouse area for implementation of panning in the map
+      MouseArea {
+        id: mousearea
+        //! Property used to indicate if panning the map
+        property bool __isPanning: false
+
+        //! Last pressed X and Y position
+        property int __lastX: -1
+        property int __lastY: -1
+
+        //! Panned distance to distinguish panning from clicks
+        property int __pannedDistance: 0
+
+        anchors.fill : parent
+
+        function isPanning() {
+            return __isPanning && __pannedDistance > 0;
+        }
+
+          //! When pressed, indicate that panning has been started and update saved X and Y values
+          onPressed: {
+            __isPanning = true
+            __lastX = mouse.x
+            __lastY = mouse.y
+            __pannedDistance = 0
+          }
+
+          //! When released, indicate that panning has finished
+          onReleased: {
+            __isPanning = false
+          }
+
+          //! Move the map when panning
+          onPositionChanged: {
+            if (__isPanning) {
+              var dx = mouse.x - __lastX
+              var dy = mouse.y - __lastY
+              mapView.pan(dx, dy)
+              __lastX = mouse.x
+              __lastY = mouse.y
+              __pannedDistance += Math.abs(dx) + Math.abs(dy);
+            }
+          }
+
+          onCanceled: {
+            __isPanning = false;
+          }
+
+          onDoubleClicked: {
+            if (!isPanning())
+              mapView.center = gps.position.coordinate;
+          }
+
+          onWheel: { //USED
+            if (wheel.angleDelta.y > 0) {
+              mapView.zoomLevel = mapView.zoomLevel + 0.3
+            } else {
+              mapView.zoomLevel = mapView.zoomLevel - 0.3
+            }
+          }
+        }
+    }
   }
 
   function qmlStationOccupancySlot(stationName, nbrOfTrains, nbrOfPlatforms)
   {
-    for (var i = 0; i < mainMap.children.length; ++i)
+    for (var i = 0; i < mapView.children.length; ++i)
     {
-      if(mainMap.children[i].objectName === "station_"+stationName)
+      if(mapView.children[i].objectName === "station_"+stationName)
       {
-        mainMap.children[i].border.width = 4;
+        mapView.children[i].border.width = 4;
         if(0 === nbrOfTrains){
-          mainMap.children[i].border.color = "green";
+          mapView.children[i].border.color = "green";
         } else if (nbrOfTrains === nbrOfPlatforms){
-          mainMap.children[i].border.color = "red";
+          mapView.children[i].border.color = "red";
         } else {
-          mainMap.children[i].border.color = "yellow";
+          mapView.children[i].border.color = "yellow";
         }
       }
     }
@@ -46,54 +150,54 @@ Item {
     var foundStartSignalId = -1;
     var foundEndSignalId = -1;
     var j;
-    for (var i = 0; i < mainMap.children.length; ++i)
+    for (var i = 0; i < mapView.children.length; ++i)
     {
-      if(mainMap.children[i].objectName === "track_"+trackName) {foundTrackId = i;}
-      if(mainMap.children[i].objectName === "track_"+trackName+"_START") {foundStartSignalId = i;}
-      if(mainMap.children[i].objectName === "track_"+trackName+"_END") {foundEndSignalId = i;}
+      if(mapView.children[i].objectName === "track_"+trackName) {foundTrackId = i;}
+      if(mapView.children[i].objectName === "track_"+trackName+"_START") {foundStartSignalId = i;}
+      if(mapView.children[i].objectName === "track_"+trackName+"_END") {foundEndSignalId = i;}
     }
-    mainMap.children[foundTrackId].line.width = nbrOfTrains+1;
+    mapView.children[foundTrackId].line.width = nbrOfTrains+1;
     if ("FREE" === trackStatus){
-      mainMap.children[foundTrackId].line.color = "green";
-      for (j = 0; j < mainMap.children.length; ++j) {
-        if(mainMap.children[j].objectName === "track_"+trackName+"_START") {
-          mainMap.children[j].destroy();
+      mapView.children[foundTrackId].line.color = "green";
+      for (j = 0; j < mapView.children.length; ++j) {
+        if(mapView.children[j].objectName === "track_"+trackName+"_START") {
+          mapView.children[j].destroy();
         }
       }
-      for (j = 0; j < mainMap.children.length; ++j) {
-        if(mainMap.children[j].objectName === "track_"+trackName+"_END") {
-          mainMap.children[j].destroy();
+      for (j = 0; j < mapView.children.length; ++j) {
+        if(mapView.children[j].objectName === "track_"+trackName+"_END") {
+          mapView.children[j].destroy();
         }
       }
     } else {
       //LOCK SIGNALS NEED TO BE ADDED
-      var coordinateStart=mainMap.children[foundTrackId].coordinateAt(0);
-      var coordinateEnd=mainMap.children[foundTrackId].coordinateAt(mainMap.children[foundTrackId].pathLength()-1);
+      var coordinateStart=mapView.children[foundTrackId].coordinateAt(0);
+      var coordinateEnd=mapView.children[foundTrackId].coordinateAt(mapView.children[foundTrackId].pathLength()-1);
 
       var startMarkLon = 0.95*coordinateStart.longitude+0.05*coordinateEnd.longitude;
       var startMarkLat = 0.95*coordinateStart.latitude+0.05*coordinateEnd.latitude;
       var endMarkLon = 0.05*coordinateStart.longitude+0.95*coordinateEnd.longitude;
       var endtMarkLat = 0.05*coordinateStart.latitude+0.95*coordinateEnd.latitude;
       if(-1 == foundStartSignalId){
-        qmlAddTrackSignal(mainMap.children[foundTrackId].objectName, "START", startMarkLat, startMarkLon);
+        qmlAddTrackSignal(mapView.children[foundTrackId].objectName, "START", startMarkLat, startMarkLon);
         foundStartSignalId = i++;
       }
       if(-1 == foundEndSignalId){
-        qmlAddTrackSignal(mainMap.children[foundTrackId].objectName, "END", endtMarkLat, endMarkLon);
+        qmlAddTrackSignal(mapView.children[foundTrackId].objectName, "END", endtMarkLat, endMarkLon);
         foundEndSignalId = i++;
       }
       if ("LOCKED_START" === trackStatus){
-        mainMap.children[foundTrackId].line.color = "yellow";
-        mainMap.children[foundStartSignalId].color="red";
-        mainMap.children[foundEndSignalId].color="green";
+        mapView.children[foundTrackId].line.color = "yellow";
+        mapView.children[foundStartSignalId].color="red";
+        mapView.children[foundEndSignalId].color="green";
       } else if ("LOCKED_END" === trackStatus){
-        mainMap.children[foundTrackId].line.color = "yellow";
-        mainMap.children[foundStartSignalId].color="green";
-        mainMap.children[foundEndSignalId].color="red";
+        mapView.children[foundTrackId].line.color = "yellow";
+        mapView.children[foundStartSignalId].color="green";
+        mapView.children[foundEndSignalId].color="red";
       } else if ("BUSY" === trackStatus || "EMERGENCY" === trackStatus){
-        mainMap.children[foundTrackId].line.color = "red";
-        mainMap.children[foundStartSignalId].color="red";
-        mainMap.children[foundEndSignalId].color="red";
+        mapView.children[foundTrackId].line.color = "red";
+        mapView.children[foundStartSignalId].color="red";
+        mapView.children[foundEndSignalId].color="red";
       }
     }
   }
@@ -104,7 +208,7 @@ Item {
     var circle = Qt.createQmlObject('import QtLocation 5.15; import QtQuick 2.3; MapCircle {id:'
                                      +name+'_'+startOrEnd
                                      +';objectName:"'+name+'_'+startOrEnd + '"}',
-                                     mainMap,
+                                     mapView,
                                      "test2")
     circle.center.latitude = lat
     circle.center.longitude = lon
@@ -112,18 +216,18 @@ Item {
     circle.color = "red"
     circle.opacity = 1;
 
-    mainMap.addMapItem(circle)
+    mapView.addMapItem(circle)
   }
 
 
   function qmlTrainPositionSlot(trainName, latitude, longitude)
   {
-    for (var i = 0; i < mainMap.children.length; ++i)
+    for (var i = 0; i < mapView.children.length; ++i)
     {
-      if(mainMap.children[i].objectName === "train_"+trainName)
+      if(mapView.children[i].objectName === "train_"+trainName)
       {
-        mainMap.children[i].center.latitude = latitude;
-        mainMap.children[i].center.longitude = longitude;
+        mapView.children[i].center.latitude = latitude;
+        mapView.children[i].center.longitude = longitude;
       }
     }
   }
@@ -132,7 +236,7 @@ Item {
     var circle = Qt.createQmlObject('import QtLocation 5.15; import QtQuick 2.3; MapCircle {id:train_'
                                      +trainName
                                      +';objectName:"train_'+trainName+'"}',
-                                     mainMap,
+                                     mapView,
                                      "test2")
     circle.border.width =1
     circle.border.color = "green"
@@ -141,15 +245,16 @@ Item {
     circle.radius = 78.0;
     circle.color = "red";
     circle.opacity = 0.7
-    mainMap.addMapItem(circle)
+    mapView.addMapItem(circle)
   }
 
   function createQMLTrack(trackName, length, coordinates) {
     var polyline = Qt.createQmlObject('import QtLocation 5.15; import QtQuick 2.3; MapPolyline {id:track_'
                                        +trackName
                                        +';objectName:"track_'+trackName+'"}',
-                                       mainMap,
+                                       mapView,
                                        "test2")
+    console.log("ADD QML TRACK")
     var iii;
     polyline.line.color = "green";
     polyline.line.width = 1;
@@ -158,7 +263,7 @@ Item {
     {
       polyline.addCoordinate(QtPositioning.coordinate(coordinates[iii*2],coordinates[iii*2+1]))
     }
-    mainMap.addMapItem(polyline)
+    mapView.addMapItem(polyline)
   }
 
   function createQMLStation(stationName, isJunction, stationLat, stationLong) {
@@ -167,7 +272,7 @@ Item {
                                      +';objectName:"station_'
                                      +stationName
                                      +'"}',
-                                     mainMap,
+                                     mapView,
                                      "test2")
     circle.center.latitude = stationLat
     circle.center.longitude = stationLong
@@ -181,6 +286,6 @@ Item {
       circle.color = 'green'
     }
     circle.opacity = 0.3
-    mainMap.addMapItem(circle)
+    mapView.addMapItem(circle)
   }
 }

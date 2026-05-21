@@ -255,8 +255,9 @@ bool NetworkDesigner::convertKmlToTnm(QString kmlFileName)
                            stationList.at(closestStartIndex).name +'\n');
         } else {
             qDebug()<<"ERROR - too long distance from station. Closest start distance for " + trackList.at(ttt).name + " is " +
-                           closestStartDistance + " " + stationList.at(closestStartIndex).name + ". Closest end distance for " +
-                           trackList.at(ttt).name + " is " + closestEndDistance + " " + stationList.at(closestEndIndex).name + '\n';
+                           QString::number(closestStartDistance) + " " + stationList.at(closestStartIndex).name +
+                           ". Closest end distance for " + trackList.at(ttt).name + " is " + QString::number(closestEndDistance) +
+                            " " + stationList.at(closestEndIndex).name + '\n';
         }
     }
 

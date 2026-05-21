@@ -36,7 +36,7 @@ SOURCES += src/main.cpp \
 #debug {
 #    QT += testlib
 #    SOURCES -= src/main.cpp
-#    SOURCES += \
+#   SOURCES += \
 #    test/tst_trafficcontrol.cpp
 #}
 
