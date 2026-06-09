@@ -129,7 +129,7 @@ bool NetworkControl::parseCmd(QString inputLine)
                         break;
             }   }   }
             if(ok){
-                approvedCommand = addTrackToNetwork(coordinateList.at(2), coordinateList.at(3).toInt(), argumentList.mid(5,-1));
+                //approvedCommand = addTrackToNetwork(coordinateList.at(2), coordinateList.at(3).toInt(), argumentList.mid(5,-1));
                 return true;
             } else {
                 return false;
@@ -141,9 +141,10 @@ bool NetworkControl::parseCmd(QString inputLine)
     match = re.match(inputLine);
     if (match.hasMatch()){
         reResults = match.capturedTexts();
-        foreach(Track* t, trackList){
-            if(t->getName() == reResults.at(0)){
-                cmdParserCurrentTrack = t->getID();
+        for (Track* track : *trackList) {
+        //foreach(Track* t, trackList){
+            if(track->getName() == reResults.at(0)){
+                cmdParserCurrentTrack = track->getID();
                 approvedCommand = true;
             } } }
 
@@ -154,7 +155,7 @@ bool NetworkControl::parseCmd(QString inputLine)
         bool speedIsInt = true;
         int iSpeed=reResults.at(0).toInt(&speedIsInt,10) ;// THIS CHECK AT OTHER PLACES TOO!!!!
         if (true == speedIsInt){
-            trackList.at(cmdParserCurrentTrack)->setMaxAllowedSpeed(iSpeed);
+            trackList->at(cmdParserCurrentTrack)->setMaxAllowedSpeed(iSpeed);
         }
         approvedCommand = true;
     }
@@ -164,14 +165,16 @@ bool NetworkControl::parseCmd(QString inputLine)
     if (match.hasMatch()){
         reResults = match.capturedTexts();
         int foundTrack = UNDEFINED;
-        foreach(Track* t, trackList) {
-            if (t->getName()==reResults.at(1)) { foundTrack=t->getID(); }
+        //foreach(Track* t, trackList) {
+        for (Track* track : *trackList) {
+            if (track->getName()==reResults.at(1)) { foundTrack=track->getID(); }
         }
         int foundStartStation = UNDEFINED;
         int foundEndStation = UNDEFINED;
-        foreach(Station* s, stationList) {
-            if(s->getName()==reResults.at(2)) { foundStartStation=s->getID(); }
-            if(s->getName()==reResults.at(3)) { foundEndStation=s->getID(); }
+        for (Station* station: *stationList) {
+        //foreach(Station* s, stationList) {
+            if(station->getName()==reResults.at(2)) { foundStartStation=station->getID(); }
+            if(station->getName()==reResults.at(3)) { foundEndStation=station->getID(); }
         }
         if ((foundStartStation != UNDEFINED) &&
                 (foundEndStation != UNDEFINED) &&
@@ -188,7 +191,7 @@ bool NetworkControl::parseCmd(QString inputLine)
     if (match.hasMatch()){
         reResults = match.capturedTexts();
         addTrainToNetwork(reResults.at(1));
-        cmdParserCurrentTrain=trainList.length()-1;
+        cmdParserCurrentTrain=trainList->length()-1;
         approvedCommand=true;
     }
 
@@ -197,15 +200,16 @@ bool NetworkControl::parseCmd(QString inputLine)
     if (match.hasMatch()){
         reResults = match.capturedTexts();
         bool foundTrain = false;
-        foreach (Train* t, trainList){
-            if (t->getName() == reResults.at(1)) {
+        //foreach (Train* t, trainList){
+        for (Train* train : *trainList) {
+            if (train->getName() == reResults.at(1)) {
                 foundTrain = true;
                 qDebug()<<"FATAL ERROR: Name is taken.";
             }
         }
         if (false == foundTrain){
             //qDebug()<<"INFO   : TRAIN SET NAME recognised with Name="<<argumentList.at(3);
-            trainList[cmdParserCurrentTrain]->setName(reResults.at(1));
+            trainList->at(cmdParserCurrentTrain)->setName(reResults.at(1));
             approvedCommand=true;
         } else {
             qDebug()<<"ERROR  : TRAIN SET NAME, name alredy taken:"<<reResults.at(1);
@@ -216,9 +220,10 @@ bool NetworkControl::parseCmd(QString inputLine)
     match = re.match(inputLine);
     if (match.hasMatch()){
         reResults = match.capturedTexts();
-        foreach(Station* s, stationList){
-            if (s->getName() == reResults.at(1)){
-                trainList[cmdParserCurrentTrain]->setCurrentStation(s->getID());
+        //foreach(Station* s, stationList){
+        for (Station* station: *stationList) {
+            if (station->getName() == reResults.at(1)){
+                trainList->at(cmdParserCurrentTrain)->setCurrentStation(station->getID());
                 approvedCommand=true;
     } } }
 
@@ -237,7 +242,7 @@ bool NetworkControl::parseCmd(QString inputLine)
         bool isSpeedInt=false;
         int iSpeed=reResults.at(1).toInt(&isSpeedInt,10) ;// THIS CHECK AT OTHER PLACES TOO!!!!
         if (true == isSpeedInt){
-            trainList.at(cmdParserCurrentTrain)->setDesiredSpeed(iSpeed);
+            trainList->at(cmdParserCurrentTrain)->setDesiredSpeed(iSpeed);
             approvedCommand=true;
         } }
 
@@ -245,9 +250,10 @@ bool NetworkControl::parseCmd(QString inputLine)
     match = re.match(inputLine);
     if (match.hasMatch()){
         reResults = match.capturedTexts();
-        foreach (Station* s, stationList) {
-            if( s->getName()==reResults.at(1)){;
-                trainList.at(cmdParserCurrentTrain)->addStationToTravelPlan(s->getID());
+        for (Station* station : *stationList) {
+        //foreach (Station* s, stationList) {
+            if( station->getName()==reResults.at(1)){;
+                trainList->at(cmdParserCurrentTrain)->addStationToTravelPlan(station->getID());
                 approvedCommand=true;
     } } }
 
@@ -255,9 +261,10 @@ bool NetworkControl::parseCmd(QString inputLine)
     match = re.match(inputLine);
     if (match.hasMatch()){
         reResults = match.capturedTexts();
-        foreach(Train* t, trainList){
-            if(t->getName()==reResults.at(1)){
-                cmdParserCurrentTrain=t->getID();
+        for (Train* train : *trainList) {
+        //foreach(Train* t, trainList){
+            if(train->getName()==reResults.at(1)){
+                cmdParserCurrentTrain=train->getID();
                 approvedCommand=true;
     }  }  }
 

@@ -50,13 +50,20 @@ int Station::totalNbrOfStations = 0;
  * @todo numberOfPlatforms is hardcoded to 2,  should be station-dependent.
  * @todo emit signal at initialisation so that QML has updated info
  */
-Station::Station(QString stationName,
+/*Station::Station(QString stationName,
                  bool isJunction,
                  QString latitude,
                  QString longitude,
                  QList<Track*>& trackList,
                  QList<Train*>& trainList,
-                 QList<Station*>& stationList)
+                 QList<Station*>& stationList)*/
+Station::Station(QString stationName,
+                 bool isJunction,
+                 QString latitude,
+                 QString longitude,
+                 QSharedPointer<QList<Track*>> trackList,
+                 QSharedPointer<QList<Train*>> trainList,
+                 QSharedPointer<QList<Station*>> stationList)
 {
   name = stationName;
   waitingPassengers = 0;
@@ -78,9 +85,9 @@ Station::Station(QString stationName,
 
   stationID = totalNbrOfStations;
   totalNbrOfStations++;
-  thisTrackList = &trackList;
-  thisTrainList = &trainList;
-  thisStationList = &stationList;
+  thisTrackList = trackList;
+  thisTrainList = trainList;
+  thisStationList = stationList;
   //sendDataChangedSignal(stationID);
 }
 
@@ -148,6 +155,7 @@ bool Station::changeNbrOfPassengers(int nbrPassengersToAdd) {
 bool Station::checkIfTrackLeavesStation(int trackID)
 {
   bool foundTrack = false;
+
   foreach(int i, leavingTrackList)  {
     if(trackID == i)
     {

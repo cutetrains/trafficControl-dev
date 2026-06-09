@@ -43,9 +43,12 @@ public:
   ~NetworkControl();
 
   QThread clockThread;
-  QList<Station*> stationList;
+  QSharedPointer<QList<Track*>> trackList;
+  QSharedPointer<QList<Train*>> trainList;
+  QSharedPointer<QList<Station*>> stationList;
+  /*QList<Station*> stationList;
   QList<Track*> trackList;
-  QList<Train*> trainList;
+  QList<Train*> trainList;*/
   TrafficClock trafficClock;
 
 signals:

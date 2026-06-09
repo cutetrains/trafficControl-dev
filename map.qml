@@ -32,6 +32,7 @@ Item {
     zoomLevel: (maximumZoomLevel+minimumZoomLevel-3.3)/2
     center: QtPositioning.coordinate(55.9,13.5)
 
+
     PinchArea {
       id: pincharea
       //! Holds map object to be controlled

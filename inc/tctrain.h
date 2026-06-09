@@ -56,16 +56,22 @@ private:
   QList<float> trainCoordinates;
   int trainID;
   QList<int> travelPlanByStationID;
-  QList<Track*> *thisTrackList;
-  QList<Train*> *thisTrainList;
-  QList<Station*> *thisStationList;
+
+  QSharedPointer<QList<Track*>> thisTrackList;
+  QSharedPointer<QList<Train*>> thisTrainList;
+  QSharedPointer<QList<Station*>> thisStationList;
   int waitingTimer;
 
 public:
-  Train(QString trainName,
+
+  /*Train(QString trainName,
         QList<Track*>& trackList,
         QList<Train*>& trainList,
-        QList<Station*>& stationList);
+        QList<Station*>& stationList);*/
+  Train(QString trainName,
+        QSharedPointer<QList<Track*>> trackList,
+        QSharedPointer<QList<Train*>> trainList,
+        QSharedPointer<QList<Station*>> stationList);
   ~Train();
   bool addStationToTravelPlan(int stationID);//Travel plans and routes will be handled by tcNetworkControl, or a new class, for example tcTrafficPlanner
   int closingState(int n);

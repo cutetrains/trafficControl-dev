@@ -32,18 +32,6 @@ NetworkDesigner::NetworkDesigner(QObject *parent) : QObject(parent)
  */
 bool NetworkDesigner::convertKmlToTnm(QString kmlFileName)
 {
-  /*
-  //TODO: Make os-agnostic
-  QString  program( "python.exe " );
-  QProcess p;
-  QStringList args = QStringList();
-  //TODO: Relies on GIT, move to resources instead?
-  args << "C:/Users/gusta/GIT/trafficControl-dev/scripts/KMLParser/TrackStationConnector.py";
-  args << kmlFileName;
-  p.start(program,args);
-  p.waitForFinished(-1);
-  QString trafficNetworkMapFile = p.readAll();
-  */
     int trackLength;
 
     QRegularExpressionMatch match;
@@ -314,10 +302,10 @@ QString NetworkDesigner::TraverseXmlNode(const QDomNode& node)
   QDomNode domNode = node.firstChild();
   QDomElement domElement;
   QDomText domText;
-  static int level = 0;
+  //static int level = 0;
   QString thisResult;
 
-  level++;
+  //level++;
 
   while(!(domNode.isNull()))
   {
@@ -330,7 +318,7 @@ QString NetworkDesigner::TraverseXmlNode(const QDomNode& node)
 
         QDomNamedNodeMap nma = domElement.attributes();
         int l = nma.length();
-        for(  int i=0; i < l; i++ )
+        for(int i=0; i < l; i++)
         {
           QDomAttr tempa = nma.item(i).toAttr();
           //debug() << __FUNCTION__ << "isElement(attribute)"  << level << QString(level, ' ').toLocal8Bit().constData() << "attribute" << i << tempa.name().toLocal8Bit().constData() << tempa.value().toLocal8Bit().constData();
@@ -352,6 +340,6 @@ QString NetworkDesigner::TraverseXmlNode(const QDomNode& node)
     domNode = domNode.nextSibling();
   }
 
-  level--;
+  //level--;
   return thisResult;
 }

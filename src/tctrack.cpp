@@ -45,12 +45,18 @@ int Track::totalNbrOfTracks=0;
  * @param trainList is a pointer to the trackList
  * @param stationList is a pointer to the stationList
  */
-Track::Track(QString trackName,
+/*Track::Track(QString trackName,
              int trackLength,
              QStringList coordinates,
              QList<Track*>& trackList,
              QList<Train*>& trainList,
-             QList<Station*>& stationList)
+             QList<Station*>& stationList)*/
+Track::Track(QString trackName,
+                 int trackLength,
+                 QStringList coordinates,
+             QSharedPointer<QList<Track*>> trackList,
+             QSharedPointer<QList<Train*>> trainList,
+             QSharedPointer<QList<Station*>> stationList)
 {
   length = trackLength;
   name = trackName;
@@ -62,9 +68,9 @@ Track::Track(QString trackName,
   reversedTraffic = false;
   trackID = totalNbrOfTracks;/*!<The trackID will correspond to the order of created Track objects. */
   totalNbrOfTracks++;
-  thisTrackList = &trackList;
-  thisTrainList = &trainList;
-  thisStationList = &stationList;
+  thisTrackList = trackList;
+  thisTrainList = trainList;
+  thisStationList = stationList;
   if ( !coordinates.isEmpty() )
   {
     float R = float(6372.8);

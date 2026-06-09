@@ -94,7 +94,7 @@ void NetworkControl::addStationToNetwork(QString stationName,
           SIGNAL(dataChangedSignal(int, const QVariant &)),
           stationListModel,
           SLOT(onDataChanged(int , const QVariant &)));
-  stationList.append(newStation);
+  stationList->append(newStation);
 
   stationListModel->insertRows(stationListModel->rowCount(), 1 , QModelIndex());
 
@@ -134,7 +134,7 @@ bool NetworkControl::addTrackToNetwork(QString trackName,
                               trackList,
                               trainList,
                               stationList);
-  trackList.append(newTrack);
+  trackList->append(newTrack);
   trackListModel->insertRows(trackListModel->rowCount(), 1 , QModelIndex()); //Better to use actual size of trackListModel
 
   connect(newTrack,
@@ -174,7 +174,7 @@ void NetworkControl::addTrainToNetwork(QString trainName)
           SIGNAL(dataChangedSignal(int, const QVariant &)),
           trainListModel,
           SLOT(onDataChanged(int , const QVariant &)));
-  trainList.append(newTrain);
+  trainList->append(newTrain);
   trainListModel->insertRows(trainListModel->rowCount(), 1 , QModelIndex());
 
   QVariant returnedValue;
@@ -204,19 +204,19 @@ bool NetworkControl::connectTrackToStations(int trackID,
                                             int startStationID,
                                             int endStationID)
 {
-  if(trackID != UNDEFINED && trackID < trackList.length() &&
-     startStationID != UNDEFINED && startStationID < stationList.length() &&
-     endStationID != UNDEFINED && endStationID < stationList.length() &&
+  if(trackID != UNDEFINED && trackID < trackList->length() &&
+     startStationID != UNDEFINED && startStationID < stationList->length() &&
+     endStationID != UNDEFINED && endStationID < stationList->length() &&
      startStationID != endStationID){
-    if(trackList.at(trackID)->getStartStation() == UNDEFINED)
+    if(trackList->at(trackID)->getStartStation() == UNDEFINED)
     {
-      trackList.at(trackID)->setStartStation(startStationID);
+      trackList->at(trackID)->setStartStation(startStationID);
     }
-    if(trackList.at(trackID)->getEndStation() == UNDEFINED)
+    if(trackList->at(trackID)->getEndStation() == UNDEFINED)
     {
-      trackList.at(trackID)->setEndStation(endStationID);
+      trackList->at(trackID)->setEndStation(endStationID);
     }
-    stationList[startStationID]->addTrack(trackID);
+    stationList->at(startStationID)->addTrack(trackID);
     return true;
   } else {
     qDebug()<<"ERROR  : TC:cTTS: Either track or station name is not found.";
@@ -246,15 +246,14 @@ bool NetworkControl::connectTrackToStationsByName(QString trackName,
   int foundEndStationID = UNDEFINED;
   int foundTrackID = UNDEFINED;
 
-  foreach(Station* thisStation, stationList)
-  {
-    if (QString::compare(startStationName, thisStation->getName()) == 0)
+  for (Station* station: *stationList) {
+    if (QString::compare(startStationName, station->getName()) == 0)
     {
-      foundStartStationID=thisStation->getID();
+      foundStartStationID =station->getID();
     }
-    if (QString::compare(endStationName, thisStation->getName()) == 0)
+    if (QString::compare(endStationName, station->getName()) == 0)
     {
-      foundEndStationID=thisStation->getID();
+      foundEndStationID = station->getID();
     }
     if ((foundStartStationID != UNDEFINED) &&
         (foundEndStationID != UNDEFINED))
@@ -263,10 +262,10 @@ bool NetworkControl::connectTrackToStationsByName(QString trackName,
     }
   }
 
-  foreach(Track* thisTrack, trackList){
-    if(QString::compare(trackName, thisTrack->getName()) == 0)
+  for (Track* track : *trackList) {
+    if(QString::compare(trackName, track->getName()) == 0)
     {
-      foundTrackID=thisTrack->getID();
+      foundTrackID=track->getID();
       break;
     }
   }
@@ -321,27 +320,28 @@ void NetworkControl::stepTimeForNetwork(int n)
   trafficClock.incrementSimulatedTime(n);
   /* ASSERTS TO VERIFY THAT TRAFFIC ELEMENTS HAS NEVER BEEN DELETED */
   bool result = false;
-  result = trainList.length() == 0 ? true :
-                     trainList.length() == trainList.last()->getID() + 1;
+  result = trainList->length() == 0 ? true :
+                     trainList->length() == trainList->last()->getID() + 1;
   Q_ASSERT_X(result,
              Q_FUNC_INFO,
              "Train ID/list mismatch. Train objects mustn't be deleted!");
 
-  result = trackList.length() == 0 ? true :
-                     trackList.length() == trackList.last()->getID() + 1;
+  result = trackList->length() == 0 ? true :
+                     trackList->length() == trackList->last()->getID() + 1;
   Q_ASSERT_X(result,
              Q_FUNC_INFO,
              "Track ID/list mismatch. Track objects mustn't be deleted!");
-  result = stationList.length() == 0 ? true :
-                       stationList.length() == stationList.last()->getID() + 1;
+  result = stationList->length() == 0 ? true :
+                       stationList->length() == stationList->last()->getID() + 1;
   Q_ASSERT_X(result,
              Q_FUNC_INFO,
              "Station ID/list mismatch. Station objects mustn't be deleted!");
 
   for(int iii=0;iii<n;iii++)
   {
-    foreach(Train* thisTrain, trainList){
-      thisTrain->move(1);
+    for (Train* train : *trainList) {
+    //foreach(Train* thisTrain, trainList){
+      train->move(1);
     }
   }
 
@@ -368,22 +368,25 @@ NetworkControl::~NetworkControl()
   trafficClock.disconnectThread();
   clockThread.terminate();
   while(!clockThread.isFinished()){}
-  foreach(Station* thisStation, stationList){
-    qInfo()<<"Deleting Station: "<<thisStation->getName();
-    thisStation->destructorResetTotalNumberOfStations();
-    delete thisStation;
-    thisStation=NULL;
+  for (Station* station : *stationList) {
+  //foreach(Station* thisStation, stationList){
+    qInfo()<<"Deleting Station: "<<station->getName();
+    station->destructorResetTotalNumberOfStations();
+    delete station;
+    station=NULL;
   }
-  foreach(Track* thisTrack, trackList){
-    qInfo()<<"Deleting Track: "<<thisTrack->getName();
-    thisTrack->destructorResetTotalNumberOfTracks();
-    delete thisTrack;
-    thisTrack=NULL;
+  for (Track* track : *trackList) {
+  //foreach(Track* thisTrack, trackList){
+    qInfo()<<"Deleting Track: "<<track->getName();
+    track->destructorResetTotalNumberOfTracks();
+    delete track;
+    track=NULL;
   }
-  foreach(Train* thisTrain, trainList){
-    qInfo()<<"Deleting Train: "<<thisTrain->getName();
-    thisTrain->destructorResetTotalNumberOfTrains();
-    delete thisTrain;
-    thisTrain=NULL;
+  for (Train* train : *trainList) {
+  //foreach(Train* thisTrain, trainList){
+    qInfo()<<"Deleting Train: "<<train->getName();
+    train->destructorResetTotalNumberOfTrains();
+    delete train;
+    train=NULL;
   }
  }

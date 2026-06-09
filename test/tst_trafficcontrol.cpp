@@ -202,9 +202,9 @@ void TstTrafficControl::network_addOneTrainToStation()
   nc->parseCmd("ADD STATION stationA");
   nc->parseCmd("ADD TRAIN trainA");
   QCOMPARE(nc->parseCmd("TRAIN SET CURRENT STATION stationA"), true);
-  QCOMPARE(nc->stationList.at(0)->getTrainList().length(), 1);
-  int firstTrainAtStationA = nc->stationList.at(0)->getTrainList().at(0);
-  QCOMPARE(nc->trainList.at(firstTrainAtStationA)->getName(), "trainA");
+  QCOMPARE(nc->stationList->at(0)->getTrainList().length(), 1);
+  int firstTrainAtStationA = nc->stationList->at(0)->getTrainList().at(0);
+  QCOMPARE(nc->trainList->at(firstTrainAtStationA)->getName(), "trainA");
 }
 
 void TstTrafficControl::network_connectThreeTracksToTwoStations()
@@ -222,17 +222,17 @@ void TstTrafficControl::network_connectThreeTracksToTwoStations()
   nc->parseCmd("CONNECT TRACK track0 FROM station1 TO station0");
   nc->parseCmd("CONNECT TRACK track1 FROM station0 TO station1");
   nc->parseCmd("CONNECT TRACK track2 FROM station1 TO station0");
-  QCOMPARE(nc->stationList.at(0)->getLeavingTrackList().length(), 1);
-  QCOMPARE(nc->stationList.at(0)->getLeavingTrackList().at(0), 1);
-  QCOMPARE(nc->stationList.at(1)->getLeavingTrackList().length(), 2);
-  QCOMPARE(nc->stationList.at(1)->getLeavingTrackList().at(0), 0);
-  QCOMPARE(nc->stationList.at(1)->getLeavingTrackList().at(1), 2);
-  QCOMPARE(nc->trackList.at(0)->getStartStation(), 1);
-  QCOMPARE(nc->trackList.at(0)->getEndStation(), 0);
-  QCOMPARE(nc->trackList.at(1)->getStartStation(), 0);
-  QCOMPARE(nc->trackList.at(1)->getEndStation(), 1);
-  QCOMPARE(nc->trackList.at(2)->getStartStation(), 1);
-  QCOMPARE(nc->trackList.at(2)->getEndStation(), 0);
+  QCOMPARE(nc->stationList->at(0)->getLeavingTrackList().length(), 1);
+  QCOMPARE(nc->stationList->at(0)->getLeavingTrackList().at(0), 1);
+  QCOMPARE(nc->stationList->at(1)->getLeavingTrackList().length(), 2);
+  QCOMPARE(nc->stationList->at(1)->getLeavingTrackList().at(0), 0);
+  QCOMPARE(nc->stationList->at(1)->getLeavingTrackList().at(1), 2);
+  QCOMPARE(nc->trackList->at(0)->getStartStation(), 1);
+  QCOMPARE(nc->trackList->at(0)->getEndStation(), 0);
+  QCOMPARE(nc->trackList->at(1)->getStartStation(), 0);
+  QCOMPARE(nc->trackList->at(1)->getEndStation(), 1);
+  QCOMPARE(nc->trackList->at(2)->getStartStation(), 1);
+  QCOMPARE(nc->trackList->at(2)->getEndStation(), 0);
 }
 
 
@@ -247,28 +247,28 @@ void TstTrafficControl::network_findReversedTrack()
   QCOMPARE(nc->parseCmd("ADD STATION Gaersnaes COORDINATES 55.54654125122775 14.18141868329311") ,true);
   QCOMPARE(nc->parseCmd("CONNECT TRACK Sim_Gar_W FROM Simrishamn TO Gaersnaes"), true);
   QCOMPARE(nc->parseCmd("CONNECT TRACK Sim_Gar_W FROM Gaersnaes TO Simrishamn"), true);
-  QCOMPARE(nc->stationList.at(0)->findLeavingTrackIndexToStation(1), 0);
-  QCOMPARE(nc->stationList.at(1)->findLeavingTrackIndexToStation(0), 0);
+  QCOMPARE(nc->stationList->at(0)->findLeavingTrackIndexToStation(1), 0);
+  QCOMPARE(nc->stationList->at(1)->findLeavingTrackIndexToStation(0), 0);
 }
 
 void TstTrafficControl::station_addingRemovingPassengers()
 { /* Verify that the station can add and remove passengers properly*/
   nc->parseCmd("ADD STATION station");
-  QVERIFY(true == nc->stationList.at(0)->changeNbrOfPassengers(10));
-  QCOMPARE(10, nc->stationList.at(0)->getNbrOfWaitingPassengers());
-  QVERIFY(true == nc->stationList.at(0)->changeNbrOfPassengers(-10));
-  QCOMPARE(0, nc->stationList.at(0)->getNbrOfWaitingPassengers());
+  QVERIFY(true == nc->stationList->at(0)->changeNbrOfPassengers(10));
+  QCOMPARE(10, nc->stationList->at(0)->getNbrOfWaitingPassengers());
+  QVERIFY(true == nc->stationList->at(0)->changeNbrOfPassengers(-10));
+  QCOMPARE(0, nc->stationList->at(0)->getNbrOfWaitingPassengers());
 }
 
 void TstTrafficControl::station_addInvalidTrackToStation()
 { /* Verify that it is possible to add tracks to station - negative case*/
   nc->parseCmd("ADD STATION stationA");
   nc->parseCmd("ADD TRACK trackA 1234");
-  QVERIFY(false == nc->stationList.at(0)->addTrack(UNDEFINED));
-  QVERIFY(false == nc->stationList.at(0)->addTrack(-3));
-  QVERIFY(false == nc->stationList.at(0)->addTrack(3));
-  QVERIFY(true == nc->stationList.at(0)->addTrack(0));
-  QVERIFY(false == nc->stationList.at(0)->addTrack(0));
+  QVERIFY(false == nc->stationList->at(0)->addTrack(UNDEFINED));
+  QVERIFY(false == nc->stationList->at(0)->addTrack(-3));
+  QVERIFY(false == nc->stationList->at(0)->addTrack(3));
+  QVERIFY(true == nc->stationList->at(0)->addTrack(0));
+  QVERIFY(false == nc->stationList->at(0)->addTrack(0));
 }
 
 void TstTrafficControl::station_addTrackToStation()
@@ -276,21 +276,21 @@ void TstTrafficControl::station_addTrackToStation()
   nc->parseCmd("ADD STATION stationA");
   nc->parseCmd("ADD TRACK trackA 1234");
   nc->parseCmd("ADD TRACK trackB 2345");
-  QVERIFY(true == nc->stationList.at(0)->addTrack(0));
-  QVERIFY(true == nc->stationList.at(0)->addTrack(1));
-  QVERIFY(0 == nc->stationList.at(0)->getLeavingTrackList().at(0));
-  QVERIFY(1 == nc->stationList.at(0)->getLeavingTrackList().at(1));
-  QVERIFY(2 == nc->stationList.at(0)->getLeavingTrackList().length());
+  QVERIFY(true == nc->stationList->at(0)->addTrack(0));
+  QVERIFY(true == nc->stationList->at(0)->addTrack(1));
+  QVERIFY(0 == nc->stationList->at(0)->getLeavingTrackList().at(0));
+  QVERIFY(1 == nc->stationList->at(0)->getLeavingTrackList().at(1));
+  QVERIFY(2 == nc->stationList->at(0)->getLeavingTrackList().length());
 }
 
 /*void TstTrafficControl::station_assertIfDuplicateTrainAtStation()
 {
   nc->parseCmd("ADD STATION station");
   nc->parseCmd("ADD TRAIN train0");
-  QVERIFY(true == nc->stationList.at(0)->trainArrival(0));
-  QVERIFY(0 == nc->stationList.at(0)->getTrainList().at(0));
+  QVERIFY(true == nc->stationList->at(0)->trainArrival(0));
+  QVERIFY(0 == nc->stationList->at(0)->getTrainList().at(0));
   //qInstallMessageHandler(myMessageOutput);
-  EXPECT_DEATH(nc->stationList.at(0)->trainArrival(0),"test123");
+  EXPECT_DEATH(nc->stationList->at(0)->trainArrival(0),"test123");
   //qInstallMessageHandler(0);
 }*/
 
@@ -303,9 +303,9 @@ void TstTrafficControl::station_connectBidirectionalTrackToStations()
   nc->parseCmd("ADD TRACK trackA 1234");
   QVERIFY(true == nc->parseCmd("CONNECT TRACK trackA FROM stationA TO stationB"));
   QVERIFY(true == nc->parseCmd("CONNECT TRACK trackA FROM stationB TO stationA"));
-  QVERIFY(0 == nc->trackList.at(0)->getStartStation());
-  QVERIFY(1 == nc->trackList.at(0)->getEndStation());
-  QVERIFY(0 == nc->stationList.at(0)->getLeavingTrackList().at(0));
+  QVERIFY(0 == nc->trackList->at(0)->getStartStation());
+  QVERIFY(1 == nc->trackList->at(0)->getEndStation());
+  QVERIFY(0 == nc->stationList->at(0)->getLeavingTrackList().at(0));
 }
 
 void TstTrafficControl::station_connectNonExistingTrackToStations()
@@ -313,7 +313,7 @@ void TstTrafficControl::station_connectNonExistingTrackToStations()
   nc->parseCmd("ADD STATION stationA");
   nc->parseCmd("ADD STATION stationB");
   QVERIFY(false == nc->connectTrackToStations(0, 0, 1));
-  QVERIFY(0 == nc->stationList.at(0)->getLeavingTrackList().length());
+  QVERIFY(0 == nc->stationList->at(0)->getLeavingTrackList().length());
   QVERIFY(false == nc->connectTrackToStationsByName("nonExistingTrack", "stationA", "stationB"));
 }
 
@@ -323,27 +323,27 @@ void TstTrafficControl::station_connectTrackToStations()
   nc->parseCmd("ADD STATION stationB");
   nc->parseCmd("ADD TRACK trackA 1234");
   QVERIFY(true == nc->connectTrackToStationsByName("trackA", "stationA", "stationB"));
-  QVERIFY(0 == nc->trackList.at(0)->getStartStation());
-  QVERIFY(1 == nc->trackList.at(0)->getEndStation());
-  QVERIFY(0 == nc->stationList.at(0)->getLeavingTrackList().at(0));
+  QVERIFY(0 == nc->trackList->at(0)->getStartStation());
+  QVERIFY(1 == nc->trackList->at(0)->getEndStation());
+  QVERIFY(0 == nc->stationList->at(0)->getLeavingTrackList().at(0));
   nc->parseCmd("ADD TRACK trackB 2345");
   QVERIFY(true == nc->connectTrackToStations(1, 1, 0));
-  QVERIFY(1 == nc->trackList.at(1)->getStartStation());
-  QVERIFY(0 == nc->trackList.at(1)->getEndStation());
-  QVERIFY(0 == nc->stationList.at(0)->getLeavingTrackList().at(0));
-  QVERIFY(1 == nc->stationList.at(1)->getLeavingTrackList().at(0));
+  QVERIFY(1 == nc->trackList->at(1)->getStartStation());
+  QVERIFY(0 == nc->trackList->at(1)->getEndStation());
+  QVERIFY(0 == nc->stationList->at(0)->getLeavingTrackList().at(0));
+  QVERIFY(1 == nc->stationList->at(1)->getLeavingTrackList().at(0));
 }
 
 void TstTrafficControl::station_emptyAfterCreated()
 {
-  QVERIFY( 0 == nc->stationList.length());
+  QVERIFY( 0 == nc->stationList->length());
   nc->parseCmd("ADD STATION station");
-  QVERIFY( 1 == nc->stationList.length());
-  QVERIFY(0 == nc->stationList.at(0)->getTrainList().length());
-  QVERIFY(0 == nc->stationList.at(0)->getLeavingTrackList().length());
-  QVERIFY(0 == nc->stationList.at(0)->getNbrOfWaitingPassengers());
-  QVERIFY(false == nc->stationList.at(0)->setNbrOfPlatforms(0));
-  QVERIFY(false == nc->stationList.at(0)->setNbrOfPlatforms(-1));
+  QVERIFY( 1 == nc->stationList->length());
+  QVERIFY(0 == nc->stationList->at(0)->getTrainList().length());
+  QVERIFY(0 == nc->stationList->at(0)->getLeavingTrackList().length());
+  QVERIFY(0 == nc->stationList->at(0)->getNbrOfWaitingPassengers());
+  QVERIFY(false == nc->stationList->at(0)->setNbrOfPlatforms(0));
+  QVERIFY(false == nc->stationList->at(0)->setNbrOfPlatforms(-1));
 }
 
 void TstTrafficControl::station_findTrackToNextStation()
@@ -360,8 +360,8 @@ void TstTrafficControl::station_findTrackToNextStation()
   nc->parseCmd("ADD TRACK trackD 1234");
   QVERIFY(true == nc->parseCmd("CONNECT TRACK trackD FROM stationA TO stationC"));
   QVERIFY(true == nc->parseCmd("CONNECT TRACK trackC FROM stationA TO stationB"));
-  QVERIFY(2 == nc->stationList.at(0)->findLeavingTrackIndexToStation(1));
-  QVERIFY(3 == nc->stationList.at(0)->findLeavingTrackIndexToStation(2));
+  QVERIFY(2 == nc->stationList->at(0)->findLeavingTrackIndexToStation(1));
+  QVERIFY(3 == nc->stationList->at(0)->findLeavingTrackIndexToStation(2));
 }
 
 void TstTrafficControl::station_findTrackToNextStationNegative()
@@ -378,13 +378,13 @@ void TstTrafficControl::station_findTrackToNextStationNegative()
   nc->parseCmd("ADD TRACK trackB 1234");
   QVERIFY(true == nc->parseCmd("CONNECT TRACK trackA FROM stationA TO stationB"));
   QVERIFY(true == nc->parseCmd("CONNECT TRACK trackB FROM stationB TO stationC"));
-  QVERIFY(0 == nc->stationList.at(0)->findLeavingTrackIndexToStation(1));
-  QVERIFY(UNDEFINED == nc->stationList.at(0)->findLeavingTrackIndexToStation(2));
-  QVERIFY(1 == nc->stationList.at(1)->findLeavingTrackIndexToStation(2));
-  QVERIFY(UNDEFINED == nc->stationList.at(1)->findLeavingTrackIndexToStation(0));
-  QVERIFY(UNDEFINED == nc->stationList.at(1)->findLeavingTrackIndexToStation(UNDEFINED));
-  QVERIFY(UNDEFINED == nc->stationList.at(1)->findLeavingTrackIndexToStation(-2));
-  QVERIFY(UNDEFINED == nc->stationList.at(1)->findLeavingTrackIndexToStation(4));
+  QVERIFY(0 == nc->stationList->at(0)->findLeavingTrackIndexToStation(1));
+  QVERIFY(UNDEFINED == nc->stationList->at(0)->findLeavingTrackIndexToStation(2));
+  QVERIFY(1 == nc->stationList->at(1)->findLeavingTrackIndexToStation(2));
+  QVERIFY(UNDEFINED == nc->stationList->at(1)->findLeavingTrackIndexToStation(0));
+  QVERIFY(UNDEFINED == nc->stationList->at(1)->findLeavingTrackIndexToStation(UNDEFINED));
+  QVERIFY(UNDEFINED == nc->stationList->at(1)->findLeavingTrackIndexToStation(-2));
+  QVERIFY(UNDEFINED == nc->stationList->at(1)->findLeavingTrackIndexToStation(4));
 }
 
 void TstTrafficControl::station_invalidFloatCoordinatesAtCreation()
@@ -392,21 +392,21 @@ void TstTrafficControl::station_invalidFloatCoordinatesAtCreation()
      example 95 N, 100W*/
   nc->parseCmd("ADD STATION station COORDINATES "
                "105.7272962532263 13.16723731495294");
-  QVERIFY(0.0 == nc->stationList.at(0)->getLatitude());
-  QVERIFY(0.0 == nc->stationList.at(0)->getLongitude());
-  QVERIFY(false == nc->stationList.at(0)->hasCoordinates());
+  QVERIFY(0.0 == nc->stationList->at(0)->getLatitude());
+  QVERIFY(0.0 == nc->stationList->at(0)->getLongitude());
+  QVERIFY(false == nc->stationList->at(0)->hasCoordinates());
   nc->parseCmd("ADD STATION station COORDINATES "
                "55.7272962532263 213.16723731495294");
-  QVERIFY(0.0 == nc->stationList.at(1)->getLatitude());
-  QVERIFY(0.0 == nc->stationList.at(1)->getLongitude());
-  QVERIFY(false == nc->stationList.at(1)->hasCoordinates());
+  QVERIFY(0.0 == nc->stationList->at(1)->getLatitude());
+  QVERIFY(0.0 == nc->stationList->at(1)->getLongitude());
+  QVERIFY(false == nc->stationList->at(1)->hasCoordinates());
 }
 
 void TstTrafficControl::station_junctionHasNoPassengersAfterAddingTen()
 { /* Verify that a Junction cannot accept any waiting passengers */
   nc->parseCmd("ADD JUNCTION station");
-  nc->stationList.at(0)->changeNbrOfPassengers(10);
-  QVERIFY(0 == nc->stationList.at(0)->getNbrOfWaitingPassengers());
+  nc->stationList->at(0)->changeNbrOfPassengers(10);
+  QVERIFY(0 == nc->stationList->at(0)->getNbrOfWaitingPassengers());
 }
 
 void TstTrafficControl::station_noMoreTrainsThanPlatforms()
@@ -416,30 +416,30 @@ void TstTrafficControl::station_noMoreTrainsThanPlatforms()
   nc->parseCmd("ADD TRAIN train1");
   nc->parseCmd("ADD TRAIN train2");
   nc->parseCmd("ADD TRAIN train3");
-  QVERIFY(2 == nc->stationList.at(0)->getNbrOfPlatforms());
-  nc->stationList.at(0)->setNbrOfPlatforms(3);
-  QVERIFY(3 == nc->stationList.at(0)->getNbrOfPlatforms());
-  QVERIFY(true == nc->stationList.at(0)->trainArrival(3));
-  QVERIFY(1 == nc->stationList.at(0)->getTrainList().length());
-  QVERIFY(3 == nc->stationList.at(0)->getTrainList().at(0));
-  QVERIFY(true == nc->stationList.at(0)->trainArrival(1));
-  QVERIFY(true == nc->stationList.at(0)->trainArrival(2));
-  QVERIFY(3 == nc->stationList.at(0)->getTrainList().length());
-  QVERIFY(false == nc->stationList.at(0)->trainArrival(0));
+  QVERIFY(2 == nc->stationList->at(0)->getNbrOfPlatforms());
+  nc->stationList->at(0)->setNbrOfPlatforms(3);
+  QVERIFY(3 == nc->stationList->at(0)->getNbrOfPlatforms());
+  QVERIFY(true == nc->stationList->at(0)->trainArrival(3));
+  QVERIFY(1 == nc->stationList->at(0)->getTrainList().length());
+  QVERIFY(3 == nc->stationList->at(0)->getTrainList().at(0));
+  QVERIFY(true == nc->stationList->at(0)->trainArrival(1));
+  QVERIFY(true == nc->stationList->at(0)->trainArrival(2));
+  QVERIFY(3 == nc->stationList->at(0)->getTrainList().length());
+  QVERIFY(false == nc->stationList->at(0)->trainArrival(0));
 }
 
 void TstTrafficControl::station_nonNumericalCoordinatesAtCreation()
 { /* Verify that station will ignore invalid coordinates at creation*/
   nc->parseCmd("ADD STATION station COORDINATES "
                "55.727hej2962532263 13.16723731495294");
-  QVERIFY(0 == nc->stationList.length());
+  QVERIFY(0 == nc->stationList->length());
 }
 
 void TstTrafficControl::station_tenPassengersAfterAddingTen()
 {
   nc->parseCmd("ADD STATION station");
-  nc->stationList.at(0)->changeNbrOfPassengers(10);
-  QVERIFY(10 == nc->stationList.at(0)->getNbrOfWaitingPassengers());
+  nc->stationList->at(0)->changeNbrOfPassengers(10);
+  QVERIFY(10 == nc->stationList->at(0)->getNbrOfWaitingPassengers());
 }
 
 void TstTrafficControl::station_trainArrivalDeparture()
@@ -448,13 +448,13 @@ void TstTrafficControl::station_trainArrivalDeparture()
   nc->parseCmd("ADD TRAIN train0");
   nc->parseCmd("ADD TRAIN train1");
   nc->parseCmd("ADD TRAIN train2");
-  QCOMPARE(true, nc->stationList.at(0)->trainArrival(1));
-  QCOMPARE(1, nc->stationList.at(0)->getTrainList().at(0));
-  QCOMPARE(true, nc->stationList.at(0)->trainArrival(0));
-  QCOMPARE(0, nc->stationList.at(0)->getTrainList().at(1));
-  QCOMPARE(false, nc->stationList.at(0)->trainArrival(2));
-  QCOMPARE(true, nc->stationList.at(0)->trainDeparture(1));
-  QCOMPARE(0, nc->stationList.at(0)->getTrainList().at(0));
+  QCOMPARE(true, nc->stationList->at(0)->trainArrival(1));
+  QCOMPARE(1, nc->stationList->at(0)->getTrainList().at(0));
+  QCOMPARE(true, nc->stationList->at(0)->trainArrival(0));
+  QCOMPARE(0, nc->stationList->at(0)->getTrainList().at(1));
+  QCOMPARE(false, nc->stationList->at(0)->trainArrival(2));
+  QCOMPARE(true, nc->stationList->at(0)->trainDeparture(1));
+  QCOMPARE(0, nc->stationList->at(0)->getTrainList().at(0));
 }
 
 void TstTrafficControl::station_trainListAfterAddingRemoving()
@@ -462,31 +462,31 @@ void TstTrafficControl::station_trainListAfterAddingRemoving()
   nc->parseCmd("ADD STATION station");
   nc->addTrainToNetwork("train1");
   nc->addTrainToNetwork("train2");
-  nc->stationList.at(0)->trainArrival(0);
-  nc->stationList.at(0)->trainArrival(1);
-  QCOMPARE(2, nc->stationList.at(0)->getTrainList().length());
-  nc->stationList.at(0)->trainDeparture(0);
-  QCOMPARE(1, nc->stationList.at(0)->getTrainList().length());
-  QCOMPARE(1, nc->stationList.at(0)->getTrainList().at(0));
+  nc->stationList->at(0)->trainArrival(0);
+  nc->stationList->at(0)->trainArrival(1);
+  QCOMPARE(2, nc->stationList->at(0)->getTrainList().length());
+  nc->stationList->at(0)->trainDeparture(0);
+  QCOMPARE(1, nc->stationList->at(0)->getTrainList().length());
+  QCOMPARE(1, nc->stationList->at(0)->getTrainList().at(0));
   nc->parseCmd("ADD TRAIN trainB");
   nc->parseCmd("TRAIN SET CURRENT STATION station");
-  QCOMPARE(2, nc->stationList.at(0)->getTrainList().at(1));
-  QCOMPARE(2, nc->stationList.at(0)->getTrainList().length());
+  QCOMPARE(2, nc->stationList->at(0)->getTrainList().at(1));
+  QCOMPARE(2, nc->stationList->at(0)->getTrainList().length());
 }
 
 void TstTrafficControl::station_trainListNonExistingTrain()
 { /* Add a train to trainList and remove a non-existing train */
   nc->parseCmd("ADD STATION stationA");
-  QCOMPARE(false, nc->stationList.at(0)->trainDeparture(3));
+  QCOMPARE(false, nc->stationList->at(0)->trainDeparture(3));
   nc->parseCmd("ADD TRAIN trainA");
   nc->parseCmd("ADD TRAIN trainB");
-  QCOMPARE(true, nc->stationList.at(0)->trainArrival(1));
-  QCOMPARE(false, nc->stationList.at(0)->trainDeparture(-1));
-  QCOMPARE(false, nc->stationList.at(0)->trainDeparture(0));
-  QCOMPARE(1, nc->stationList.at(0)->getTrainList().at(0));
-  QCOMPARE(false, nc->stationList.at(0)->trainArrival(2));
-  QCOMPARE(false, nc->stationList.at(0)->trainArrival(-1));
-  QCOMPARE(1, nc->stationList.at(0)->getTrainList().length());
+  QCOMPARE(true, nc->stationList->at(0)->trainArrival(1));
+  QCOMPARE(false, nc->stationList->at(0)->trainDeparture(-1));
+  QCOMPARE(false, nc->stationList->at(0)->trainDeparture(0));
+  QCOMPARE(1, nc->stationList->at(0)->getTrainList().at(0));
+  QCOMPARE(false, nc->stationList->at(0)->trainArrival(2));
+  QCOMPARE(false, nc->stationList->at(0)->trainArrival(-1));
+  QCOMPARE(1, nc->stationList->at(0)->getTrainList().length());
 }
 
 
@@ -497,10 +497,10 @@ void TstTrafficControl::station_validateCheckIfTrackLeavesStation()
   nc->parseCmd("ADD TRACK trackA 1234");
   nc->parseCmd("ADD TRACK trackB 2345");
   nc->parseCmd("CONNECT TRACK trackA FROM stationA TO stationB");
-  QVERIFY(true == nc->stationList.at(0)->checkIfTrackLeavesStation(0));
-  QVERIFY(false == nc->stationList.at(0)->checkIfTrackLeavesStation(1));
-  QVERIFY(false == nc->stationList.at(0)->checkIfTrackLeavesStation(3));
-  QVERIFY(false == nc->stationList.at(0)->checkIfTrackLeavesStation(-1));
+  QVERIFY(true == nc->stationList->at(0)->checkIfTrackLeavesStation(0));
+  QVERIFY(false == nc->stationList->at(0)->checkIfTrackLeavesStation(1));
+  QVERIFY(false == nc->stationList->at(0)->checkIfTrackLeavesStation(3));
+  QVERIFY(false == nc->stationList->at(0)->checkIfTrackLeavesStation(-1));
 }
 
 void TstTrafficControl::station_validCoordinatesAtCreation()
@@ -508,9 +508,9 @@ void TstTrafficControl::station_validCoordinatesAtCreation()
   QString latitude = "55.72729652532263";
   QString longitude = "13.16723731495294";
   nc->addStationToNetwork("station", false, latitude, longitude);
-  QVERIFY(true == nc->stationList.at(0)->hasCoordinates());
-  QVERIFY(latitude.toFloat() == nc->stationList.at(0)->getLatitude());
-  QVERIFY(longitude.toFloat() == nc->stationList.at(0)->getLongitude());
+  QVERIFY(true == nc->stationList->at(0)->hasCoordinates());
+  QVERIFY(latitude.toFloat() == nc->stationList->at(0)->getLatitude());
+  QVERIFY(longitude.toFloat() == nc->stationList->at(0)->getLongitude());
 }
 
 void TstTrafficControl::station_validNegativeCoordinatesAtCreation()
@@ -519,9 +519,9 @@ void TstTrafficControl::station_validNegativeCoordinatesAtCreation()
   QString latitude = "-55.72729652532263";
   QString longitude = "-13.16723731495294";
   nc->addStationToNetwork("station", false, latitude, longitude);
-  QVERIFY(true == nc->stationList.at(0)->hasCoordinates());
-  QVERIFY(latitude.toFloat() == nc->stationList.at(0)->getLatitude());
-  QVERIFY(longitude.toFloat() == nc->stationList.at(0)->getLongitude());
+  QVERIFY(true == nc->stationList->at(0)->hasCoordinates());
+  QVERIFY(latitude.toFloat() == nc->stationList->at(0)->getLatitude());
+  QVERIFY(longitude.toFloat() == nc->stationList->at(0)->getLongitude());
 }
 
 void TstTrafficControl::track_trackLength()
@@ -535,15 +535,15 @@ void TstTrafficControl::track_trackLength()
 void TstTrafficControl::track_trackCoordinates()
 { /* Verify that the track adds coordinates if existing */
   QCOMPARE(nc->parseCmd("ADD TRACK trackA 1234"), true);
-  QCOMPARE(nc->trackList.at(0)->hasCoordinates(),false);
+  QCOMPARE(nc->trackList->at(0)->hasCoordinates(),false);
   QCOMPARE(nc->parseCmd("ADD TRACK trackB 1196 COORDINATES "
                            "55.6416151613465 13.08148964751508 "
                            "55.6338439674224 13.06831950424542"), true);
-  QCOMPARE(nc->trackList.at(1)->hasCoordinates(),true);
+  QCOMPARE(nc->trackList->at(1)->hasCoordinates(),true);
   QCOMPARE(nc->parseCmd("ADD TRACK trackC 1196 COORDINATES "
                            "-55.6416151613465 -13.08148964751508 "
                            "-55.6338439674224 -13.06831950424542"), true);
-  QCOMPARE(nc->trackList.at(2)->hasCoordinates(),true);
+  QCOMPARE(nc->trackList->at(2)->hasCoordinates(),true);
 }
 
 void TstTrafficControl::track_trackCoordinatesInvalid()
@@ -560,14 +560,14 @@ void TstTrafficControl::track_trackCoordinatesInvalid()
                            "95.6416151613465 13.08148964751508 "
                            "95.6338439674224 13.06831950424542"), false);
   QCOMPARE(nc->parseCmd("ADD TRACK trackB 1196 COORDINATES "), false);
-  QCOMPARE(nc->trackList.length(), 0);
+  QCOMPARE(nc->trackList->length(), 0);
 }
 
 void TstTrafficControl::track_startEndStation()
 { /* Verifies that start and end station are empty after creation */
   nc->parseCmd("ADD TRACK trackB 1196");
-  QCOMPARE(nc->trackList.at(0)->getEndStation(), UNDEFINED);
-  QCOMPARE(nc->trackList.at(0)->getStartStation(), UNDEFINED);
+  QCOMPARE(nc->trackList->at(0)->getEndStation(), UNDEFINED);
+  QCOMPARE(nc->trackList->at(0)->getStartStation(), UNDEFINED);
 }
 
 //TEST_F(trackTest, trainListAddRmUpstream)
@@ -591,30 +591,30 @@ void TstTrafficControl::track_startEndStation()
 //  do{
 //    nc->stepTimeForNetwork(1);
 //  }
-//  while (nc->trainList.at(0)->getTrackPosition()<3000);
-//  QCOMPARE(nc->trackList.at(0)->isLockedDownStream(), false));
-//  QCOMPARE(nc->trackList.at(0)->isLockedUpStream(), true));
+//  while (nc->trainList->at(0)->getTrackPosition()<3000);
+//  QCOMPARE(nc->trackList->at(0)->isLockedDownStream(), false));
+//  QCOMPARE(nc->trackList->at(0)->isLockedUpStream(), true));
 //  QCOMPARE(nc->parseCmd("ADD TRAIN trainB"), true));
 //  QCOMPARE(nc->parseCmd("TRAIN SET CURRENT STATION stationA"), true));
 //  QCOMPARE(nc->parseCmd("TRAIN TRAVELPLAN ADD STATION stationB"), true));
 //  nc->stepTimeForNetwork(8);
-//  QCOMPARE(nc->trackList.at(0)->getTrainList().at(0),0));
-//  QCOMPARE(nc->trackList.at(0)->getTrainList().at(1),1));
-//  QCOMPARE(nc->trackList.at(0)->getTrainList().length(),2));
+//  QCOMPARE(nc->trackList->at(0)->getTrainList().at(0),0));
+//  QCOMPARE(nc->trackList->at(0)->getTrainList().at(1),1));
+//  QCOMPARE(nc->trackList->at(0)->getTrainList().length(),2));
 //  do{
 //    nc->stepTimeForNetwork(1);
 //  }
-//  while (nc->trainList.at(0)->getTrackPosition()<12344);
-//  QCOMPARE(nc->trackList.at(0)->getTrainList().length(),2));
+//  while (nc->trainList->at(0)->getTrackPosition()<12344);
+//  QCOMPARE(nc->trackList->at(0)->getTrainList().length(),2));
 //  nc->stepTimeForNetwork(10);
-//  QCOMPARE(nc->trackList.at(0)->getTrainList().length(),1));
-//  QCOMPARE(nc->trackList.at(0)->getTrainList().at(0),1));
+//  QCOMPARE(nc->trackList->at(0)->getTrainList().length(),1));
+//  QCOMPARE(nc->trackList->at(0)->getTrainList().at(0),1));
 //  do{
 //    nc->stepTimeForNetwork(1);
 //  }
-//  while (nc->trainList.at(1)->getTrackPosition()<12344);
+//  while (nc->trainList->at(1)->getTrackPosition()<12344);
 //  nc->stepTimeForNetwork(10);
-//  QCOMPARE(nc->trackList.at(0)->getTrainList().length(),0));
+//  QCOMPARE(nc->trackList->at(0)->getTrainList().length(),0));
 //}
 
 void TstTrafficControl::track_trainListAddDownstream()
@@ -636,24 +636,24 @@ void TstTrafficControl::track_trainListAddDownstream()
   do{
     nc->stepTimeForNetwork(1);
   }
-  while (nc->trainList.at(0)->getState()!=2);
-  QCOMPARE(nc->trackList.at(0)->getTrainList().at(0),0);
-  QCOMPARE(nc->trackList.at(0)->getTrainList().length(),1);
+  while (nc->trainList->at(0)->getState()!=2);
+  QCOMPARE(nc->trackList->at(0)->getTrainList().at(0),0);
+  QCOMPARE(nc->trackList->at(0)->getTrainList().length(),1);
   QCOMPARE(nc->parseCmd("ADD TRAIN trainB"), true);
   QCOMPARE(nc->parseCmd("TRAIN SET CURRENT STATION stationA"), true);
   QCOMPARE(nc->parseCmd("TRAIN TRAVELPLAN ADD STATION stationB"), true);
   //CHECK THAT THERE IS ONLY ONE TRAIN ON TRACK
   nc->stepTimeForNetwork(8);
-  QCOMPARE(nc->trackList.at(0)->getTrainList().at(0),0);
-  QCOMPARE(nc->trackList.at(0)->getTrainList().length(),1);
-  QCOMPARE(nc->trackList.at(0)->isReversedTraffic(), true);
-  QCOMPARE(nc->trainList.at(1)->getState(), 1);//READY
+  QCOMPARE(nc->trackList->at(0)->getTrainList().at(0),0);
+  QCOMPARE(nc->trackList->at(0)->getTrainList().length(),1);
+  QCOMPARE(nc->trackList->at(0)->isReversedTraffic(), true);
+  QCOMPARE(nc->trainList->at(1)->getState(), 1);//READY
   do{
     nc->stepTimeForNetwork(1);
   }
-  while (nc->trainList.at(0)->getState() == 2);//RUNNING
+  while (nc->trainList->at(0)->getState() == 2);//RUNNING
   nc->stepTimeForNetwork(3);
-  QCOMPARE(nc->trainList.at(1)->getState(), 2);//RUNNING
+  QCOMPARE(nc->trainList->at(1)->getState(), 2);//RUNNING
 }
 
 void TstTrafficControl::traffic_regularTrackTest()
@@ -673,13 +673,13 @@ void TstTrafficControl::traffic_regularTrackTest()
   do{
     nc->stepTimeForNetwork(1);
   }
-  while (nc->trainList.at(0)->getState()!=2); //RUNNING
-  QCOMPARE(nc->trainList.at(0)->getCurrentTrack(), 0);
-  QCOMPARE(nc->trainList.at(0)->getTrackPosition(), 0);
-  QCOMPARE(nc->trainList.at(0)->getCurrentStation(), -1);
-  QCOMPARE(nc->trackList.at(0)->isReversedTraffic(), false);
+  while (nc->trainList->at(0)->getState()!=2); //RUNNING
+  QCOMPARE(nc->trainList->at(0)->getCurrentTrack(), 0);
+  QCOMPARE(nc->trainList->at(0)->getTrackPosition(), 0);
+  QCOMPARE(nc->trainList->at(0)->getCurrentStation(), -1);
+  QCOMPARE(nc->trackList->at(0)->isReversedTraffic(), false);
   nc->stepTimeForNetwork(1);
-  QCOMPARE(nc->trainList.at(0)->getTrackPosition(), 1);
+  QCOMPARE(nc->trainList->at(0)->getTrackPosition(), 1);
 }
 
 void TstTrafficControl::traffic_reversedTrackTest()
@@ -699,18 +699,18 @@ void TstTrafficControl::traffic_reversedTrackTest()
   do{
     nc->stepTimeForNetwork(1);
   }
-  while (nc->trainList.at(0)->getState()!=2); //RUNNING
-  QCOMPARE(nc->trainList.at(0)->getCurrentTrack(), 0);
-  QCOMPARE(nc->trainList.at(0)->getTrackPosition(),
-              nc->trackList.at(0)->getLength());
+  while (nc->trainList->at(0)->getState()!=2); //RUNNING
+  QCOMPARE(nc->trainList->at(0)->getCurrentTrack(), 0);
+  QCOMPARE(nc->trainList->at(0)->getTrackPosition(),
+              nc->trackList->at(0)->getLength());
 
-  QCOMPARE(nc->trainList.at(0)->getCurrentStation(), -1);
+  QCOMPARE(nc->trainList->at(0)->getCurrentStation(), -1);
 
-  QCOMPARE(nc->trackList.at(0)->isReversedTraffic(), true);
+  QCOMPARE(nc->trackList->at(0)->isReversedTraffic(), true);
   nc->stepTimeForNetwork(1);
 
-  QCOMPARE(nc->trainList.at(0)->getTrackPosition(),
-              nc->trackList.at(0)->getLength() - 1);
+  QCOMPARE(nc->trainList->at(0)->getTrackPosition(),
+              nc->trackList->at(0)->getLength() - 1);
 }
 
 //void TstTrafficControl::traffic_fastTrainBehindSlowTrainOnTrack)
@@ -719,31 +719,31 @@ void TstTrafficControl::traffic_reversedTrackTest()
 void TstTrafficControl::train_nbrOfPassengersAddRemove()
 { /* Verify that the train has no current station after creation */
   nc->parseCmd("ADD TRAIN testTrain");
-  QCOMPARE(nc->trainList.at(0)->getNbrOfPassengers(), 0);
-  int deniedPassengers = nc->trainList.at(0)->load(3);
-  QCOMPARE(nc->trainList.at(0)->getNbrOfPassengers(), 3);
+  QCOMPARE(nc->trainList->at(0)->getNbrOfPassengers(), 0);
+  int deniedPassengers = nc->trainList->at(0)->load(3);
+  QCOMPARE(nc->trainList->at(0)->getNbrOfPassengers(), 3);
   QCOMPARE(deniedPassengers, 0);
-  deniedPassengers = nc->trainList.at(0)->load(-4);
-  QCOMPARE(nc->trainList.at(0)->getNbrOfPassengers(), 0);
+  deniedPassengers = nc->trainList->at(0)->load(-4);
+  QCOMPARE(nc->trainList->at(0)->getNbrOfPassengers(), 0);
   QCOMPARE(deniedPassengers, -1);
 }
 
 void TstTrafficControl::train_nbrOfPassengersVsCapacity()
 { /* Verify that the train has no current station after creation */
   nc->parseCmd("ADD TRAIN testTrain");
-  int capacity = nc->trainList.at(0)->getPassengerCapacity();
-  int denied = nc->trainList.at(0)->load(4);
-  denied = nc->trainList.at(0)->load(capacity);
+  int capacity = nc->trainList->at(0)->getPassengerCapacity();
+  int denied = nc->trainList->at(0)->load(4);
+  denied = nc->trainList->at(0)->load(capacity);
   QCOMPARE(denied, 4);
-  QCOMPARE(nc->trainList.at(0)->getNbrOfPassengers(), capacity);
+  QCOMPARE(nc->trainList->at(0)->getNbrOfPassengers(), capacity);
 }
 
 void TstTrafficControl::train_statusAfterCreation()
 { /* Verify that the train has no current station after creation */
   nc->parseCmd("ADD TRAIN testTrain");
-  QCOMPARE(nc->trainList.at(0)->getCurrentStation(), UNDEFINED);
-  QCOMPARE(nc->trainList.at(0)->getCurrentTrack(), UNDEFINED);
-  QCOMPARE(nc->trainList.at(0)->getTravelPlan().length(), 0);
+  QCOMPARE(nc->trainList->at(0)->getCurrentStation(), UNDEFINED);
+  QCOMPARE(nc->trainList->at(0)->getCurrentTrack(), UNDEFINED);
+  QCOMPARE(nc->trainList->at(0)->getTravelPlan().length(), 0);
 }
 
 QTEST_MAIN(TstTrafficControl)

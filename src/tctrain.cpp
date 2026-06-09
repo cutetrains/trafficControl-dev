@@ -37,11 +37,15 @@ int Train::totalNbrOfTrains=0;
  *
  * @todo Implement copy and assign constructor.
  */
-Train::Train(QString trainName,
+/*Train::Train(QString trainName,
              QList<Track*>& trackList,
              QList<Train*>& trainList,
-             QList<Station*>& stationList)
-{
+             QList<Station*>& stationList)*/
+Train::Train(QString trainName,
+      QSharedPointer<QList<Track*>> trackList,
+      QSharedPointer<QList<Train*>> trainList,
+      QSharedPointer<QList<Station*>> stationList)
+    {
   name = trainName;
   passengerCapacity = 100;
   positionOnTrack = 0;
@@ -65,9 +69,9 @@ Train::Train(QString trainName,
   totalNbrOfTrains++;
   nextIndexTravelPlanByStationID = 0;
   maxSpeed = 40;//Replace by constant DEFAULT_MAX_SPEED
-  thisTrackList = &trackList;
-  thisTrainList = &trainList;
-  thisStationList = &stationList;
+  thisTrackList = trackList;
+  thisTrainList = trainList;
+  thisStationList = stationList;
   passing = false;
 }
 
@@ -84,11 +88,12 @@ Train::Train(QString trainName,
 bool Train::addStationToTravelPlan(int stationID)
 {
   qInfo()<<"To add station in T::asttp "<<stationID;
-  if (stationID < 0){
+  if (stationID < 0)
+  {
     qDebug()<<"ERROR  : Train::addTrackToTrainRoute Error: negative number specified."
             << stationID<<" : "<< thisStationList->at(stationID)->getName();
     return false;
-    }
+  }
   else
   {
     travelPlanByStationID << stationID;

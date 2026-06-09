@@ -48,17 +48,26 @@ private:
   static int totalNbrOfTracks;
   int trackID;
   QList<int> trainsOnTrackQueue;
-  QList<Track*> *thisTrackList;
+  QSharedPointer<QList<Track*>> thisTrackList;
+  QSharedPointer<QList<Train*>> thisTrainList;
+  QSharedPointer<QList<Station*>> thisStationList;
+  /*QList<Track*> *thisTrackList;
   QList<Train*> *thisTrainList;
-  QList<Station*> *thisStationList;
+  QList<Station*> *thisStationList;*/
 
 public:
-  Track(QString trackName,
+  /*Track(QString trackName,
         int trackLength,
         QStringList coordinates,
         QList<Track*>& trackList,
         QList<Train*>& trainList,
-        QList<Station*>& stationList);
+        QList<Station*>& stationList);*/
+  Track(QString trackName,
+          int trackLength,
+          QStringList coordinates,
+          QSharedPointer<QList<Track*>> thisTrackList,
+          QSharedPointer<QList<Train*>> thisTrainList,
+          QSharedPointer<QList<Station*>> thisStationList);
   Track(const Track& sTrack);
   Track& operator=(const Track& sTrack);
   ~Track();

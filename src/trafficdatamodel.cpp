@@ -26,7 +26,7 @@
  *
  * Contact: gustaf_brannberg@hotmail.com
  */
-#include <iostream>
+//#include <iostream>
 #include <QDebug>
 #include <QListIterator>
 #include <QObject>

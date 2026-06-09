@@ -39,22 +39,35 @@ private:
   int stationID;
   bool stationIsJunction;
   QList<float> thisCoordinate;
-  QList<Track*> *thisTrackList;
+  QSharedPointer<QList<Track*>> thisTrackList;
+  QSharedPointer<QList<Train*>> thisTrainList;
+  QSharedPointer<QList<Station*>> thisStationList;
+  /*QList<Track*> *thisTrackList;
   QList<Train*> *thisTrainList;
-  QList<Station*> *thisStationList;
+  QList<Station*> *thisStationList;*/
   static int totalNbrOfStations;
   QList<int> trainsAtStationList;
   int waitingPassengers;
 
 public:
-  Station(QString stationName,
+  /*Station(QString stationName,
           bool isJunction,
           QString latitude,
           QString longitude,
           QList<Track*>& trackList,
           QList<Train*>& trainList,
-          QList<Station*>& stationList);
-  ~Station();
+          QList<Station*>& stationList);*/
+    Station(QString stationName,
+            bool isJunction,
+            QString latitude,
+            QString longitude,
+            QSharedPointer<QList<Track*>> trackList,
+            QSharedPointer<QList<Train*>> trainList,
+            QSharedPointer<QList<Station*>> stationList);
+            /*QList<Track*>& trackList,
+            QList<Train*>& trainList,
+            QList<Station*>& stationList);*/
+    ~Station();
 
   bool addTrack(int trackID); //To be handled in trafficcontrol
   bool changeNbrOfPassengers(int n);
