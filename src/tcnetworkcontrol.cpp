@@ -54,6 +54,10 @@ NetworkControl::NetworkControl(TrafficDataModel &trackListModel,
   this->stationListModel = &stationListModel;
   this->handleQMLObject = &handleQMLObject;
 
+  trackList = QSharedPointer<QList<Track*>>(new QList<Track*>());
+  trainList = QSharedPointer<QList<Train*>>(new QList<Train*>());
+  stationList = QSharedPointer<QList<Station*>>(new QList<Station*>());
+
   trafficClock.threadSetup(clockThread);
   trafficClock.moveToThread(&clockThread);
   clockThread.start();
